@@ -8,9 +8,9 @@ var gravity: float
 var strength: float
 
 func _init(
-	attribute_walk_speed: float = 140.0,
+	attribute_walk_speed: float = 160.0,
 	attribute_run_speed: float = 220.0,
-	attribute_jump_impulse: float = 320.0,
+	attribute_jump_impulse: float = 500.0,
 	attribute_gravity: float = 980.0,
 	attribute_strength: float = 1.0
 ) -> void:

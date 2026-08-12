@@ -56,7 +56,9 @@ static func build_while_example() -> ProgramDefinition:
 	program.add_block(ProgramBlockScript.new("walk_clear_path", BlockKindScript.Value.WALK))
 	program.add_block(ProgramBlockScript.new("if_gap", BlockKindScript.Value.IF, gap_condition))
 	program.add_block(ProgramBlockScript.new("jump_gap", BlockKindScript.Value.JUMP))
+	program.add_block(ProgramBlockScript.new("walk_after_check", BlockKindScript.Value.WALK))
 	program.add_connection(ProgramConnectionScript.new("while_path_clear", "body", "walk_clear_path"))
 	program.add_connection(ProgramConnectionScript.new("while_path_clear", "next", "if_gap"))
 	program.add_connection(ProgramConnectionScript.new("if_gap", "true", "jump_gap"))
+	program.add_connection(ProgramConnectionScript.new("if_gap", "false", "walk_after_check"))
 	return program

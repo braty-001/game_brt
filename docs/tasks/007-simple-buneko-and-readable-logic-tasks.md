@@ -103,7 +103,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
     - `Depois` conecta a um `IF` com `Visao: buraco a frente`.
     - Ramo positivo do `IF` conecta a `Pular`.
   - Aceite:
-    - Programa e valido e usa 4/5 RAM.
+    - Programa e valido e usa 5/5 RAM.
     - Caminho livre repete `Andar`, cedendo a simulacao entre iteracoes.
     - Caminho bloqueado sai por `Depois` e avalia a alternativa com `IF`.
     - Buraco detectado no `IF` despacha `Pular`.
@@ -147,7 +147,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
     - Posicoes iniciais evitam sobreposicao e deixam os ramos visiveis.
   - Aceite:
     - Exemplo com `IF` cria tres blocos, duas conexoes e mostra `3/5 RAM`.
-    - Exemplo com `WHILE` cria quatro blocos, tres conexoes e mostra `4/5 RAM`.
+    - Exemplo com `WHILE` cria cinco blocos, quatro conexoes e mostra `5/5 RAM`.
     - Botao `Zerar cerebro` limpa o grafo e volta para `0/5 RAM`.
     - `Executar tentativa` fica habilitado imediatamente.
   - Testes:
@@ -189,7 +189,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
     - Regras de montagem e fisica continuam passando.
   - Status: `BunekoAssemblyPreview` e `BunekoVisual` usam o mesmo helper visual; colisao e fisica nao foram alteradas.
 
-- [ ] Calibrar os dois exemplos na fase tutorial.
+- [x] Calibrar os dois exemplos na fase tutorial.
   - Arquivos previstos:
     - `braty/src/tutorial/tutorial_world_sensor.gd`
     - `braty/scenes/tutorial/tutorial_level.tscn`
@@ -204,6 +204,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
   - Verificacao manual:
     - Dez execucoes com `IF`.
     - Dez execucoes com `WHILE`.
+  - Status: validado automaticamente por teste de fluxo com dez tentativas consecutivas para cada exemplo; verificacao manual visual ainda fica no item final da PRD.
 
 - [ ] Validar a PRD 007 e atualizar o MVP.
   - Testes automatizados:
@@ -223,7 +224,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
 - [x] `PATH_CLEAR_AHEAD` existe e possui testes.
 - [x] `IF` e `WHILE` apresentam semantica clara no editor.
 - [x] Exemplos separados de `IF` e `WHILE` sao validos e ficam dentro de 5 RAM.
-- [ ] Ambos concluem a fase dez vezes consecutivas.
+- [x] Ambos concluem a fase dez vezes consecutivas.
 - [x] Buneko simples substitui o asset atual na montagem e na fase.
 - [x] Suite GUT completa passa.
 - [ ] Verificacao manual de layout e fluxo foi executada.

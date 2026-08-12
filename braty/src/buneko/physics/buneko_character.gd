@@ -6,9 +6,9 @@ const PhysicsControllerScript = preload("res://src/buneko/physics/buneko_physics
 
 signal fell_out_of_bounds
 
-@export var walk_speed := 140.0
+@export var walk_speed := 160.0
 @export var run_speed := 220.0
-@export var jump_impulse := 320.0
+@export var jump_impulse := 500.0
 @export var gravity := 980.0
 @export var strength := 1.0
 @export var fall_limit_y := 720.0

@@ -549,12 +549,15 @@ func _load_while_example_graph() -> void:
 	var if_node = create_block(ProgramBlockKind.Value.IF, Vector2(430, 190))
 	apply_condition_to_selected(ConditionCatalog.Modality.VISION, ConditionCatalog.Query.GAP_AHEAD)
 	var jump_node = create_block(ProgramBlockKind.Value.JUMP, Vector2(655, 170))
+	var walk_after_check_node = create_block(ProgramBlockKind.Value.WALK, Vector2(655, 270))
 	start_connection(while_node.block_id, "body")
 	complete_connection(walk_node.block_id)
 	start_connection(while_node.block_id, "next")
 	complete_connection(if_node.block_id)
 	start_connection(if_node.block_id, "true")
 	complete_connection(jump_node.block_id)
+	start_connection(if_node.block_id, "false")
+	complete_connection(walk_after_check_node.block_id)
 	select_block(while_node.block_id)
 
 func _reset_graph_state() -> void:

@@ -3,6 +3,7 @@ extends GutTest
 const BlockKind = preload("res://src/programming/domain/block_kind.gd")
 const MissionStateScript = preload("res://src/tutorial/mission_state.gd")
 const RuntimeStateScript = preload("res://src/programming/runtime/runtime_state.gd")
+const TutorialReferenceProgramScript = preload("res://src/tutorial/tutorial_reference_program.gd")
 
 func test_tutorial_mission_scene_starts_at_assembly() -> void:
 	var mission = await _ready_mission()
@@ -118,9 +119,47 @@ func test_goal_completion_sets_completed_state() -> void:
 	assert_eq(mission.active_runtime.state, RuntimeStateScript.Value.COMPLETED)
 	assert_eq(mission.mission_header.status_label.text, "Concluido")
 
+func test_reference_examples_complete_ten_attempts_each() -> void:
+	for example in [
+		TutorialReferenceProgramScript.Example.IF_GAP,
+		TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR,
+	]:
+		for attempt in range(10):
+			var mission = await _ready_mission()
+			mission.install_base_assembly()
+			assert_true(mission.enter_editor())
+			mission.brain_editor.load_tutorial_example(example)
+			assert_true(mission.start_attempt())
+
+			await _run_attempt_until_terminal(mission)
+
+			assert_eq(
+				mission.evaluator.state,
+				MissionStateScript.Value.COMPLETED,
+				"Example %d attempt %d should complete. result=%d pos=%s last=%s failure=%d feedback=%s" % [
+					example,
+					attempt + 1,
+					mission.evaluator.result.kind,
+					str(mission.buneko.global_position) if mission.buneko != null else "none",
+					mission.active_runtime.last_executed_block_id if mission.active_runtime != null else "none",
+					mission.active_runtime.failure_reason if mission.active_runtime != null else -1,
+					mission.feedback_label.text,
+				]
+			)
+			mission.free()
+			await get_tree().process_frame
+
 func _ready_mission():
 	var scene: PackedScene = load("res://scenes/tutorial/tutorial_mission.tscn")
 	var mission = scene.instantiate()
 	add_child_autofree(mission)
 	await get_tree().process_frame
 	return mission
+
+func _run_attempt_until_terminal(mission) -> void:
+	for frame in range(900):
+		if mission.evaluator.state != MissionStateScript.Value.RUNNING:
+			return
+		await get_tree().physics_frame
+
+	fail_test("Attempt did not finish within the frame budget.")

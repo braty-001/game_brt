@@ -27,7 +27,7 @@ func test_path_is_clear_before_decision_distance_reaches_gap() -> void:
 	sensor.buneko_direction = 1
 	sensor.gap_start_x = 320.0
 	sensor.gap_end_x = 440.0
-	sensor.path_decision_distance = 54.0
+	sensor.path_decision_distance = 40.0
 
 	assert_true(sensor.is_path_clear_ahead())
 
@@ -37,7 +37,7 @@ func test_path_is_not_clear_near_gap_edge() -> void:
 	sensor.buneko_direction = 1
 	sensor.gap_start_x = 320.0
 	sensor.gap_end_x = 440.0
-	sensor.path_decision_distance = 54.0
+	sensor.path_decision_distance = 40.0
 
 	assert_false(sensor.is_path_clear_ahead())
 
@@ -47,7 +47,7 @@ func test_path_is_clear_after_landing_platform() -> void:
 	sensor.buneko_direction = 1
 	sensor.gap_start_x = 320.0
 	sensor.gap_end_x = 440.0
-	sensor.path_decision_distance = 54.0
+	sensor.path_decision_distance = 40.0
 
 	assert_true(sensor.is_path_clear_ahead())
 
@@ -57,7 +57,7 @@ func test_path_clear_checks_reverse_direction_and_obstacles() -> void:
 	sensor.buneko_direction = -1
 	sensor.gap_start_x = 320.0
 	sensor.gap_end_x = 440.0
-	sensor.path_decision_distance = 54.0
+	sensor.path_decision_distance = 40.0
 
 	assert_false(sensor.is_path_clear_ahead())
 

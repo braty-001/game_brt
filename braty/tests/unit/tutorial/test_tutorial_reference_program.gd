@@ -40,7 +40,7 @@ func test_reference_program_is_valid_and_within_ram_limit() -> void:
 	var while_program := TutorialReferenceProgramScript.build_while_example()
 
 	assert_eq(ProgramValidatorScript.validate(while_program).size(), 0)
-	assert_eq(ProgramRamCalculatorScript.used_ram(while_program), 4)
+	assert_eq(ProgramRamCalculatorScript.used_ram(while_program), 5)
 
 func test_if_reference_program_jumps_on_gap_then_walks_when_clear() -> void:
 	var sensor_reader := FakeSensorReader.new()

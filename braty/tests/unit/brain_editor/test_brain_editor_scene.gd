@@ -140,9 +140,9 @@ func test_tutorial_while_example_builds_compact_valid_program() -> void:
 
 	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
 
-	assert_eq(editor.graph_state.blocks.size(), 4)
-	assert_eq(editor.graph_state.connections.size(), 3)
-	assert_eq(editor.ram_label.text, "4/5 RAM")
+	assert_eq(editor.graph_state.blocks.size(), 5)
+	assert_eq(editor.graph_state.connections.size(), 4)
+	assert_eq(editor.ram_label.text, "5/5 RAM")
 	assert_false(editor.start_button.disabled)
 	assert_eq(editor.validation_label.text, "Programa pronto para executar")
 	var start_block = editor.graph_state.blocks[editor.graph_state.start_block_id]
@@ -164,7 +164,7 @@ func test_example_selector_loads_while_example() -> void:
 	var start_block = editor.graph_state.blocks[editor.graph_state.start_block_id]
 	assert_eq(start_block.kind, BlockKind.Value.WHILE)
 	assert_eq(start_block.condition.query, ConditionCatalogScript.Query.PATH_CLEAR_AHEAD)
-	assert_eq(editor.ram_label.text, "4/5 RAM")
+	assert_eq(editor.ram_label.text, "5/5 RAM")
 
 func test_reset_brain_button_clears_blocks_connections_and_ram() -> void:
 	var editor = await _ready_editor()

@@ -149,7 +149,7 @@ O mesmo conjunto visual deve alimentar a bancada e o personagem da fase para que
 - `WHILE` deve mostrar `Enquanto [condicao]` e portas `Repetir` e `Depois`.
 - Bloco sem condicao deve ser destacado e informar exatamente o que falta.
 - A area de exemplos deve permitir escolher `Exemplo com IF` ou `Exemplo com WHILE`.
-- A RAM do exemplo deve atualizar imediatamente: `3/5 RAM` no exemplo com `IF` e `4/5 RAM` no exemplo com `WHILE` mais decisao de saida.
+- A RAM do exemplo deve atualizar imediatamente: `3/5 RAM` no exemplo com `IF` e `5/5 RAM` no exemplo com `WHILE` mais decisao de saida.
 - O editor deve permitir zerar o cerebro atual, removendo blocos e conexoes.
 - O bloco e o ramo executados mais recentemente devem ficar disponiveis para feedback de falha.
 

@@ -6,8 +6,8 @@ var buneko_direction := 1
 var gap_start_x := 320.0
 var gap_end_x := 440.0
 var goal_position := Vector2(720, 240)
-var vision_range := 220.0
-var path_decision_distance := 54.0
+var vision_range := 40.0
+var path_decision_distance := 40.0
 var obstacles: Array[Vector2] = []
 var signal_heard := false
 
