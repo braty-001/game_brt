@@ -1,0 +1,13 @@
+[gd_resource type="Theme" format=3]
+
+[resource]
+default_font_size = 16
+Label/colors/font_color = Color(0.956863, 0.941176, 0.901961, 1)
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.28)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1
+Button/colors/font_color = Color(0.956863, 0.941176, 0.901961, 1)
+Button/colors/font_disabled_color = Color(0.52, 0.58, 0.6, 1)
+Button/colors/font_hover_color = Color(1, 1, 1, 1)
+OptionButton/colors/font_color = Color(0.956863, 0.941176, 0.901961, 1)
+Panel/colors/font_color = Color(0.956863, 0.941176, 0.901961, 1)

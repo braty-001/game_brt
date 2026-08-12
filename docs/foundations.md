@@ -48,6 +48,21 @@ Todo comportamento deterministico e sem interface deve ter testes automatizados:
 
 Interacoes visuais, animacao, colisao e usabilidade exigem verificacao manual documentada na tarefa correspondente. Antes da primeira tarefa de codigo, a PRD tecnica deve registrar a ferramenta de testes compativel com a versao de Godot escolhida e como ela sera executada localmente e em CI.
 
+Os testes GUT devem ser executados a partir da raiz do repositorio com:
+
+```bash
+/home/braty/projetos/godot/godot --headless --path braty -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs -gexit
+```
+
+## Convencoes de workspace e linguagem
+
+- A raiz do repositorio contem documentacao e configuracoes compartilhadas. O projeto Godot fica em `braty/`; seu arquivo de projeto e `braty/project.godot`.
+- Cenas, scripts, assets, testes e plugins do Godot devem ficar dentro de `braty/`. Em particular, o GUT deve ficar em `braty/addons/gut` para ser reconhecido pelo editor e pela execucao de testes.
+- Comandos do Godot devem apontar explicitamente para `braty/`, por exemplo, `godot --path braty` quando executados a partir da raiz do repositorio.
+- Antes de executar comandos dependentes do Godot, confirme a raiz real do projeto e a localizacao de `project.godot`; nao assuma que ela coincide com a raiz do repositorio.
+- Nomes de diretorios, arquivos, classes, scripts, cenas, variaveis, funcoes e outros identificadores tecnicos devem ser em ingles.
+- Comentarios no codigo devem ser em portugues e explicar somente trechos cuja intencao nao seja evidente pelo proprio codigo.
+
 ## Execucao segura de programas
 
 Estruturas como `WHILE` podem criar programas que nunca terminam. O executor deve ter um limite de instrucoes por atualizacao, diagnostico compreensivel para o jogador e controles para pausar, parar e reiniciar a execucao. O jogo nao pode congelar por causa de um programa criado pelo jogador.

@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/buneko/physics/buneko_character.gd" id="1_buneko"]
+[ext_resource type="Script" path="res://src/buneko/visual/buneko_visual.gd" id="2_visual"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_buneko"]
+size = Vector2(32, 48)
+
+[node name="Buneko" type="CharacterBody2D"]
+script = ExtResource("1_buneko")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_buneko")
+
+[node name="Visual" type="Node2D" parent="."]
+position = Vector2(0, -2)
+script = ExtResource("2_visual")

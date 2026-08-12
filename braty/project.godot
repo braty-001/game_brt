@@ -11,5 +11,17 @@ config_version=5
 [application]
 
 config/name="braty"
+run/main_scene="res://scenes/tutorial/tutorial_mission.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=1440
+window/size/viewport_height=810
+window/size/resizable=true
+window/stretch/mode="canvas_items"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")

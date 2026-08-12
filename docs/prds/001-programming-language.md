@@ -23,7 +23,7 @@ Cada bloco colocado consome 1 RAM. O ponto inicial, as conexoes e os parametros 
 
 `IF` e `WHILE` possuem uma condicao selecionavel. A condicao combina modalidade e consulta, permitindo uma interface generica como `visao: ha buraco a frente?` ou `audicao: ouviu sinal?`.
 
-O MVP deve suportar pelo menos condicoes visuais necessarias para o tutorial, incluindo percepcao do buraco a frente e do objetivo. Audicao deve existir como tipo de condicao selecionavel, mesmo que a primeira fase use apenas uma fonte simples de som ou apenas demonstre sua indisponibilidade de forma clara. Consultas e alvos futuros devem poder ser adicionados sem modificar os blocos de controle.
+O MVP deve suportar pelo menos condicoes visuais necessarias para o tutorial, incluindo caminho livre a frente, percepcao do buraco a frente e percepcao do objetivo. Audicao deve existir como tipo de condicao selecionavel, mesmo que a primeira fase use apenas uma fonte simples de som ou apenas demonstre sua indisponibilidade de forma clara. Consultas e alvos futuros devem poder ser adicionados sem modificar os blocos de controle.
 
 ## Regras de fluxo
 
@@ -31,6 +31,7 @@ O MVP deve suportar pelo menos condicoes visuais necessarias para o tutorial, in
 - A execucao segue conexoes de fluxo validas.
 - `IF` tem saidas verdadeira e falsa; ambas podem ficar vazias.
 - `WHILE` possui uma saida de corpo e uma saida para continuar apos a repeticao.
+- Ao terminar o fluxo conectado ao corpo de `WHILE`, a execucao retorna implicitamente para reavaliar a condicao. Essa volta nao usa uma conexao visual nem permite ciclo arbitrario.
 - Ciclos arbitrarios por conexao nao sao permitidos no MVP; repeticao deve usar `WHILE`.
 - Um bloco desconectado nao faz parte do programa executavel e nao consome RAM ate ser conectado ao fluxo de inicio.
 - Parametros invalidos e conexoes incompletas tornam o programa invalido e impedem sua execucao.
