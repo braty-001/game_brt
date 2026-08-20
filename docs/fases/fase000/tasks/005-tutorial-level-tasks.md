@@ -1,6 +1,6 @@
 # Tarefas: PRD 005 - Fase Tutorial
 
-Status geral: implementado para o MVP funcional. Testes automatizados passam; verificacao manual de repetibilidade ainda pendente.
+Status geral: implementado para o MVP funcional. Testes automatizados foram preparados para o fluxo principal; verificacao manual de repetibilidade e revisao da experiencia do brain ainda pendentes antes de fechar o tutorial como pronto.
 
 ## Ordem de implementacao
 
@@ -163,6 +163,7 @@ Status geral: implementado para o MVP funcional. Testes automatizados passam; ve
     - Confirmar retorno para edicao com programa e montagem preservados.
     - Executar a solucao de referencia ate a conclusao.
     - Repetir a solucao de referencia dez vezes sem resultado inconsistente antes de declarar MVP pronto.
+    - Revisar se o brain editor comunica claramente como montar, conectar, configurar e executar o programa sem explicacao externa.
 
 ## Dependencias e limites
 
@@ -179,4 +180,5 @@ Status geral: implementado para o MVP funcional. Testes automatizados passam; ve
 - Queda gera `Voce falhou` e retorna para edicao preservando programa e montagem.
 - Objetivo final conclui a missao.
 - A solucao de referencia cabe em 5 RAM e e repetivel.
+- A experiencia do brain editor parece compreensivel e responsiva para montar a solucao, nao apenas tecnicamente valida.
 - O checklist da PRD 000 marca a lista 005 como executada.

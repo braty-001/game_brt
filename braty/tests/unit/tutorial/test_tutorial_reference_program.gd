@@ -35,27 +35,32 @@ func test_reference_program_is_valid_and_within_ram_limit() -> void:
 	var program := TutorialReferenceProgramScript.build_if_example()
 
 	assert_eq(ProgramValidatorScript.validate(program).size(), 0)
-	assert_eq(ProgramRamCalculatorScript.used_ram(program), 3)
+	assert_eq(ProgramRamCalculatorScript.used_ram(program), 5)
 
 	var while_program := TutorialReferenceProgramScript.build_while_example()
 
 	assert_eq(ProgramValidatorScript.validate(while_program).size(), 0)
 	assert_eq(ProgramRamCalculatorScript.used_ram(while_program), 5)
 
-func test_if_reference_program_jumps_on_gap_then_walks_when_clear() -> void:
+func test_if_reference_program_walks_until_gap_then_jumps_and_runs() -> void:
 	var sensor_reader := FakeSensorReader.new()
 	var dispatcher := FakeActionDispatcher.new()
 	var runtime := ProgramRuntimeScript.new(sensor_reader, dispatcher)
 
 	assert_true(runtime.prepare(TutorialReferenceProgramScript.build_if_example()))
 	assert_true(runtime.start())
-	sensor_reader.gap_ahead = true
+	sensor_reader.path_clear_ahead = true
 	runtime.tick()
-	sensor_reader.gap_ahead = false
+	sensor_reader.path_clear_ahead = false
+	sensor_reader.gap_ahead = true
 	runtime.tick()
 	runtime.tick()
 
-	assert_eq(dispatcher.action_kinds, [BlockKindScript.Value.JUMP, BlockKindScript.Value.WALK])
+	assert_eq(dispatcher.action_kinds, [
+		BlockKindScript.Value.WALK,
+		BlockKindScript.Value.JUMP,
+		BlockKindScript.Value.RUN,
+	])
 
 func test_while_reference_program_walks_while_clear_then_jumps() -> void:
 	var sensor_reader := FakeSensorReader.new()

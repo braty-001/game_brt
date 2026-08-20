@@ -18,7 +18,8 @@ func remove_block(graph_state, block_nodes: Dictionary, workspace: Node, block_i
 		var node = block_nodes[block_id]
 		block_nodes.erase(block_id)
 		if is_instance_valid(node):
-			workspace.remove_child(node)
-			node.free()
+			# O botao de remover ainda esta emitindo o sinal; liberar o no no proximo frame evita o bloqueio do Godot.
+			# Mantemos o pai ate entao para nao criar um objeto orfao entre os frames.
+			node.queue_free()
 
 	return true

@@ -62,6 +62,7 @@ func test_remove_selected_block_updates_graph_and_validation() -> void:
 	editor.create_block(BlockKind.Value.WALK)
 
 	assert_true(editor.remove_selected_block())
+	await get_tree().process_frame
 
 	assert_eq(editor.graph_state.blocks.size(), 0)
 	assert_eq(editor.block_nodes.size(), 0)
@@ -77,8 +78,76 @@ func test_connecting_port_to_block_creates_graph_connection_and_line() -> void:
 	assert_true(editor.complete_connection(jump.block_id))
 
 	assert_eq(editor.graph_state.connections.size(), 1)
-	assert_eq(editor.connection_lines.size(), 2)
+	assert_eq(_connection_visual_count(editor), 2)
 	assert_eq(editor.ram_label.text, "2/5 RAM")
+
+func test_port_buttons_create_connection_and_line() -> void:
+	var editor = await _ready_editor()
+	var walk = editor.create_block(BlockKind.Value.WALK, Vector2(100, 100))
+	var jump = editor.create_block(BlockKind.Value.JUMP, Vector2(320, 100))
+
+	walk._port_buttons["next"].pressed.emit()
+	jump._input_button.pressed.emit()
+
+	assert_eq(editor.graph_state.connections.size(), 1)
+	assert_eq(_connection_visual_count(editor), 2)
+	assert_eq(_connection_visual_count(editor), 2)
+
+func test_removing_connected_block_removes_its_connection_visuals_immediately() -> void:
+	var editor = await _ready_editor()
+	var walk = editor.create_block(BlockKind.Value.WALK, Vector2(100, 100))
+	var jump = editor.create_block(BlockKind.Value.JUMP, Vector2(320, 100))
+
+	editor.start_connection(walk.block_id, "next")
+	assert_true(editor.complete_connection(jump.block_id))
+	assert_eq(_connection_visual_count(editor), 2)
+
+	editor.select_block(walk.block_id)
+	assert_true(editor.remove_selected_block())
+	await get_tree().process_frame
+
+	assert_eq(editor.graph_state.connections.size(), 0)
+	assert_eq(_connection_visual_count(editor), 0)
+	assert_eq(_connection_visual_count(editor), 0)
+
+func test_remove_button_returns_ram_for_a_connected_block() -> void:
+	var editor = await _ready_editor()
+	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	var jump_node = _block_node_for_kind(editor, BlockKind.Value.JUMP)
+
+	assert_eq(editor.ram_label.text, "5/5 RAM")
+	var header = jump_node.get_node("Content").get_child(0)
+	var remove_button: Button = header.get_child(2)
+	remove_button.pressed.emit()
+	await get_tree().process_frame
+
+	assert_eq(editor.ram_label.text, "3/5 RAM")
+	assert_eq(editor.editor_header.ram_label.text, "3/5 RAM")
+	assert_false(is_instance_valid(jump_node))
+
+func test_removing_block_also_clears_an_untracked_connection_visual() -> void:
+	var editor = await _ready_editor()
+	var walk = editor.create_block(BlockKind.Value.WALK, Vector2(100, 100))
+	var stale_connection := Node2D.new()
+	stale_connection.name = "Connection"
+	editor.workspace.add_child(stale_connection)
+
+	editor.select_block(walk.block_id)
+	assert_true(editor.remove_selected_block())
+	await get_tree().process_frame
+
+	assert_eq(_connection_visual_count(editor), 0)
+
+func test_removing_block_reuses_the_next_default_spawn_position() -> void:
+	var editor = await _ready_editor()
+	var first_walk = editor.create_block(BlockKind.Value.WALK)
+	var first_position: Vector2 = first_walk.position
+
+	assert_true(editor.remove_selected_block())
+	await get_tree().process_frame
+	var second_walk = editor.create_block(BlockKind.Value.WALK)
+
+	assert_eq(second_walk.position, first_position)
 
 func test_selecting_control_block_and_applying_condition_updates_validation() -> void:
 	var editor = await _ready_editor()
@@ -126,9 +195,9 @@ func test_tutorial_example_builds_compact_valid_program() -> void:
 
 	editor.load_tutorial_example()
 
-	assert_eq(editor.graph_state.blocks.size(), 3)
-	assert_eq(editor.graph_state.connections.size(), 2)
-	assert_eq(editor.ram_label.text, "3/5 RAM")
+	assert_eq(editor.graph_state.blocks.size(), 5)
+	assert_eq(editor.graph_state.connections.size(), 4)
+	assert_eq(editor.ram_label.text, "5/5 RAM")
 	assert_false(editor.start_button.disabled)
 	assert_eq(editor.validation_label.text, "Programa pronto para executar")
 	assert_eq(editor.palette.item_buttons[0].custom_minimum_size.y, 34.0)
@@ -206,6 +275,15 @@ func test_block_node_scene_instantiates() -> void:
 
 	assert_not_null(instance)
 	instance.free()
+
+func _connection_visual_count(editor) -> int:
+	return editor.workspace.visible_connection_count()
+
+func _block_node_for_kind(editor, kind: int):
+	for block_node in editor.block_nodes.values():
+		if block_node.block_kind == kind:
+			return block_node
+	return null
 
 func _ready_editor():
 	var scene: PackedScene = load("res://scenes/brain_editor/brain_editor.tscn")

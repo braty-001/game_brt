@@ -50,6 +50,18 @@ func test_executes_linear_actions_across_ticks() -> void:
 	assert_eq(dispatcher.action_kinds, [BlockKind.Value.WALK, BlockKind.Value.JUMP])
 	assert_eq(runtime.state, RuntimeStateScript.Value.RUNNING)
 
+func test_finished_linear_program_does_not_restart_from_its_first_block() -> void:
+	var dispatcher := FakeActionDispatcher.new()
+	var runtime := _create_runtime(FakeSensorReader.new(), dispatcher)
+
+	assert_true(runtime.prepare(_linear_program([BlockKind.Value.RUN])))
+	assert_true(runtime.start())
+	runtime.tick()
+	runtime.tick()
+
+	assert_eq(dispatcher.action_kinds, [BlockKind.Value.RUN])
+	assert_true(runtime.current_block_id.is_empty())
+
 func test_if_uses_true_and_false_branches() -> void:
 	var condition := _gap_condition()
 	var sensor_reader := FakeSensorReader.new()
@@ -146,6 +158,36 @@ func test_empty_while_body_fails_at_instruction_limit() -> void:
 	assert_true(runtime.prepare(program))
 	assert_true(runtime.start())
 	runtime.tick()
+	assert_eq(runtime.state, RuntimeStateScript.Value.FAILED)
+	assert_eq(runtime.failure_reason, RuntimeFailureReasonScript.Value.EXECUTION_LIMIT)
+
+func test_refused_action_records_block_and_fails_after_limit() -> void:
+	var dispatcher := FakeActionDispatcher.new()
+	dispatcher.results = [
+		ActionDispatchResultScript.Value.NO_PROGRESS,
+		ActionDispatchResultScript.Value.NO_PROGRESS,
+	]
+	var runtime := _create_runtime(FakeSensorReader.new(), dispatcher)
+	runtime.instruction_limit = 2
+
+	var condition := _gap_condition()
+	var program := ProgramDefinitionScript.new()
+	program.start_block_id = "while"
+	program.add_block(ProgramBlockScript.new("while", BlockKind.Value.WHILE, condition))
+	program.add_block(ProgramBlockScript.new("jump", BlockKind.Value.JUMP))
+	program.add_connection(ProgramConnectionScript.new("while", "body", "jump"))
+	var sensor_reader := FakeSensorReader.new()
+	sensor_reader.set_value(condition, true)
+	runtime.sensor_reader = sensor_reader
+	assert_true(runtime.prepare(program))
+	assert_true(runtime.start())
+	runtime.tick()
+	runtime.tick()
+	runtime.tick()
+	runtime.tick()
+
+	assert_eq(runtime.last_refused_action_block_id, "jump")
+	assert_eq(runtime.last_refused_action_kind, BlockKind.Value.JUMP)
 	assert_eq(runtime.state, RuntimeStateScript.Value.FAILED)
 	assert_eq(runtime.failure_reason, RuntimeFailureReasonScript.Value.EXECUTION_LIMIT)
 

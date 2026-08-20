@@ -1,6 +1,6 @@
 # Tarefas: PRD 007 - Buneko Simples e Logica Visual Legivel
 
-Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exemplos de `IF`/`WHILE`, seletor do editor e Buneko 2D simples estao integrados; falta validacao manual de layout e repetibilidade fisica.
+Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exemplos de `IF`/`WHILE`, seletor do editor e Buneko 2D simples estao integrados; falta validacao manual de layout, leitura do personagem e revisao qualitativa do brain antes de fechar a PRD.
 
 ## Ordem de implementacao
 
@@ -40,7 +40,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
   - Arquivos previstos:
     - `braty/src/programming/domain/condition_catalog.gd`
     - `braty/src/brain_editor/condition_selector.gd`
-    - `docs/prds/001-programming-language.md`
+    - `docs/fases/fase000/prds/001-programming-language.md`
   - Regras:
     - A consulta pertence a modalidade `VISION`.
     - `IF` e `WHILE` aceitam a mesma instancia de `ProgramCondition`.
@@ -213,11 +213,14 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
   - Verificacao manual:
     - Montar o Buneko simples.
     - Carregar, compreender e executar cada exemplo.
+    - Montar manualmente uma solucao com `IF` e uma com `WHILE`, sem depender dos exemplos carregaveis.
     - Confirmar leitura do personagem na montagem e na fase.
     - Confirmar que textos, blocos e conexoes nao se sobrepoem em 1440x810 e 960x540.
+    - Confirmar que a diferenca entre `Se [condicao]` e `Enquanto [condicao]` fica clara durante edicao e tentativa.
   - Documentacao:
     - Atualizar PRD 001 com a condicao final.
     - Atualizar tarefas 005, 006 e checklist 000 conforme resultados reais.
+    - Registrar achados da revisao do brain como ajustes de comportamento ou polimento pendente.
 
 ## Criterio para declarar a PRD 007 concluida
 

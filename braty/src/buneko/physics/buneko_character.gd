@@ -36,6 +36,8 @@ func run() -> bool:
 	return controller != null and controller.run()
 
 func jump() -> bool:
+	if controller != null:
+		controller.grounded = is_on_floor()
 	return controller != null and controller.jump()
 
 func turn() -> bool:
@@ -45,3 +47,8 @@ func turn() -> bool:
 	var turned: bool = controller.turn()
 	scale.x = abs(scale.x) * controller.direction
 	return turned
+
+func show_action_pulse(action_kind: int, refused := false) -> void:
+	var visual = get_node_or_null("Visual")
+	if visual != null:
+		visual.show_action_pulse(action_kind, refused)

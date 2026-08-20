@@ -1,6 +1,6 @@
 # Tarefas: PRD 006 - Experiencia Visual de Montagem e Programacao
 
-Status geral: implementado para validacao manual. Tema, montagem visual, editor reorganizado e tentativa real estao integrados; suite automatizada passa. Falta executar o roteiro manual completo de falha e conclusao.
+Status geral: implementado para validacao manual. Tema, montagem visual, editor reorganizado e tentativa real estao integrados; falta executar o roteiro manual completo de falha/conclusao e revisar qualitativamente o comportamento do brain editor.
 
 ## Ordem de implementacao
 
@@ -198,6 +198,9 @@ Cada marco deve terminar com testes automatizados e abertura do projeto para ins
     - Posicoes das linhas sao recalculadas apos movimento e redimensionamento.
   - Verificacao manual:
     - Montar fluxo linear, `IF` e `WHILE`; mover os blocos e desconectar cada ramo.
+  - Ajuste posterior: o proprio workspace desenha conexoes a partir do grafo atual, no mesmo ciclo de desenho da grade; mover ou remover blocos atualiza as setas sem estado visual separado.
+  - Ajuste posterior: a exclusao pelo botao `x` agenda a destruicao visual para depois do sinal do botao; o grafo e o RAM atualizam imediatamente.
+  - Ajuste posterior: a criacao pela paleta reutiliza a proxima posicao disponivel conforme a quantidade atual de blocos; criar e apagar nao desloca os novos blocos indefinidamente.
 
 - [x] Integrar as etapas da missao e a execucao real.
   - Arquivos previstos:
@@ -239,6 +242,29 @@ Cada marco deve terminar com testes automatizados e abertura do projeto para ins
     - Completar o tutorial uma vez sem atalhos de teste.
     - Pedir a uma pessoa sem contexto que monte e inicie uma tentativa; registrar pontos de hesitacao.
 
+- [ ] Revisar comportamento e sensacao de uso do brain editor.
+  - Motivacao:
+    - A implementacao atual cobre contratos tecnicos, mas ainda precisa ser julgada pela sensacao de criar, entender e executar um programa.
+    - A revisao deve responder se o brain esta divertido, claro e previsivel, nao apenas se passa nos testes.
+  - Pontos de revisao:
+    - Criacao de blocos pela paleta.
+    - Selecao e configuracao de condicoes.
+    - Conexao de saidas e entradas, incluindo `Inicio`, `IF` e `WHILE`.
+    - Feedback para conexao recusada, condicao ausente, programa invalido e RAM.
+    - Diferenca entre carregar exemplo, zerar cerebro, editar manualmente e executar tentativa real.
+    - Clareza visual do bloco ativo durante execucao e do ultimo ramo executado em falhas.
+  - Aceite:
+    - Um jogador consegue construir um fluxo linear sem hesitar sobre onde clicar.
+    - Um jogador entende que `IF` decide entre `Sim`/`Nao` e `WHILE` repete por `Repetir`/`Depois`.
+    - O editor mostra o problema atual perto da acao que causou o problema, quando possivel.
+    - O comando `Executar tentativa` parece conectado ao Buneko no mundo, nao a uma simulacao separada invisivel.
+  - Testes:
+    - Atualizar ou adicionar testes somente apos decidir ajustes concretos de comportamento.
+  - Verificacao manual:
+    - Montar manualmente um programa `IF` sem usar exemplo.
+    - Montar manualmente um programa `WHILE` sem usar exemplo.
+    - Forcar pelo menos tres erros comuns e avaliar se a mensagem ajuda a corrigir.
+
 ## Dependencias e limites
 
 - Reutilizar `BunekoAssembly`, `ProgramDefinition`, `EditorGraphState`, `ProgramRuntime` e o avaliador da missao existentes.
@@ -258,3 +284,4 @@ Cada marco deve terminar com testes automatizados e abertura do projeto para ins
 - [x] Layout aprovado em 1152x648 e 960x540.
 - [x] Suite GUT completa passa.
 - [ ] Roteiro manual de montagem, programacao, falha e conclusao foi executado.
+- [ ] Revisao qualitativa do brain editor foi executada e seus ajustes necessarios foram registrados ou implementados.

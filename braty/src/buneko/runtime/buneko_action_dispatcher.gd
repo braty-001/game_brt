@@ -16,8 +16,7 @@ func dispatch(action_kind: int) -> int:
 		ProgramBlockKind.Value.RUN:
 			return _dispatch_motor_call("run")
 		ProgramBlockKind.Value.JUMP:
-			motor.jump()
-			return ActionDispatchResult.Value.YIELDED
+			return _dispatch_motor_call("jump")
 		ProgramBlockKind.Value.TURN:
 			return _dispatch_motor_call("turn")
 		_:

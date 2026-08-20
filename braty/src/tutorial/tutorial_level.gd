@@ -1,7 +1,7 @@
 class_name TutorialLevel
 extends Node2D
 
-@export var spawn_position := Vector2(80, 248)
+@export var spawn_position := Vector2(80, 280)
 @export var gap_start_x := 320.0
 @export var gap_end_x := 440.0
 @export var goal_position := Vector2(760, 248)

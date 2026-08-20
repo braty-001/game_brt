@@ -10,6 +10,10 @@ var failure_reason: int = RuntimeFailureReason.Value.NONE
 var validation_errors: Array[ProgramValidationError] = []
 var current_block_id: String
 var last_executed_block_id: String
+var last_refused_action_block_id: String
+var last_refused_action_kind := -1
+var has_last_condition_result := false
+var last_condition_result := false
 var instruction_limit: int = DEFAULT_INSTRUCTION_LIMIT
 
 var _program: ProgramDefinition
@@ -95,7 +99,6 @@ func tick() -> void:
 			return
 
 		if current_block_id.is_empty():
-			current_block_id = _program.start_block_id
 			return
 
 		var block: ProgramBlock = _program.blocks[current_block_id]
@@ -112,6 +115,8 @@ func tick() -> void:
 
 func _execute_control_block(block: ProgramBlock) -> void:
 	var condition_is_true := sensor_reader.evaluate(block.condition)
+	has_last_condition_result = true
+	last_condition_result = condition_is_true
 	if block.kind == ProgramBlockKind.Value.IF:
 		if condition_is_true:
 			_move_to_output(block.id, "true")
@@ -131,13 +136,18 @@ func _execute_control_block(block: ProgramBlock) -> void:
 		_move_to_output(block.id, "next")
 
 func _execute_action_block(block: ProgramBlock) -> bool:
+	has_last_condition_result = false
 	var result := action_dispatcher.dispatch(block.kind)
 	_move_to_output(block.id, "next")
 	if result == ActionDispatchResult.Value.YIELDED:
+		last_refused_action_block_id = ""
+		last_refused_action_kind = -1
 		_instructions_without_progress = 0
 		return true
 
-	return false
+	last_refused_action_block_id = block.id
+	last_refused_action_kind = block.kind
+	return true
 
 func _move_to_output(block_id: String, port: String) -> void:
 	var target := _output_target(block_id, port)
@@ -165,6 +175,10 @@ func _resume_after_terminal() -> void:
 func _reset_execution() -> void:
 	current_block_id = _program.start_block_id
 	last_executed_block_id = ""
+	last_refused_action_block_id = ""
+	last_refused_action_kind = -1
+	has_last_condition_result = false
+	last_condition_result = false
 	_frames.clear()
 	_instructions_without_progress = 0
 

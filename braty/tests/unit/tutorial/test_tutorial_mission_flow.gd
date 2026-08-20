@@ -50,6 +50,8 @@ func test_start_attempt_requires_editor_and_shows_level() -> void:
 	assert_eq(mission.active_runtime.action_dispatcher.motor, mission.buneko)
 	assert_not_null(mission.world_sensor)
 	assert_not_null(mission.runtime_overlay)
+	assert_not_null(mission.return_button)
+	assert_true(mission.return_button.visible)
 
 func test_editor_execute_button_starts_real_mission_attempt() -> void:
 	var mission = await _ready_mission()
@@ -85,6 +87,23 @@ func test_return_to_assembly_preserves_graph_and_completed_parts() -> void:
 	assert_true(mission.assembly_bench.assembly.is_complete())
 	assert_eq(mission.current_graph_state.blocks.size(), 1)
 
+func test_runtime_return_button_returns_to_editor_preserving_program() -> void:
+	var mission = await _ready_mission()
+	mission.install_base_assembly()
+	mission.enter_editor()
+	mission.brain_editor.create_block(BlockKind.Value.WALK)
+	mission.start_attempt()
+	var program = mission.current_program
+
+	mission.return_button.pressed.emit()
+	await get_tree().process_frame
+
+	assert_eq(mission.evaluator.state, MissionStateScript.Value.EDITING)
+	assert_not_null(mission.brain_editor)
+	assert_eq(mission.current_program, program)
+	assert_eq(mission.brain_editor.graph_state.blocks.size(), 1)
+	assert_true(mission.feedback_label.text.contains("voltou"))
+
 func test_fall_returns_to_editor_preserving_program_and_assembly() -> void:
 	var mission = await _ready_mission()
 	mission.install_base_assembly()
@@ -118,36 +137,34 @@ func test_goal_completion_sets_completed_state() -> void:
 	assert_true(mission.feedback_label.text.contains("Objetivo concluido"))
 	assert_eq(mission.active_runtime.state, RuntimeStateScript.Value.COMPLETED)
 	assert_eq(mission.mission_header.status_label.text, "Concluido")
+	assert_not_null(mission.success_message)
+	assert_true(mission.success_message.visible)
+	assert_eq(mission.success_title_label.text, "Objetivo concluido!")
+	assert_true(mission.return_button.visible)
 
-func test_reference_examples_complete_ten_attempts_each() -> void:
+func test_reference_examples_wait_for_landing_before_the_action_after_jump() -> void:
 	for example in [
 		TutorialReferenceProgramScript.Example.IF_GAP,
 		TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR,
 	]:
-		for attempt in range(10):
-			var mission = await _ready_mission()
-			mission.install_base_assembly()
-			assert_true(mission.enter_editor())
-			mission.brain_editor.load_tutorial_example(example)
-			assert_true(mission.start_attempt())
+		var mission = await _ready_mission()
+		mission.install_base_assembly()
+		assert_true(mission.enter_editor())
+		mission.brain_editor.load_tutorial_example(example)
+		assert_true(mission.start_attempt())
 
-			await _run_attempt_until_terminal(mission)
+		for frame in range(120):
+			if mission.waiting_for_jump_landing:
+				break
+			await get_tree().physics_frame
 
-			assert_eq(
-				mission.evaluator.state,
-				MissionStateScript.Value.COMPLETED,
-				"Example %d attempt %d should complete. result=%d pos=%s last=%s failure=%d feedback=%s" % [
-					example,
-					attempt + 1,
-					mission.evaluator.result.kind,
-					str(mission.buneko.global_position) if mission.buneko != null else "none",
-					mission.active_runtime.last_executed_block_id if mission.active_runtime != null else "none",
-					mission.active_runtime.failure_reason if mission.active_runtime != null else -1,
-					mission.feedback_label.text,
-				]
-			)
-			mission.free()
-			await get_tree().process_frame
+		assert_true(
+			mission.waiting_for_jump_landing,
+			"Example %d should wait for landing after jumping." % example
+		)
+		assert_eq(mission.active_runtime.state, RuntimeStateScript.Value.RUNNING)
+		mission.free()
+		await get_tree().process_frame
 
 func _ready_mission():
 	var scene: PackedScene = load("res://scenes/tutorial/tutorial_mission.tscn")

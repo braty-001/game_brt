@@ -3,6 +3,7 @@ extends Control
 
 const AssemblyBenchScene = preload("res://scenes/buneko/assembly_bench.tscn")
 const BasePartsScript = preload("res://src/buneko/domain/base_buneko_parts.gd")
+const BlockKind = preload("res://src/programming/domain/block_kind.gd")
 const BrainEditorScene = preload("res://scenes/brain_editor/brain_editor.tscn")
 const BunekoActionDispatcherScript = preload("res://src/buneko/runtime/buneko_action_dispatcher.gd")
 const BunekoScene = preload("res://scenes/buneko/buneko.tscn")
@@ -35,9 +36,16 @@ var feedback_label: Label
 var hint_label: Label
 var runtime_overlay: PanelContainer
 var runtime_status_label: Label
+var success_message: PanelContainer
+var success_title_label: Label
+var success_body_label: Label
 var pause_button: Button
 var resume_button: Button
 var stop_button: Button
+var return_button: Button
+var last_visual_action_kind := -1
+var waiting_for_jump_landing := false
+var jump_has_left_ground := false
 
 func _ready() -> void:
 	_build_ui()
@@ -50,9 +58,13 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	world_sensor.update_from_buneko(buneko)
+	if _is_waiting_for_jump_landing():
+		return
+	var previous_block_id: String = active_runtime.last_executed_block_id
+	var previous_refused_block_id: String = active_runtime.last_refused_action_block_id
 	active_runtime.tick()
-	if runtime_status_label != null:
-		runtime_status_label.text = "Executando bloco: %s" % active_runtime.last_executed_block_id
+	_track_accepted_jump(previous_block_id)
+	_present_action_pulse(previous_block_id, previous_refused_block_id)
 	if active_runtime.failure_reason == RuntimeFailureReasonScript.Value.EXECUTION_LIMIT:
 		fail_from_runtime()
 
@@ -104,7 +116,6 @@ func start_attempt() -> bool:
 		_show_editor()
 		_set_feedback("Nao foi possivel iniciar este programa.")
 		return false
-
 	_set_feedback("Observe o Buneko. O programa esta no controle.")
 	_set_hint_for_current_state()
 	_refresh_runtime_overlay()
@@ -129,11 +140,12 @@ func resume_attempt() -> bool:
 func stop_attempt() -> bool:
 	if active_runtime == null or not active_runtime.stop():
 		return false
-	evaluator.enter_editing(current_assembly, current_program)
-	_show_editor()
-	_set_feedback("Tentativa interrompida. Ajuste o programa e tente novamente.")
-	_set_hint_for_current_state()
-	return true
+	return _return_to_editor_from_attempt("Tentativa interrompida. Ajuste o programa e tente novamente.")
+
+func return_to_editor_from_attempt() -> bool:
+	if active_runtime != null and active_runtime.state != RuntimeState.Value.COMPLETED:
+		active_runtime.stop()
+	return _return_to_editor_from_attempt("Voce voltou para ajustar o programa.")
 
 func fail_by_fall() -> bool:
 	if not evaluator.fail_by_fall():
@@ -155,6 +167,7 @@ func complete_goal() -> bool:
 	_set_feedback("Objetivo concluido! O Buneko executou seu programa.")
 	_set_hint_for_current_state()
 	mission_header.configure("ETAPA 3/3  RESULTADO", "Atravesse o buraco e alcance o objetivo", "Concluido", "")
+	_show_success_message()
 	_refresh_runtime_overlay()
 	return true
 
@@ -271,6 +284,7 @@ func _show_level() -> void:
 	level.get_node("Goal").reached.connect(complete_goal)
 	level.get_node("FallZone").fallen.connect(_on_fall_detected)
 	_build_runtime_overlay()
+	_build_success_message()
 	mission_header.configure("ETAPA 3/3  TESTE", "Atravesse o buraco e alcance o objetivo", "Executando", "")
 
 func _build_runtime_overlay() -> void:
@@ -305,6 +319,48 @@ func _build_runtime_overlay() -> void:
 	Tokens.apply_secondary_button(stop_button)
 	stop_button.pressed.connect(_on_stop_requested)
 	row.add_child(stop_button)
+	return_button = Button.new()
+	return_button.name = "ReturnButton"
+	return_button.text = "Voltar"
+	return_button.tooltip_text = "Volta para o editor mantendo o programa atual"
+	Tokens.apply_secondary_button(return_button)
+	return_button.pressed.connect(_on_return_requested)
+	row.add_child(return_button)
+
+func _build_success_message() -> void:
+	success_message = PanelContainer.new()
+	success_message.name = "SuccessMessage"
+	success_message.visible = false
+	success_message.anchor_left = 0.5
+	success_message.anchor_right = 0.5
+	success_message.anchor_top = 0.0
+	success_message.anchor_bottom = 0.0
+	success_message.offset_left = -210.0
+	success_message.offset_right = 210.0
+	success_message.offset_top = 18.0
+	success_message.offset_bottom = 104.0
+	Tokens.apply_panel(success_message, Color("183c35"))
+	stage_container.add_child(success_message)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	success_message.add_child(box)
+
+	success_title_label = Label.new()
+	success_title_label.name = "SuccessTitleLabel"
+	success_title_label.text = "Objetivo concluido!"
+	success_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	success_title_label.add_theme_color_override("font_color", Tokens.SUCCESS)
+	success_title_label.add_theme_font_size_override("font_size", 24)
+	box.add_child(success_title_label)
+
+	success_body_label = Label.new()
+	success_body_label.name = "SuccessBodyLabel"
+	success_body_label.text = "O Buneko chegou ao final da fase."
+	success_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	success_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	success_body_label.add_theme_color_override("font_color", Tokens.TEXT)
+	box.add_child(success_body_label)
 
 func _refresh_runtime_overlay() -> void:
 	if runtime_overlay == null or active_runtime == null:
@@ -312,6 +368,7 @@ func _refresh_runtime_overlay() -> void:
 	pause_button.visible = active_runtime.state == RuntimeState.Value.RUNNING
 	resume_button.visible = active_runtime.state == RuntimeState.Value.PAUSED
 	stop_button.visible = active_runtime.state == RuntimeState.Value.RUNNING or active_runtime.state == RuntimeState.Value.PAUSED
+	return_button.visible = active_runtime.state == RuntimeState.Value.RUNNING or active_runtime.state == RuntimeState.Value.PAUSED or active_runtime.state == RuntimeState.Value.COMPLETED
 	if active_runtime.state == RuntimeState.Value.COMPLETED:
 		runtime_status_label.text = "Objetivo concluido"
 		runtime_status_label.add_theme_color_override("font_color", Tokens.SUCCESS)
@@ -327,9 +384,16 @@ func _clear_stage_nodes() -> void:
 	buneko = null
 	runtime_overlay = null
 	runtime_status_label = null
+	success_message = null
+	success_title_label = null
+	success_body_label = null
 	pause_button = null
 	resume_button = null
 	stop_button = null
+	return_button = null
+	last_visual_action_kind = -1
+	waiting_for_jump_landing = false
+	jump_has_left_ground = false
 
 func _set_feedback(message: String) -> void:
 	if feedback_label != null:
@@ -359,6 +423,49 @@ func _on_back_to_assembly_requested() -> void:
 func _on_stop_requested() -> void:
 	call_deferred("stop_attempt")
 
+func _on_return_requested() -> void:
+	call_deferred("return_to_editor_from_attempt")
+
+func _present_action_pulse(previous_block_id: String, previous_refused_block_id: String) -> void:
+	if buneko == null:
+		return
+	if not active_runtime.last_refused_action_block_id.is_empty() and active_runtime.last_refused_action_block_id != previous_refused_block_id:
+		buneko.show_action_pulse(active_runtime.last_refused_action_kind, true)
+		return
+	if active_runtime.last_executed_block_id == previous_block_id:
+		return
+	if current_program == null or not current_program.blocks.has(active_runtime.last_executed_block_id):
+		return
+	var action_kind: int = current_program.blocks[active_runtime.last_executed_block_id].kind
+	if BlockKind.requires_condition(action_kind) or action_kind == last_visual_action_kind:
+		return
+	last_visual_action_kind = action_kind
+	buneko.show_action_pulse(action_kind)
+
+func _is_waiting_for_jump_landing() -> bool:
+	if not waiting_for_jump_landing:
+		return false
+	if not buneko.is_on_floor():
+		jump_has_left_ground = true
+		return true
+	if not jump_has_left_ground:
+		return true
+	waiting_for_jump_landing = false
+	jump_has_left_ground = false
+	return false
+
+func _track_accepted_jump(previous_block_id: String) -> void:
+	if active_runtime.last_executed_block_id == previous_block_id:
+		return
+	if current_program == null or not current_program.blocks.has(active_runtime.last_executed_block_id):
+		return
+	if current_program.blocks[active_runtime.last_executed_block_id].kind != BlockKind.Value.JUMP:
+		return
+	if active_runtime.last_refused_action_block_id == active_runtime.last_executed_block_id:
+		return
+	waiting_for_jump_landing = true
+	jump_has_left_ground = false
+
 func _on_fall_detected() -> void:
 	call_deferred("_fail_from_detected_fall")
 
@@ -370,6 +477,19 @@ func _set_hint_for_current_state() -> void:
 	if hint_label == null or hint_presenter == null or evaluator == null:
 		return
 	hint_label.text = hint_presenter.hint_for(evaluator.state, evaluator.result.kind, _current_program_block_count())
+
+func _show_success_message() -> void:
+	if success_message != null:
+		success_message.visible = true
+
+func _return_to_editor_from_attempt(message: String) -> bool:
+	if current_assembly == null or current_program == null:
+		return false
+	evaluator.enter_editing(current_assembly, current_program)
+	_show_editor()
+	_set_feedback(message)
+	_set_hint_for_current_state()
+	return true
 
 func _current_program_block_count() -> int:
 	if current_program != null:

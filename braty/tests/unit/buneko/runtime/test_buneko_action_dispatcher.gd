@@ -37,12 +37,12 @@ func test_dispatches_action_blocks_to_motor() -> void:
 	assert_eq(dispatcher.dispatch(BlockKind.Value.TURN), ActionDispatchResultScript.Value.YIELDED)
 	assert_eq(motor.calls, ["walk", "run", "jump", "turn"])
 
-func test_jump_without_ground_still_yields_to_simulation() -> void:
+func test_jump_without_ground_reports_no_progress() -> void:
 	var motor := FakeMotor.new()
 	motor.jump_allowed = false
 	var dispatcher = DispatcherScript.new(motor)
 
-	assert_eq(dispatcher.dispatch(BlockKind.Value.JUMP), ActionDispatchResultScript.Value.YIELDED)
+	assert_eq(dispatcher.dispatch(BlockKind.Value.JUMP), ActionDispatchResultScript.Value.NO_PROGRESS)
 	assert_eq(motor.calls, ["jump"])
 
 func test_turn_updates_motor_direction() -> void:

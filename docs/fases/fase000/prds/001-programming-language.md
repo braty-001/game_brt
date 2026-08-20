@@ -21,9 +21,16 @@ Cada bloco colocado consome 1 RAM. O ponto inicial, as conexoes e os parametros 
 
 ## Sensores e condicoes
 
-`IF` e `WHILE` possuem uma condicao selecionavel. A condicao combina modalidade e consulta, permitindo uma interface generica como `visao: ha buraco a frente?` ou `audicao: ouviu sinal?`.
+`IF` e `WHILE` possuem uma condicao selecionavel. A condicao combina modalidade e consulta, permitindo uma interface generica como `visao: caminho livre a frente`, `visao: ha buraco a frente?` ou `audicao: ouviu sinal?`.
 
-O MVP deve suportar pelo menos condicoes visuais necessarias para o tutorial, incluindo caminho livre a frente, percepcao do buraco a frente e percepcao do objetivo. Audicao deve existir como tipo de condicao selecionavel, mesmo que a primeira fase use apenas uma fonte simples de som ou apenas demonstre sua indisponibilidade de forma clara. Consultas e alvos futuros devem poder ser adicionados sem modificar os blocos de controle.
+O MVP suporta as condicoes visuais necessarias para o tutorial:
+
+- `Visao: caminho livre a frente`, usada principalmente para repetir movimento com `WHILE`.
+- `Visao: buraco a frente`, usada principalmente para decidir quando pular com `IF`.
+- `Visao: objetivo visivel`.
+- `Audicao: sinal ouvido`.
+
+Audicao deve existir como tipo de condicao selecionavel, mesmo que a primeira fase use apenas uma fonte simples de som ou apenas demonstre sua indisponibilidade de forma clara. Consultas e alvos futuros devem poder ser adicionados sem modificar os blocos de controle.
 
 ## Regras de fluxo
 

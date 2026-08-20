@@ -199,8 +199,8 @@ Status geral: concluido para o MVP funcional. Polimento visual e refinamentos de
 
 - [x] Revisar a PRD 001 apos o prototipo do editor estabilizar a representacao visual.
   - Arquivos afetados:
-    - `docs/tasks/001-programming-language-tasks.md`
-    - opcionalmente `docs/prds/001-programming-language.md`, se houver ajuste real de contrato.
+    - `docs/fases/fase000/tasks/001-programming-language-tasks.md`
+    - opcionalmente `docs/fases/fase000/prds/001-programming-language.md`, se houver ajuste real de contrato.
   - Regras:
     - Atualizar somente divergencias reais encontradas na integracao.
     - Nao mudar a semantica da linguagem para acomodar detalhe visual sem necessidade.

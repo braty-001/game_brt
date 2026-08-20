@@ -38,7 +38,7 @@ Aplicar SOLID de forma pratica, sem criar camadas artificiais:
 
 ## PRDs e tarefas
 
-Cada funcionalidade relevante recebe uma PRD em `docs/prds/` e uma lista correspondente em `docs/tasks/`, ambas com o mesmo identificador. Exemplo: `001-brain-editor.md` e `001-brain-editor-tasks.md`.
+Cada fase fica em `docs/fases/faseNNN/`, com PRDs em `prds/` e listas correspondentes em `tasks/`. Exemplo: `docs/fases/fase000/prds/001-brain-editor.md` e `docs/fases/fase000/tasks/001-brain-editor-tasks.md`.
 
 Uma PRD descreve problema, experiencia do jogador, escopo, regras, criterios de aceite, riscos e limites. A lista de tarefas traduz essa definicao em trabalho executavel, com dependencias, status, criterio de conclusao e testes exigidos. Nenhuma PRD ou lista deve ser criada apenas para preencher estrutura: elas surgem quando o trabalho precisa delas.
 

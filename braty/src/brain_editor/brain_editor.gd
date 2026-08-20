@@ -23,6 +23,9 @@ const ValidationPanelScript = preload("res://src/brain_editor/validation_panel.g
 const WorkspaceScript = preload("res://src/brain_editor/editor_workspace.gd")
 const WorkspaceInputControllerScript = preload("res://src/brain_editor/workspace_input_controller.gd")
 
+const DEFAULT_SPAWN_POSITION := Vector2(230, 108)
+const SPAWN_OFFSET := Vector2(24, 82)
+
 signal attempt_requested
 signal back_to_assembly_requested
 signal summary_changed(ram: String, status: String, is_valid: bool)
@@ -40,11 +43,10 @@ var runtime
 var runtime_controls
 
 var block_nodes: Dictionary = {}
-var connection_lines: Array[Node2D] = []
 var selected_block_id := ""
 var pending_connection_from_block_id := ""
 var pending_connection_from_port := ""
-var next_spawn_position := Vector2(230, 108)
+var next_spawn_position := DEFAULT_SPAWN_POSITION
 var external_attempt_runner := false
 
 var editor_header
@@ -101,6 +103,7 @@ func create_block(kind: int, block_position: Vector2 = Vector2.INF):
 		graph_state.start_block_id = block_state.id
 
 	var block_node = _add_block_node(block_state)
+	_refresh_next_spawn_position()
 	select_block(block_state.id)
 	_rebuild_connection_lines()
 	refresh_panels()
@@ -121,6 +124,7 @@ func load_graph_state(saved_graph_state) -> bool:
 	for block_id in graph_state.blocks:
 		_add_block_node(graph_state.blocks[block_id])
 
+	_refresh_next_spawn_position()
 	_rebuild_connection_lines()
 	refresh_panels()
 	return true
@@ -506,6 +510,7 @@ func _remove_block(block_id: String) -> bool:
 	var removed: bool = workspace_controller.remove_block(graph_state, block_nodes, workspace, block_id)
 	if removed:
 		selected_block_id = ""
+		_refresh_next_spawn_position()
 		_rebuild_connection_lines()
 		_update_parameter_panel()
 		refresh_panels()
@@ -532,15 +537,22 @@ func _add_block_node(block_state):
 	return block_node
 
 func _load_if_example_graph() -> void:
-	var if_node = create_block(ProgramBlockKind.Value.IF, Vector2(205, 86))
+	var while_node = create_block(ProgramBlockKind.Value.WHILE, Vector2(205, 86))
+	apply_condition_to_selected(ConditionCatalog.Modality.VISION, ConditionCatalog.Query.PATH_CLEAR_AHEAD)
+	var walk_node = create_block(ProgramBlockKind.Value.WALK, Vector2(430, 62))
+	var if_node = create_block(ProgramBlockKind.Value.IF, Vector2(430, 190))
 	apply_condition_to_selected(ConditionCatalog.Modality.VISION, ConditionCatalog.Query.GAP_AHEAD)
-	var jump_node = create_block(ProgramBlockKind.Value.JUMP, Vector2(430, 62))
-	var walk_node = create_block(ProgramBlockKind.Value.WALK, Vector2(430, 190))
+	var jump_node = create_block(ProgramBlockKind.Value.JUMP, Vector2(655, 170))
+	var run_node = create_block(ProgramBlockKind.Value.RUN, Vector2(655, 270))
+	start_connection(while_node.block_id, "body")
+	complete_connection(walk_node.block_id)
+	start_connection(while_node.block_id, "next")
+	complete_connection(if_node.block_id)
 	start_connection(if_node.block_id, "true")
 	complete_connection(jump_node.block_id)
-	start_connection(if_node.block_id, "false")
-	complete_connection(walk_node.block_id)
-	select_block(if_node.block_id)
+	start_connection(jump_node.block_id, "next")
+	complete_connection(run_node.block_id)
+	select_block(while_node.block_id)
 
 func _load_while_example_graph() -> void:
 	var while_node = create_block(ProgramBlockKind.Value.WHILE, Vector2(205, 86))
@@ -549,15 +561,15 @@ func _load_while_example_graph() -> void:
 	var if_node = create_block(ProgramBlockKind.Value.IF, Vector2(430, 190))
 	apply_condition_to_selected(ConditionCatalog.Modality.VISION, ConditionCatalog.Query.GAP_AHEAD)
 	var jump_node = create_block(ProgramBlockKind.Value.JUMP, Vector2(655, 170))
-	var walk_after_check_node = create_block(ProgramBlockKind.Value.WALK, Vector2(655, 270))
+	var run_node = create_block(ProgramBlockKind.Value.RUN, Vector2(655, 270))
 	start_connection(while_node.block_id, "body")
 	complete_connection(walk_node.block_id)
 	start_connection(while_node.block_id, "next")
 	complete_connection(if_node.block_id)
 	start_connection(if_node.block_id, "true")
 	complete_connection(jump_node.block_id)
-	start_connection(if_node.block_id, "false")
-	complete_connection(walk_after_check_node.block_id)
+	start_connection(jump_node.block_id, "next")
+	complete_connection(run_node.block_id)
 	select_block(while_node.block_id)
 
 func _reset_graph_state() -> void:
@@ -566,16 +578,13 @@ func _reset_graph_state() -> void:
 	selected_block_id = ""
 	pending_connection_from_block_id = ""
 	pending_connection_from_port = ""
-	next_spawn_position = Vector2(230, 108)
+	next_spawn_position = DEFAULT_SPAWN_POSITION
 	if runtime != null:
 		runtime.stop()
 		runtime.prepare(graph_builder.build(graph_state))
 
 func _clear_workspace_program() -> void:
-	for connection_visual in connection_lines:
-		if is_instance_valid(connection_visual):
-			connection_visual.free()
-	connection_lines.clear()
+	_clear_connection_visuals()
 
 	for block_id in block_nodes:
 		var block_node = block_nodes[block_id]
@@ -584,46 +593,18 @@ func _clear_workspace_program() -> void:
 	block_nodes.clear()
 
 func _rebuild_connection_lines() -> void:
-	for connection_visual in connection_lines:
-		if is_instance_valid(connection_visual):
-			connection_visual.queue_free()
-	connection_lines.clear()
+	_clear_connection_visuals()
+	workspace.configure_connections(graph_state, block_nodes)
 
-	if not graph_state.start_block_id.is_empty() and block_nodes.has(graph_state.start_block_id):
-		_add_connection_visual(Vector2(152, 51), block_nodes[graph_state.start_block_id].input_position(), Tokens.TEAL)
+func _clear_connection_visuals() -> void:
+	# Remove visuais legados que foram criados antes do canvas unico.
+	for child in workspace.get_children():
+		if child is Node2D and is_instance_valid(child):
+			child.free()
+	workspace.configure_connections(null, {})
 
-	for connection in graph_state.connections:
-		if not block_nodes.has(connection.from_block_id) or not block_nodes.has(connection.to_block_id):
-			continue
-		var from_node = block_nodes[connection.from_block_id]
-		var to_node = block_nodes[connection.to_block_id]
-		_add_connection_visual(from_node.output_position(connection.from_port), to_node.input_position(), Tokens.category_color(from_node.block_kind))
-
-func _add_connection_visual(from_position: Vector2, to_position: Vector2, color: Color) -> void:
-	var visual := Node2D.new()
-	visual.name = "Connection"
-	var line := Line2D.new()
-	line.width = 4.0
-	line.default_color = color
-	line.antialiased = true
-	var middle_x: float = (from_position.x + to_position.x) * 0.5
-	line.add_point(from_position)
-	line.add_point(Vector2(middle_x, from_position.y))
-	line.add_point(Vector2(middle_x, to_position.y))
-	line.add_point(to_position)
-	visual.add_child(line)
-
-	var direction := (to_position - Vector2(middle_x, to_position.y)).normalized()
-	if direction == Vector2.ZERO:
-		direction = Vector2.RIGHT
-	var perpendicular := Vector2(-direction.y, direction.x)
-	var arrow := Polygon2D.new()
-	arrow.color = color
-	arrow.polygon = PackedVector2Array([to_position, to_position - direction * 13.0 + perpendicular * 6.0, to_position - direction * 13.0 - perpendicular * 6.0])
-	visual.add_child(arrow)
-	workspace.add_child(visual)
-	workspace.move_child(visual, 0)
-	connection_lines.append(visual)
+func _refresh_next_spawn_position() -> void:
+	next_spawn_position = DEFAULT_SPAWN_POSITION + SPAWN_OFFSET * block_nodes.size()
 
 func _validation_messages(errors: Array) -> PackedStringArray:
 	var messages := PackedStringArray()
