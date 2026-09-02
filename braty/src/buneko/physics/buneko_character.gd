@@ -3,22 +3,41 @@ extends CharacterBody2D
 
 const AttributesScript = preload("res://src/buneko/domain/buneko_attributes.gd")
 const PhysicsControllerScript = preload("res://src/buneko/physics/buneko_physics_controller.gd")
+const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 
 signal fell_out_of_bounds
 
-@export var walk_speed := 160.0
-@export var run_speed := 220.0
+@export var movement_speed := 160.0
+@export var ground_deceleration := 180.0
 @export var jump_impulse := 500.0
 @export var gravity := 980.0
 @export var strength := 1.0
 @export var fall_limit_y := 720.0
 
 var controller
+var _configured_attributes
 
 func _ready() -> void:
-	var attributes = AttributesScript.new(walk_speed, run_speed, jump_impulse, gravity, strength)
+	var attributes = AttributesScript.new(
+		movement_speed,
+		ground_deceleration,
+		jump_impulse,
+		gravity,
+		strength
+	)
+	if _configured_attributes != null:
+		attributes = _configured_attributes.duplicate_attributes()
 	controller = PhysicsControllerScript.new(attributes)
 	controller.fall_limit_y = fall_limit_y
+
+func configure_attributes(attributes) -> bool:
+	if attributes == null:
+		return false
+
+	_configured_attributes = attributes.duplicate_attributes()
+	if controller != null:
+		controller.attributes = _configured_attributes.duplicate_attributes()
+	return true
 
 func _physics_process(delta: float) -> void:
 	if controller == null:
@@ -29,11 +48,8 @@ func _physics_process(delta: float) -> void:
 	if controller.has_fallen(global_position):
 		fell_out_of_bounds.emit()
 
-func walk() -> bool:
-	return controller != null and controller.walk()
-
-func run() -> bool:
-	return controller != null and controller.run()
+func walk(pace: int = MovementPaceScript.Value.NORMAL) -> bool:
+	return controller != null and controller.walk(pace)
 
 func jump() -> bool:
 	if controller != null:
@@ -47,6 +63,9 @@ func turn() -> bool:
 	var turned: bool = controller.turn()
 	scale.x = abs(scale.x) * controller.direction
 	return turned
+
+func is_motion_settled() -> bool:
+	return controller != null and controller.is_motion_settled()
 
 func show_action_pulse(action_kind: int, refused := false) -> void:
 	var visual = get_node_or_null("Visual")

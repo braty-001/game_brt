@@ -13,3 +13,10 @@ func configure(kind: int, label: String) -> void:
 	tooltip_text = "Adicionar bloco %s" % label
 	Tokens.apply_compact_secondary_button(self)
 	add_theme_color_override("font_color", Tokens.category_color(kind))
+
+func _get_drag_data(_at_position: Vector2):
+	var preview := Label.new()
+	preview.text = text
+	Tokens.apply_panel(preview, Tokens.SURFACE_RAISED)
+	set_drag_preview(preview)
+	return {"type": "brain_block", "kind": block_kind}

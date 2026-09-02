@@ -13,7 +13,7 @@ func test_ram_summary_uses_reachable_blocks() -> void:
 	graph.start_block_id = "walk"
 	graph.add_block(EditorBlockStateScript.new("walk", BlockKind.Value.WALK))
 	graph.add_block(EditorBlockStateScript.new("jump", BlockKind.Value.JUMP))
-	graph.add_block(EditorBlockStateScript.new("unused", BlockKind.Value.RUN))
+	graph.add_block(EditorBlockStateScript.new("unused", BlockKind.Value.TURN))
 	graph.add_connection(EditorConnectionStateScript.new("walk", "next", "jump"))
 	var program = ProgramGraphBuilderScript.new().build(graph)
 

@@ -8,7 +8,7 @@ Executar com seguranca o programa visual do Buneko em uma fase de fisica livre, 
 
 O ciclo principal do executor e implicito e nao consome RAM. Ele comeca no ponto inicial do programa e volta a avaliacao continuamente enquanto a missao estiver ativa. Acoes de movimento devem ser aplicadas por intervalos de simulacao, permitindo que `WHILE` mantenha uma acao ativa por repeticao e que sensores sejam reavaliados conforme o mundo muda.
 
-`Andar` e `Correr` usam a direcao atual do Buneko. `Virar` troca essa direcao. `Pular` so produz efeito quando a fisica informar que o Buneko pode saltar.
+`Andar` usa a direcao atual do Buneko e encaminha seu ritmo configurado para o adaptador fisico. `Virar` troca essa direcao. `Pular` so produz efeito quando a fisica informar que o Buneko pode saltar. O dispatcher recebe o bloco de acao completo para preservar parametros sem acoplar o executor a detalhes da cena.
 
 ## Estados
 

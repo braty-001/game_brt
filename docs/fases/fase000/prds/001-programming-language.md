@@ -10,14 +10,15 @@ O jogador conecta blocos para formar um fluxo. Ao iniciar a missao, o executor p
 
 ## Blocos do MVP
 
-- `Andar`: movimenta o Buneko na direcao para a qual ele esta voltado.
-- `Correr`: movimenta o Buneko na direcao atual com maior velocidade.
+- `Andar`: movimenta o Buneko na direcao atual e possui ritmo `normal` ou `rapido`.
 - `Pular`: aplica um pulo quando o Buneko esta apoiado no chao.
 - `Virar`: inverte a direcao atual do Buneko.
 - `IF`: avalia uma condicao e direciona o fluxo para o ramo verdadeiro ou falso.
 - `WHILE`: continua executando seu ramo enquanto a condicao for verdadeira.
 
 Cada bloco colocado consome 1 RAM. O ponto inicial, as conexoes e os parametros de um bloco nao consomem RAM. O programa nao pode ultrapassar 5 RAM.
+
+O ritmo padrao de `Andar` e `normal`. O ritmo `rapido` solicita uma velocidade maior sem criar outro bloco nem aumentar o custo de RAM. O resultado fisico depende da capacidade da peca de locomocao instalada.
 
 ## Sensores e condicoes
 

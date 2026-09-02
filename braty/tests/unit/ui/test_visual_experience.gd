@@ -1,5 +1,20 @@
 extends GutTest
 
+const SimplePartsScript = preload("res://src/buneko/visual/buneko_simple_parts.gd")
+
+func test_buneko_placeholder_palette_is_neutral() -> void:
+	var fills := [
+		SimplePartsScript.HEAD_FILL,
+		SimplePartsScript.BODY_FILL,
+		SimplePartsScript.LOCOMOTION_FILL,
+		SimplePartsScript.DIRECTION_MARKER,
+	]
+
+	for color: Color in fills:
+		var highest_channel := maxf(color.r, maxf(color.g, color.b))
+		var lowest_channel := minf(color.r, minf(color.g, color.b))
+		assert_lte(highest_channel - lowest_channel, 0.08)
+
 func test_shared_theme_and_header_load() -> void:
 	var theme: Theme = load("res://themes/buneko_theme.tres")
 	var header_scene: PackedScene = load("res://scenes/ui/mission_step_header.tscn")

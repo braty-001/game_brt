@@ -6,6 +6,8 @@ const BasePartsScript = preload("res://src/buneko/domain/base_buneko_parts.gd")
 const BlockKind = preload("res://src/programming/domain/block_kind.gd")
 const BrainEditorScene = preload("res://scenes/brain_editor/brain_editor.tscn")
 const BunekoActionDispatcherScript = preload("res://src/buneko/runtime/buneko_action_dispatcher.gd")
+const BunekoAttributeResolverScript = preload("res://src/buneko/domain/buneko_attribute_resolver.gd")
+const BunekoAttributesScript = preload("res://src/buneko/domain/buneko_attributes.gd")
 const BunekoScene = preload("res://scenes/buneko/buneko.tscn")
 const BunekoSensorReaderScript = preload("res://src/buneko/runtime/buneko_sensor_reader.gd")
 const EvaluatorScript = preload("res://src/tutorial/tutorial_objective_evaluator.gd")
@@ -67,6 +69,8 @@ func _physics_process(_delta: float) -> void:
 	_present_action_pulse(previous_block_id, previous_refused_block_id)
 	if active_runtime.failure_reason == RuntimeFailureReasonScript.Value.EXECUTION_LIMIT:
 		fail_from_runtime()
+	elif active_runtime.has_finished_execution() and buneko.is_motion_settled():
+		fail_from_program_end()
 
 func install_base_assembly() -> void:
 	current_assembly = BasePartsScript.complete_assembly()
@@ -183,6 +187,42 @@ func fail_from_runtime() -> bool:
 		return failed
 	return false
 
+func fail_from_program_end() -> bool:
+	if active_runtime == null or not active_runtime.has_finished_execution():
+		return false
+	if not evaluator.fail_by_program_end():
+		return false
+
+	var false_while_block_id := _false_while_with_empty_next_block_id()
+	active_runtime.stop()
+	if buneko != null and buneko.controller != null:
+		buneko.controller.stop_horizontal()
+	_show_editor()
+	if not false_while_block_id.is_empty():
+		brain_editor.select_block(false_while_block_id)
+		_set_feedback("O WHILE avaliou a condicao como falsa e seguiu por Depois. Como essa saida esta vazia, o programa terminou. Altere a condicao ou preencha Depois.")
+	else:
+		_set_feedback("O programa terminou antes de o Buneko alcancar o objetivo.")
+	_set_hint_for_current_state()
+	return true
+
+func _false_while_with_empty_next_block_id() -> String:
+	if active_runtime == null or current_program == null:
+		return ""
+	if not active_runtime.has_last_condition_result or active_runtime.last_condition_result:
+		return ""
+
+	var block_id: String = active_runtime.last_executed_block_id
+	if block_id.is_empty() or not current_program.blocks.has(block_id):
+		return ""
+	if current_program.blocks[block_id].kind != BlockKind.Value.WHILE:
+		return ""
+
+	for connection in current_program.connections:
+		if connection.from_block_id == block_id and connection.from_port == "next":
+			return ""
+	return block_id
+
 func _build_ui() -> void:
 	if evaluator == null:
 		evaluator = EvaluatorScript.new()
@@ -231,6 +271,7 @@ func _build_ui() -> void:
 	guidance.add_child(guidance_box)
 	feedback_label = Label.new()
 	feedback_label.name = "FeedbackLabel"
+	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	feedback_label.add_theme_color_override("font_color", Tokens.TEXT)
 	guidance_box.add_child(feedback_label)
 	hint_label = Label.new()
@@ -279,6 +320,16 @@ func _show_level() -> void:
 	buneko.name = "Buneko"
 	buneko.position = level.spawn_position
 	buneko.fall_limit_y = level.fall_limit_y
+	var base_attributes = BunekoAttributesScript.new(
+		buneko.movement_speed,
+		buneko.ground_deceleration,
+		buneko.jump_impulse,
+		buneko.gravity,
+		buneko.strength
+	)
+	buneko.configure_attributes(
+		BunekoAttributeResolverScript.resolve(current_assembly, base_attributes)
+	)
 	level.add_child(buneko)
 	buneko.fell_out_of_bounds.connect(_on_fall_detected)
 	level.get_node("Goal").reached.connect(complete_goal)

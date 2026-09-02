@@ -12,10 +12,11 @@ Os encaixes sao parte do MVP porque estabelecem a linguagem visual e tecnica par
 
 ## Movimento e fisica
 
-O Buneko opera em uma plataforma lateral 2D com gravidade, colisao e impacto. Ele possui direcao atual, estado de apoio e velocidades de andar e correr. O executor solicita intencoes, e o controlador fisico decide o resultado permitido pelo ambiente.
+O Buneko opera em uma plataforma lateral 2D com gravidade, colisao e impacto. Ele possui direcao atual, estado de apoio, velocidade de locomocao e desaceleracao. O executor solicita intencoes, e o controlador fisico decide o resultado permitido pelo ambiente.
 
-- Andar produz movimento na direcao atual.
-- Correr produz movimento mais rapido na direcao atual.
+- Andar produz movimento na direcao atual conforme o ritmo `normal` ou `rapido`.
+- Quando a intencao termina, o Buneko conserva inercia e desacelera no chao.
+- Momentum horizontal e preservado no ar ate o pouso.
 - Virar altera a direcao atual sem deslocar o Buneko.
 - Pular funciona apenas enquanto apoiado no chao.
 - Cair para fora da area jogavel causa falha de missao.
@@ -29,7 +30,7 @@ O nucleo deve expor capacidades de movimento e atributos de forma que futuras pe
 ## Criterios de aceite
 
 - O jogador monta o conjunto basico nos encaixes corretos antes da fase.
-- O Buneko responde a andar, correr, virar e pular de acordo com a fisica.
+- O Buneko responde aos ritmos de andar, virar e pular de acordo com a fisica.
 - Pulo no ar nao produz novo impulso.
 - Colisoes e queda para fora do nivel geram resultados consistentes.
 - As regras de montagem e restricoes de movimento possuem testes automatizados; o comportamento fisico possui verificacao manual.

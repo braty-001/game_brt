@@ -14,15 +14,15 @@ O brain e o controle autonomo do Buneko. Cada bloco de acao deve emitir uma inte
 
 - `Andar` faz o Buneko dar um passo curto quando executado uma vez.
 - `WHILE` com `Andar` ensina que repetir a intencao produz movimento continuo.
-- `Correr` segue a mesma ideia de `Andar`, mas com passo ou velocidade maior.
+- `Andar [rapido]` solicita velocidade maior sem criar uma segunda acao.
 - `Pular` aplica uma forca de pulo quando o Buneko pode pular.
 - Se uma acao nao puder acontecer, o jogo deve comunicar a falha de forma perceptivel.
 
-### Correr como pulso
+### Ritmo e inercia
 
-`Correr` isolado segue o mesmo contrato de `Andar`: dispara um sprint curto e termina. Em solo, ao fim do pulso, o Buneko para horizontalmente. Se o pulso terminar no ar, o corpo preserva o impulso horizontal ate pousar; isso permite que uma sequencia como `Pular -> Correr` atravesse um vao sem exigir comandos no meio do salto. Mudancas relevantes de acao recebem feedback visual no Buneko.
+`Andar` aceita os ritmos discretos `normal` e `rapido`. O parametro representa a intencao do brain, enquanto a peca de locomocao determina a capacidade fisica. Quando o brain deixa de emitir movimento, o Buneko conserva inercia e desacelera no chao. No ar, o momentum horizontal e preservado ate o pouso.
 
-Quando a cadeia chega ao fim, o brain nao reinicia automaticamente. Para emitir uma nova acao, o programa precisa chegar nela por uma repeticao explicita, como `WHILE`. Assim, um bloco isolado equivale de fato a um unico passo ou sprint.
+Quando a cadeia chega ao fim, o brain nao reinicia automaticamente. Para sustentar velocidade, o programa precisa repetir `Andar` explicitamente, como em `WHILE -> Andar`. Um bloco isolado produz movimento seguido de desaceleracao.
 
 A linguagem deve continuar simples. Parametros podem existir, mas devem ensinar o comportamento, nao virar ajuste fino obrigatorio.
 
@@ -47,17 +47,16 @@ resultado esperado: caminhar continuamente enquanto o sensor permitir.
 
 ### Parametro de movimento
 
-`Andar` pode receber um parametro simples de ritmo ou velocidade. Para o MVP, preferir opcoes discretas a sliders livres:
+`Andar` recebe um parametro simples de ritmo com opcoes discretas:
 
-- `curto` ou `devagar`;
 - `normal`;
-- `rapido`, se ficar claro e calibrado.
+- `rapido`.
 
 O parametro nao consome RAM. No futuro, atributos e upgrades do Buneko podem limitar ou ampliar essas opcoes sem mudar a estrutura da linguagem.
 
 ### Pulo com forca
 
-`Pular` pode receber um parametro simples de forca:
+`Pular` pode receber um parametro simples de forca no futuro:
 
 - `baixo`;
 - `normal`;
@@ -65,7 +64,7 @@ O parametro nao consome RAM. No futuro, atributos e upgrades do Buneko podem lim
 
 Para o MVP, o valor padrao deve bastar para concluir o tutorial. Forca de pulo nao deve transformar a fase inicial em puzzle de precisao numerica.
 
-Quando `Pular` possui uma proxima acao, o runtime da fase espera o Buneko pousar antes de liberar esse proximo bloco. Assim, `Pular -> Correr` inicia a corrida no outro lado do vao, em vez de consumir seu pulso ainda no ar. Repeticoes de `WHILE -> Andar` nao recebem essa espera.
+Quando `Pular` possui uma proxima acao, o runtime da fase espera o Buneko pousar antes de liberar esse proximo bloco. Assim, `Pular -> Andar [rapido]` inicia o movimento no outro lado do vao. Repeticoes de `WHILE -> Andar` nao recebem essa espera.
 
 ### Falha visivel de acao
 
@@ -93,9 +92,9 @@ O Buneko deve sentir que possui corpo:
 
 A primeira entrega pode usar ajustes simples de duracao de passo, aceleracao, atrito e feedback visual. Nao e necessario implementar fisica complexa.
 
-## Experimentos obrigatorios
+## Resultado dos experimentos
 
-Antes de fechar a decisao de movimento, comparar pelo menos dois modelos:
+Foram comparados dois modelos:
 
 ### Experimento A: acao por pulso
 
@@ -111,11 +110,20 @@ Perguntas:
 
 Enquanto o runtime passa por `Andar`, o Buneko recebe intencao de movimento naquele ciclo fisico. Quando o brain deixa de mandar movimento, o Buneko desacelera ou para.
 
-Perguntas:
+O experimento B foi escolhido como base do contrato final. O teste manual mostrou que uma intencao limitada a um unico frame era curta demais; por isso o modelo final combina intencao por ciclo com inercia e desaceleracao calibradas. No modo final:
 
-- A sensacao de plataforma fica melhor?
-- O jogador entende por que o Buneko para?
-- `IF` e `WHILE` continuam visualmente legiveis?
+- `Andar` renova a velocidade desejada conforme o ritmo somente no ciclo em que e executado;
+- repeticoes explicitas, como `WHILE -> Andar`, renovam essa intencao em cada ciclo;
+- na ausencia de uma nova intencao, o Buneko desacelera de modo deterministico no chao;
+- o impulso horizontal continua preservado no ar ate o pouso;
+- pausar, interromper ou encerrar uma tentativa limpa a intencao horizontal.
+
+Conclusao:
+
+- `Correr` e removido por duplicar a mesma intencao de `Andar`.
+- Ritmos permanecem discretos e nao consomem RAM.
+- Velocidade e desaceleracao podem ser alteradas por futuras pecas de locomocao.
+- A validacao manual final ainda deve confirmar a calibracao da inercia.
 
 ## Criterios de aceite
 
@@ -127,6 +135,7 @@ Perguntas:
 - Um jogador consegue explicar, apos observar a fase, por que um `Andar` unico nao atravessa o buraco sozinho.
 - Movimento nao depende de precisao de um unico frame.
 - A mudanca nao quebra RAM, validacao, sensores ou montagem.
+- Se o programa chegar ao fim antes do objetivo, a tentativa termina com feedback util em vez de permanecer indefinidamente como `Executando`.
 
 ## Fora do escopo
 
@@ -155,8 +164,8 @@ Essa ideia deve ser preservada como aprimoramento de feedback, mas nao deve bloq
 - Se o passo for curto demais, o jogo pode parecer travado; se for longo demais, o jogador perde controle mental sobre a repeticao.
 - Parametros demais podem fazer o MVP parecer ferramenta de ajuste numerico em vez de jogo de programacao.
 - Feedback de falha precisa ajudar sem poluir a tela.
-- O sinal luminoso nao pode alterar a ordem do programa nem bloquear sequencias legitimas como `Pular -> Correr`.
+- O sinal luminoso nao pode alterar a ordem do programa nem bloquear sequencias legitimas como `Pular -> Andar [rapido]`.
 
 ## Resultado esperado
 
-O jogador coloca blocos, executa a tentativa e reconhece uma relacao direta entre programa e corpo: um `Andar` vira um passo, repeticao vira caminhada, `Correr` isolado vira um sprint curto, `Pular` so funciona quando existe apoio, e erros de resposta ficam legiveis o bastante para corrigir o brain.
+O jogador coloca blocos, executa a tentativa e reconhece uma relacao direta entre programa e corpo: um `Andar` inicia movimento no ritmo escolhido, repeticao sustenta a caminhada, a ausencia de comando produz desaceleracao, `Pular` so funciona quando existe apoio, e erros de resposta ficam legiveis o bastante para corrigir o brain.

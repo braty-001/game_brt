@@ -5,6 +5,7 @@ const ActionDispatcherScript = preload("res://src/programming/runtime/action_dis
 const BlockKindScript = preload("res://src/programming/domain/block_kind.gd")
 const ConditionCatalogScript = preload("res://src/programming/domain/condition_catalog.gd")
 const ProgramRamCalculatorScript = preload("res://src/programming/domain/program_ram_calculator.gd")
+const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 const ProgramRuntimeScript = preload("res://src/programming/runtime/program_runtime.gd")
 const ProgramValidatorScript = preload("res://src/programming/domain/program_validator.gd")
 const SensorReaderScript = preload("res://src/programming/runtime/sensor_reader.gd")
@@ -26,9 +27,12 @@ class FakeSensorReader extends SensorReader:
 
 class FakeActionDispatcher extends ActionDispatcher:
 	var action_kinds: Array[int] = []
+	var movement_paces: Array[int] = []
 
-	func dispatch(action_kind: int) -> int:
-		action_kinds.append(action_kind)
+	func dispatch(block: ProgramBlock) -> int:
+		action_kinds.append(block.kind)
+		if block.kind == BlockKindScript.Value.WALK:
+			movement_paces.append(MovementPaceScript.from_parameters(block.parameters))
 		return ActionDispatchResult.Value.YIELDED
 
 func test_reference_program_is_valid_and_within_ram_limit() -> void:
@@ -36,13 +40,18 @@ func test_reference_program_is_valid_and_within_ram_limit() -> void:
 
 	assert_eq(ProgramValidatorScript.validate(program).size(), 0)
 	assert_eq(ProgramRamCalculatorScript.used_ram(program), 5)
+	assert_true(program.blocks.has("if_gap"))
 
 	var while_program := TutorialReferenceProgramScript.build_while_example()
 
 	assert_eq(ProgramValidatorScript.validate(while_program).size(), 0)
 	assert_eq(ProgramRamCalculatorScript.used_ram(while_program), 5)
+	assert_eq(while_program.blocks.size(), 5)
+	assert_false(while_program.blocks.has("if_gap"))
+	assert_true(while_program.blocks.has("while_goal_path_clear"))
+	assert_false(program.blocks.has("while_goal_path_clear"))
 
-func test_if_reference_program_walks_until_gap_then_jumps_and_runs() -> void:
+func test_if_reference_program_walks_until_gap_then_jumps_and_walks_fast() -> void:
 	var sensor_reader := FakeSensorReader.new()
 	var dispatcher := FakeActionDispatcher.new()
 	var runtime := ProgramRuntimeScript.new(sensor_reader, dispatcher)
@@ -59,8 +68,9 @@ func test_if_reference_program_walks_until_gap_then_jumps_and_runs() -> void:
 	assert_eq(dispatcher.action_kinds, [
 		BlockKindScript.Value.WALK,
 		BlockKindScript.Value.JUMP,
-		BlockKindScript.Value.RUN,
+		BlockKindScript.Value.WALK,
 	])
+	assert_eq(dispatcher.movement_paces, [MovementPaceScript.Value.NORMAL, MovementPaceScript.Value.FAST])
 
 func test_while_reference_program_walks_while_clear_then_jumps() -> void:
 	var sensor_reader := FakeSensorReader.new()
@@ -75,9 +85,17 @@ func test_while_reference_program_walks_while_clear_then_jumps() -> void:
 	sensor_reader.path_clear_ahead = false
 	sensor_reader.gap_ahead = true
 	runtime.tick()
+	sensor_reader.path_clear_ahead = true
+	runtime.tick()
 
 	assert_eq(dispatcher.action_kinds, [
 		BlockKindScript.Value.WALK,
 		BlockKindScript.Value.WALK,
 		BlockKindScript.Value.JUMP,
+		BlockKindScript.Value.WALK,
+	])
+	assert_eq(dispatcher.movement_paces, [
+		MovementPaceScript.Value.NORMAL,
+		MovementPaceScript.Value.NORMAL,
+		MovementPaceScript.Value.FAST,
 	])

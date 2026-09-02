@@ -19,6 +19,8 @@ func hint_for(state: int, result_kind: int = MissionResultScript.Kind.NONE, prog
 				return "Ajuste o sensor visual do buraco e tente pular antes da borda."
 			if result_kind == MissionResultScript.Kind.FAILED_BY_EXECUTION_LIMIT:
 				return "Revise repeticoes que nao chegam a uma acao de movimento."
+			if result_kind == MissionResultScript.Kind.FAILED_BEFORE_OBJECTIVE:
+				return "O programa precisa manter o Buneko em movimento ate alcancar o objetivo."
 			return "Revise o programa e tente novamente."
 		MissionStateScript.Value.COMPLETED:
 			return "Objetivo concluido."

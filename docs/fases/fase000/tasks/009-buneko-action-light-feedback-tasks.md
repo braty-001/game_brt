@@ -55,7 +55,7 @@ Status geral: implementado para validacao visual. Acompanhar e `NEXT` foram remo
     - Disparar vermelho para acao recusada.
   - Aceite:
     - `WHILE -> Andar` nao pisca repetidamente.
-    - `Andar -> Pular -> Correr` produz pulsos distintos sem mudar a trajetoria.
+    - `Andar -> Pular -> Andar [rapido]` produz pulsos coerentes sem mudar a trajetoria.
     - Pulo fora do chao produz pulso vermelho.
   - Status: concluido; `TutorialMission` observa acao efetiva e recusa sem alterar o runtime ou a fisica.
 
@@ -77,7 +77,7 @@ Status geral: implementado para validacao visual. Acompanhar e `NEXT` foram remo
     - Cobrir remocao de controles, transicoes de acao e acao recusada.
   - Verificacao manual:
     - Executar `WHILE caminho livre -> Andar` e verificar ausencia de flicker.
-    - Executar transicao para `Pular` e depois `Correr` e verificar luzes distintas com movimento normal.
+    - Executar transicao para `Pular` e depois `Andar [rapido]` e verificar luzes coerentes com movimento normal.
     - Forcar pulo no ar e verificar luz vermelha.
     - Retornar ao editor e iniciar nova tentativa para verificar reset visual.
 

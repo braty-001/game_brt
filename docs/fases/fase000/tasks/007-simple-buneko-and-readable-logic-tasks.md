@@ -135,6 +135,20 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
     - Mensagens de condicao ausente e ramo vazio.
   - Status: resumos de bloco, ramos positivo/negativo de `IF` e exemplos foram cobertos por testes; aviso especifico de ramo vazio permanece como polimento futuro sem mudar validade da PRD 001.
 
+- [x] Explicar o encerramento de um `WHILE` inicialmente falso.
+  - Arquivos previstos:
+    - `braty/src/tutorial/tutorial_mission.gd`
+    - `braty/tests/unit/tutorial/test_tutorial_mission_flow.gd`
+  - Regras:
+    - O `WHILE` continua avaliando a condicao antes do corpo.
+    - Saidas vazias continuam permitidas e nao impedem o inicio da tentativa.
+    - Quando a condicao for falsa e `Depois` estiver vazio, o retorno ao editor explica o resultado da condicao e o caminho percorrido.
+    - O bloco responsavel volta selecionado sem alterar grafo, RAM ou conexoes.
+  - Aceite:
+    - O jogador entende por que o Buneko nao executou o corpo do `WHILE`.
+    - A mensagem orienta alterar a condicao ou preencher a saida `Depois`.
+  - Status: implementado sem alterar validade ou semantica do programa. O retorno seleciona o `WHILE` e explica condicao falsa, caminho `Depois` e saida vazia. Teste focado com 14 testes/82 asserts e suite completa com 181 testes/703 asserts passaram; leitura visual da mensagem permanece para validacao manual.
+
 - [x] Permitir escolher o programa de exemplo no editor.
   - Arquivos previstos:
     - `braty/src/brain_editor/brain_editor.gd`
@@ -188,6 +202,22 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
     - Cenas carregam e partes esperadas existem.
     - Regras de montagem e fisica continuam passando.
   - Status: `BunekoAssemblyPreview` e `BunekoVisual` usam o mesmo helper visual; colisao e fisica nao foram alteradas.
+
+- [x] Neutralizar o placeholder visual durante a validacao do MVP.
+  - Arquivos previstos:
+    - `braty/src/buneko/visual/buneko_simple_parts.gd`
+    - testes de cena e experiencia visual afetados.
+  - Regras:
+    - Cabeca, corpo e locomocao usam apenas caixas alinhadas e tons neutros.
+    - O visual nao possui rosto, orelhas, simbolos ou ornamentos.
+    - Uma marca lateral minima preserva a leitura da direcao.
+    - O pulso luminoso continua visivel como feedback funcional.
+    - Montagem, colisao, atributos, sensores e fisica nao mudam.
+  - Aceite:
+    - Bancada e fase usam o mesmo placeholder.
+    - As tres pecas continuam distinguiveis quando instaladas separadamente.
+    - A troca nao altera o tamanho da colisao nem o comportamento do tutorial.
+  - Status: implementado com tres caixas neutras compartilhadas entre bancada e fase, marca de direcao e pulso funcional preservados. Validacao automatizada: 39 testes/109 asserts de Buneko, 4 testes/13 asserts de experiencia visual e suite completa com 180 testes/694 asserts. Aceite visual manual ainda pendente.
 
 - [x] Calibrar os dois exemplos na fase tutorial.
   - Arquivos previstos:

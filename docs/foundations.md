@@ -67,6 +67,8 @@ Os testes GUT devem ser executados a partir da raiz do repositorio com:
 
 Estruturas como `WHILE` podem criar programas que nunca terminam. O executor deve ter um limite de instrucoes por atualizacao, diagnostico compreensivel para o jogador e controles para pausar, parar e reiniciar a execucao. O jogo nao pode congelar por causa de um programa criado pelo jogador.
 
-## Agentes
+## Instrucoes do Codex
 
-Os papeis em `.agents/` orientam a execucao e a revisao do trabalho. Eles nao substituem a PRD, a lista de tarefas ou uma decisao registrada: esses documentos sao a fonte de verdade do projeto.
+`AGENTS.md`, na raiz do repositorio, concentra as regras permanentes para trabalhar no Buneko. Fluxos repetiveis e especializados ficam em `.agents/skills/`; a auditoria de qualidade do projeto e definida pela skill `buneko-godot-audit`.
+
+Essas instrucoes orientam a execucao e a revisao do trabalho, mas nao substituem a PRD, a lista de tarefas ou uma decisao registrada: esses documentos continuam sendo a fonte de verdade do projeto.

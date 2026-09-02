@@ -6,6 +6,7 @@ const EditorBlockStateScript = preload("res://src/brain_editor/editor_block_stat
 const EditorConnectionStateScript = preload("res://src/brain_editor/editor_connection_state.gd")
 const EditorGraphStateScript = preload("res://src/brain_editor/editor_graph_state.gd")
 const ProgramConditionScript = preload("res://src/programming/domain/program_condition.gd")
+const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 const ProgramGraphBuilderScript = preload("res://src/brain_editor/program_graph_builder.gd")
 const ProgramRamCalculatorScript = preload("res://src/programming/domain/program_ram_calculator.gd")
 const ProgramValidatorScript = preload("res://src/programming/domain/program_validator.gd")
@@ -29,11 +30,27 @@ func test_disconnected_blocks_do_not_count_toward_ram() -> void:
 	var graph = EditorGraphStateScript.new()
 	graph.start_block_id = "walk"
 	graph.add_block(EditorBlockStateScript.new("walk", BlockKind.Value.WALK))
-	graph.add_block(EditorBlockStateScript.new("unused", BlockKind.Value.RUN))
+	graph.add_block(EditorBlockStateScript.new("unused", BlockKind.Value.TURN))
 
 	var program = _build_program(graph)
 
 	assert_eq(program.blocks.size(), 2)
+	assert_eq(ProgramRamCalculatorScript.used_ram(program), 1)
+
+func test_movement_parameters_are_preserved_without_extra_ram() -> void:
+	var graph = EditorGraphStateScript.new()
+	graph.start_block_id = "walk"
+	graph.add_block(EditorBlockStateScript.new(
+		"walk",
+		BlockKind.Value.WALK,
+		Vector2.ZERO,
+		null,
+		{MovementPaceScript.PARAMETER_KEY: MovementPaceScript.Value.FAST}
+	))
+
+	var program = _build_program(graph)
+
+	assert_eq(MovementPaceScript.from_parameters(program.blocks["walk"].parameters), MovementPaceScript.Value.FAST)
 	assert_eq(ProgramRamCalculatorScript.used_ram(program), 1)
 
 func test_control_blocks_keep_conditions_and_ports() -> void:
@@ -46,10 +63,10 @@ func test_control_blocks_keep_conditions_and_ports() -> void:
 	graph.add_block(EditorBlockStateScript.new("if", BlockKind.Value.IF, Vector2.ZERO, gap_condition))
 	graph.add_block(EditorBlockStateScript.new("jump", BlockKind.Value.JUMP))
 	graph.add_block(EditorBlockStateScript.new("while", BlockKind.Value.WHILE, Vector2.ZERO, gap_condition))
-	graph.add_block(EditorBlockStateScript.new("run", BlockKind.Value.RUN))
+	graph.add_block(EditorBlockStateScript.new("turn", BlockKind.Value.TURN))
 	graph.add_connection(EditorConnectionStateScript.new("if", "true", "jump"))
 	graph.add_connection(EditorConnectionStateScript.new("if", "false", "while"))
-	graph.add_connection(EditorConnectionStateScript.new("while", "body", "run"))
+	graph.add_connection(EditorConnectionStateScript.new("while", "body", "turn"))
 
 	var program = _build_program(graph)
 

@@ -14,6 +14,12 @@ func test_hints_cover_main_mission_states() -> void:
 		presenter.hint_for(MissionStateScript.Value.FAILED, MissionResultScript.Kind.FAILED_BY_FALL),
 		""
 	)
+	assert_true(
+		presenter.hint_for(
+			MissionStateScript.Value.FAILED,
+			MissionResultScript.Kind.FAILED_BEFORE_OBJECTIVE
+		).contains("movimento")
+	)
 	assert_ne(presenter.hint_for(MissionStateScript.Value.COMPLETED), "")
 
 func test_editing_hint_introduces_visual_sensor_and_control_blocks() -> void:

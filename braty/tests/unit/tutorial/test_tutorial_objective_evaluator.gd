@@ -40,6 +40,17 @@ func test_return_to_editing_after_failure_preserves_data() -> void:
 	assert_eq(evaluator.assembly, "assembly")
 	assert_eq(evaluator.program, "program")
 
+func test_program_end_before_objective_is_a_specific_failure() -> void:
+	var evaluator = EvaluatorScript.new()
+	evaluator.enter_editing("assembly", "program")
+	evaluator.start_attempt()
+
+	assert_true(evaluator.fail_by_program_end())
+
+	assert_eq(evaluator.state, MissionStateScript.Value.FAILED)
+	assert_eq(evaluator.result.kind, MissionResultScript.Kind.FAILED_BEFORE_OBJECTIVE)
+	assert_true(evaluator.result.is_failure())
+
 func test_events_out_of_order_are_rejected() -> void:
 	var evaluator = EvaluatorScript.new()
 

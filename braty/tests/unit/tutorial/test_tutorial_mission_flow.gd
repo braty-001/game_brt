@@ -1,8 +1,10 @@
 extends GutTest
 
 const BlockKind = preload("res://src/programming/domain/block_kind.gd")
+const ConditionCatalogScript = preload("res://src/programming/domain/condition_catalog.gd")
 const MissionStateScript = preload("res://src/tutorial/mission_state.gd")
 const RuntimeStateScript = preload("res://src/programming/runtime/runtime_state.gd")
+const MissionResultScript = preload("res://src/tutorial/mission_result.gd")
 const TutorialReferenceProgramScript = preload("res://src/tutorial/tutorial_reference_program.gd")
 
 func test_tutorial_mission_scene_starts_at_assembly() -> void:
@@ -52,6 +54,47 @@ func test_start_attempt_requires_editor_and_shows_level() -> void:
 	assert_not_null(mission.runtime_overlay)
 	assert_not_null(mission.return_button)
 	assert_true(mission.return_button.visible)
+
+func test_program_end_returns_to_editor_with_specific_feedback() -> void:
+	var mission = await _ready_mission()
+	mission.install_base_assembly()
+	mission.enter_editor()
+	mission.brain_editor.create_block(BlockKind.Value.WALK)
+	assert_true(mission.start_attempt())
+
+	mission.active_runtime.tick()
+	assert_true(mission.active_runtime.has_finished_execution())
+	mission.buneko.controller.stop_horizontal()
+	mission.buneko.controller.step(0.016, true)
+	mission._physics_process(0.016)
+
+	assert_eq(mission.evaluator.state, MissionStateScript.Value.FAILED)
+	assert_eq(mission.evaluator.result.kind, MissionResultScript.Kind.FAILED_BEFORE_OBJECTIVE)
+	assert_not_null(mission.brain_editor)
+	assert_eq(mission.brain_editor.graph_state.blocks.size(), 1)
+	assert_true(mission.feedback_label.text.contains("terminou"))
+
+func test_false_while_with_empty_next_explains_the_exit_and_selects_the_block() -> void:
+	var mission = await _ready_mission()
+	mission.install_base_assembly()
+	mission.enter_editor()
+	var while_node = mission.brain_editor.create_block(BlockKind.Value.WHILE)
+	var while_block_id: String = while_node.block_id
+	assert_true(mission.brain_editor.apply_condition_to_selected(
+		ConditionCatalogScript.Modality.VISION,
+		ConditionCatalogScript.Query.GAP_AHEAD
+	))
+	assert_true(mission.start_attempt())
+
+	mission.active_runtime.tick()
+	assert_true(mission.active_runtime.has_finished_execution())
+	assert_true(mission.fail_from_program_end())
+
+	assert_eq(mission.evaluator.state, MissionStateScript.Value.FAILED)
+	assert_true(mission.feedback_label.text.contains("WHILE avaliou a condicao como falsa"))
+	assert_true(mission.feedback_label.text.contains("Depois"))
+	assert_eq(mission.brain_editor.selected_block_id, while_block_id)
+	assert_eq(mission.brain_editor.graph_state.connections.size(), 0)
 
 func test_editor_execute_button_starts_real_mission_attempt() -> void:
 	var mission = await _ready_mission()
@@ -165,6 +208,20 @@ func test_reference_examples_wait_for_landing_before_the_action_after_jump() -> 
 		assert_eq(mission.active_runtime.state, RuntimeStateScript.Value.RUNNING)
 		mission.free()
 		await get_tree().process_frame
+
+func test_while_reference_program_completes_the_tutorial() -> void:
+	var mission = await _ready_mission()
+	mission.install_base_assembly()
+	assert_true(mission.enter_editor())
+	mission.brain_editor.load_tutorial_example(
+		TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR
+	)
+	assert_true(mission.start_attempt())
+
+	await _run_attempt_until_terminal(mission)
+
+	assert_eq(mission.evaluator.state, MissionStateScript.Value.COMPLETED)
+	assert_eq(mission.active_runtime.state, RuntimeStateScript.Value.COMPLETED)
 
 func _ready_mission():
 	var scene: PackedScene = load("res://scenes/tutorial/tutorial_mission.tscn")

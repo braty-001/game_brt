@@ -12,8 +12,8 @@ func test_base_assembly_resolves_default_attributes() -> void:
 
 	var attributes = AttributeResolverScript.new().resolve(assembly)
 
-	assert_gt(attributes.walk_speed, 0.0)
-	assert_gt(attributes.run_speed, attributes.walk_speed)
+	assert_gt(attributes.movement_speed, 0.0)
+	assert_gt(attributes.ground_deceleration, 0.0)
 	assert_gt(attributes.jump_impulse, 0.0)
 	assert_gt(attributes.gravity, 0.0)
 	assert_eq(attributes.strength, 1.0)
@@ -25,13 +25,13 @@ func test_part_modifiers_extend_base_attributes() -> void:
 		"fast_locomotion",
 		SlotScript.Value.LOCOMOTION,
 		"Locomocao Rapida",
-		{"walk_speed": 25.0, "run_speed": 50.0}
+		{"movement_speed": 25.0, "ground_deceleration": 50.0}
 	))
 
 	var attributes = AttributeResolverScript.new().resolve(assembly, base_attributes)
 
-	assert_eq(attributes.walk_speed, 125.0)
-	assert_eq(attributes.run_speed, 200.0)
+	assert_eq(attributes.movement_speed, 125.0)
+	assert_eq(attributes.ground_deceleration, 200.0)
 	assert_eq(attributes.jump_impulse, 200.0)
 
 func test_unknown_modifiers_are_ignored() -> void:

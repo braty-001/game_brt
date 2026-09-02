@@ -81,6 +81,8 @@ Regras:
 - Ao terminar o corpo, o runtime retorna implicitamente ao `WHILE` e reavalia o sensor.
 - Toda repeticao que produz uma acao deve ceder tempo para a simulacao fisica.
 - Corpo vazio continua protegido pelo limite de execucao e recebe erro compreensivel.
+- Se a condicao for falsa e a saida `Depois` estiver vazia, a tentativa pode terminar sem exigir uma conexao artificial. Ao retornar ao editor, o jogo deve explicar que o `WHILE` avaliou falso, seguiu por `Depois` e encontrou a saida vazia.
+- Nesse encerramento, o `WHILE` responsavel deve voltar selecionado para que o jogador consiga alterar a condicao ou preencher `Depois` imediatamente.
 
 ## Condicoes disponiveis
 
@@ -117,18 +119,18 @@ WHILE: caminho livre a frente
 
 Os dois devem concluir a fase tutorial de forma repetivel. O jogador pode carregar um exemplo, observar as conexoes, mover os blocos e modificar a condicao. O exemplo nao deve ser apresentado como unica solucao possivel.
 
-## Direcao visual do Buneko
+## Direcao visual temporaria do Buneko
 
-Substituir o visual atual por uma representacao 2D mais simples e propria para um jogo de programacao:
+Durante a validacao do MVP, o Buneko usa um placeholder deliberadamente neutro para que leitura, movimento e montagem sejam avaliados sem a influencia de um design de personagem prematuro:
 
-- Silhueta de robo-gato reconhecivel em tamanho pequeno.
-- Cabeca grande e expressiva, corpo compacto e locomocao simples.
-- Formas geometricas claras e contornos consistentes.
-- No maximo quatro cores dominantes no personagem.
-- Preenchimentos planos com, no maximo, uma sombra simples por peca.
-- Poucas articulacoes aparentes e nenhum detalhe metalico ornamental.
-- Olhos e expressao legiveis durante montagem e fase.
-- Pontos de encaixe entre cabeca, corpo e locomocao alinhados e discretos.
+- Cabeca, corpo e locomocao aparecem como tres caixas alinhadas.
+- Tons neutros, preenchimento plano e contorno consistente substituem cores e detalhes de personalidade.
+- O placeholder nao possui olhos, orelhas, rosto, simbolos, articulacoes ou ornamentos.
+- Uma marca lateral minima na cabeca comunica somente a direcao na fase.
+- O pulso luminoso de acao permanece por ser feedback funcional do programa.
+- Pontos de encaixe entre cabeca, corpo e locomocao continuam claros na montagem.
+
+Esse placeholder nao define a direcao de arte final nem precisa parecer um robo-gato. Uma futura decisao visual pode substitui-lo sem alterar montagem, colisao, atributos, runtime ou sensores.
 
 O mesmo conjunto visual deve alimentar a bancada e o personagem da fase para que o jogador reconheca imediatamente o Buneko que montou.
 
@@ -159,10 +161,11 @@ O mesmo conjunto visual deve alimentar a bancada e o personagem da fase para que
 - O sensor distingue trecho imediato seguro, buraco proximo e obstaculo a frente.
 - `IF` escolhe corretamente entre pular e andar conforme o sensor de buraco.
 - `WHILE` repete andar enquanto o caminho esta livre e sai para um `IF` que escolhe uma alternativa, como pular quando ha buraco.
+- Um `WHILE` inicialmente falso com `Depois` vazio retorna ao editor com diagnostico especifico e deixa o bloco responsavel selecionado.
 - Os exemplos de `IF` e `WHILE` ficam dentro do limite de 5 RAM e sao validos pelo mesmo `ProgramValidator` do jogo.
 - Os dois exemplos concluem a fase tutorial de forma repetivel apos calibracao fisica.
 - O editor comunica pergunta, repeticao, saida e erro de condicao sem exigir explicacao externa.
-- O novo Buneko usa visual 2D simples, possui as tres pecas separaveis e continua legivel na bancada e na fase.
+- O placeholder do Buneko usa tres caixas separaveis, continua legivel na bancada e na fase e nao antecipa a arte final.
 - Trocar os assets nao altera regras de montagem, atributos, runtime ou sensores.
 - Testes automatizados cobrem catalogo, leitor de sensor, semantica do runtime, exemplos e carregamento das cenas.
 

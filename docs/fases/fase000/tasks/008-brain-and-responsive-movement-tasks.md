@@ -1,15 +1,15 @@
 # Tarefas: PRD 008 - Brain e Movimento Responsivo
 
-Status geral: experimento A implementado para validacao automatizada. A cadeia brain -> runtime -> Buneko foi ajustada para retorno correto de acoes, `Andar`/`Correr` como passo curto e momentum no ar. O feedback de transicao visual foi movido para a PRD 009; falta comparar com intencao continua, escolher contrato final e validar manualmente a sensacao.
+Status geral: o experimento B foi consolidado como contrato final. `Correr` foi substituido por `Andar` com ritmo `normal` ou `rapido`; a fisica conserva inercia com desaceleracao no chao e momentum no ar. Programas que terminam antes do objetivo encerram a tentativa com feedback. A migracao automatizada esta concluida; falta validar manualmente a sensacao.
 
 ## Ordem de implementacao
 
-1. Mapear o comportamento atual de `Andar`, `Correr`, `Pular` e `Virar`. Concluido para o experimento A.
+1. Mapear o comportamento atual de `Andar`, `Pular` e `Virar`. Concluido.
 2. Corrigir a acao que reporta sucesso mesmo quando nao alterou o Buneko. Concluido para `Pular`.
 3. Prototipar movimento por pulso. Implementado como passo curto com momentum aereo.
-4. Prototipar movimento por intencao continua por ciclo.
-5. Comparar os experimentos na fase tutorial.
-6. Escolher o contrato final do MVP e atualizar documentacao da linguagem.
+4. Prototipar movimento por intencao continua por ciclo. Concluido para comparacao automatizada.
+5. Comparar os experimentos na fase tutorial. Concluido pelo usuario.
+6. Escolher o contrato final do MVP e atualizar documentacao da linguagem. Escolhido: intencao continua com inercia e ritmo em `Andar`.
 7. Adicionar feedback minimo para acao recusada.
 8. Adicionar feedback visual de transicao de acao. Movido para a PRD 009.
 9. Rodar testes automatizados e validacao manual.
@@ -31,7 +31,7 @@ Status geral: experimento A implementado para validacao automatizada. A cadeia b
 
 ### Marco C: Fechamento do contrato
 
-- Contrato final de `Andar`, `Correr`, `Pular` e `Virar` fica documentado.
+- Contrato final de `Andar`, `Pular` e `Virar` fica documentado.
 - Feedback minimo de acao recusada fica integrado.
 - Programas de referencia continuam concluindo a fase.
 - Roteiro manual valida sensacao de resposta.
@@ -90,10 +90,9 @@ Status geral: experimento A implementado para validacao automatizada. A cadeia b
   - Verificacao manual:
     - Executar programa com apenas `Andar`.
     - Executar programa `WHILE caminho livre -> Andar`.
-  - Status: implementado no `BunekoPhysicsController`; `Andar` e `Correr` aplicam passos temporarios, repeticoes explicitas renovam o passo e momentum horizontal e preservado no ar ate aterrissar. O runtime nao reinicia a cadeia ao chegar ao fim.
-  - Ajuste posterior: apos um `Pular` aceito, a fase aguarda o pouso antes de despachar a proxima acao. Isso faz `Pular -> Correr` iniciar no outro lado do vao.
+  - Status: experimento historico implementado e rejeitado como contrato final. O runtime nao reinicia a cadeia ao chegar ao fim.
 
-- [ ] Prototipar `Andar` como intencao continua por ciclo.
+- [x] Prototipar `Andar` como intencao continua por ciclo.
   - Arquivos previstos:
     - `braty/src/programming/runtime/program_runtime.gd`
     - `braty/src/buneko/physics/buneko_physics_controller.gd`
@@ -101,16 +100,34 @@ Status geral: experimento A implementado para validacao automatizada. A cadeia b
     - testes de runtime/fisica afetados
   - Regras:
     - Movimento horizontal existe enquanto o brain emite intencao.
-    - Ausencia de intencao desacelera ou para o Buneko de forma previsivel.
+    - Ausencia de intencao desacelera o Buneko no chao de forma previsivel.
+    - Momentum horizontal continua preservado no ar ate o pouso.
+    - Pausa, interrupcao e fim de tentativa limpam a intencao horizontal.
     - `WHILE` continua sendo a forma clara de manter movimento.
+    - O modo por pulso e a cena temporaria de comparacao sao removidos apos a escolha.
   - Aceite:
     - Sensacao de plataforma melhora sem esconder a logica do brain.
     - O jogador consegue explicar por que o Buneko parou.
-  - Verificacao manual:
-    - Comparar lado a lado com o experimento de passo curto.
-  - Status: pendente; deve ser comparado antes de declarar o contrato final do MVP.
+  - Status: consolidado como unico controlador com desaceleracao no chao e momentum aereo.
 
-- [ ] Definir parametros simples de movimento.
+- [x] Encerrar tentativa cujo programa terminou antes do objetivo.
+  - Arquivos previstos:
+    - `braty/src/programming/runtime/program_runtime.gd`
+    - `braty/src/tutorial/mission_result.gd`
+    - `braty/src/tutorial/tutorial_objective_evaluator.gd`
+    - `braty/src/tutorial/tutorial_mission.gd`
+    - testes de runtime e fluxo tutorial afetados
+  - Regras:
+    - O runtime deve expor quando uma execucao valida consumiu todo o grafo.
+    - A fase deve tratar esse estado como tentativa encerrada antes do objetivo.
+    - Movimento horizontal deve parar e o programa deve ser preservado para edicao.
+    - O jogador deve receber uma explicacao curta em vez de continuar vendo `Executando`.
+  - Aceite:
+    - Programa linear terminado nao reinicia e nao deixa a tentativa presa.
+    - O editor reaparece com o mesmo programa e feedback sobre o objetivo nao alcancado.
+  - Status: implementado; a fase aguarda o movimento produzido pelo ultimo bloco terminar antes de declarar que o objetivo nao foi alcancado.
+
+- [x] Consolidar `Andar` com ritmos discretos e capacidades de locomocao.
   - Arquivos previstos:
     - `braty/src/programming/domain/program_block.gd`
     - `braty/src/brain_editor/block_parameter_panel.gd`
@@ -119,13 +136,14 @@ Status geral: experimento A implementado para validacao automatizada. A cadeia b
   - Regras:
     - Parametros nao consomem RAM.
     - Preferir opcoes discretas a slider livre.
-    - `Andar` pode receber ritmo ou distancia simples.
-    - `Pular` pode receber forca simples.
+    - `Andar` recebe `normal` ou `rapido`.
+    - `Correr` deixa de existir como bloco separado.
+    - Velocidade e desaceleracao podem ser modificadas por futuras pernas.
+    - `Pular` permanece com forca padrao no MVP.
   - Aceite:
     - O parametro padrao conclui o tutorial.
     - O jogador nao precisa ajustar numero fino para passar da primeira fase.
-  - Observacao:
-    - Esta etapa pode ser adiada se os experimentos mostrarem que parametros ainda aumentam complexidade demais para o MVP.
+  - Status: decisao registrada na ADR 008 e implementada no dominio, editor, runtime, fisica e tutorial.
 
 - [ ] Adicionar feedback minimo para acao recusada.
   - Arquivos previstos:
@@ -165,13 +183,17 @@ Status geral: experimento A implementado para validacao automatizada. A cadeia b
     - Programa com `IF buraco -> Pular / senao Andar`.
     - Pulo propositalmente executado sem chao.
     - Executar `WHILE caminho livre -> Andar` e confirmar que a caminhada segue continua sem flicker repetido.
-    - Executar `WHILE -> Andar -> Pular -> Correr` e confirmar que o pulo recebe a velocidade horizontal da caminhada.
+    - Executar `WHILE -> Andar -> Pular -> Andar [rapido]` e confirmar inercia e retomada apos o pouso.
     - Dez execucoes do programa escolhido para referencia.
   - Documentacao:
     - Atualizar PRD 001 com contrato final de movimento.
     - Atualizar tarefas 005, 006, 007 e checklist 000 conforme o resultado real.
   - Pendencia identificada:
-    - A antiga referencia chegava ao objetivo porque o runtime reiniciava o grafo ao fim. Com o contrato de pulso unico, a fase precisa de uma nova solucao completa dentro de 5 RAM ou de uma recalibracao de geometria e objetivo.
+    - A referencia deve usar `Andar [rapido]` e repeticao explicita depois do pouso para concluir dentro de 5 RAM, sem depender de deslizamento excessivo.
+  - Validacao automatizada mais recente:
+    - 34 scripts, 175 testes e 659 asserts passaram em 2026-08-21.
+    - O contrato final, os ritmos, a inercia, o encerramento antecipado e o programa de referencia possuem cobertura automatizada.
+    - A sensacao da desaceleracao e a usabilidade visual continuam reservadas ao teste manual do usuario.
 
 ## Criterio para declarar a PRD 008 concluida
 

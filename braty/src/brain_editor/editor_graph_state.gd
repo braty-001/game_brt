@@ -1,6 +1,19 @@
 class_name EditorGraphState
 extends RefCounted
 
+enum Change {
+	BLOCK_ADDED,
+	BLOCK_REMOVED,
+	BLOCK_MOVED,
+	CONNECTION_ADDED,
+	CONNECTION_REMOVED,
+	CONDITION_CHANGED,
+	PARAMETER_CHANGED,
+	START_CHANGED,
+}
+
+signal changed(change: int, affected_block_ids: PackedStringArray)
+
 var start_block_id: String
 var blocks: Dictionary = {}
 var connections: Array = []
@@ -10,12 +23,14 @@ func add_block(block) -> bool:
 		return false
 
 	blocks[block.id] = block
+	changed.emit(Change.BLOCK_ADDED, PackedStringArray([block.id]))
 	return true
 
 func remove_block(block_id: String) -> bool:
 	if not blocks.has(block_id):
 		return false
 
+	var affected_block_ids := PackedStringArray([block_id])
 	blocks.erase(block_id)
 	if start_block_id == block_id:
 		start_block_id = ""
@@ -23,8 +38,11 @@ func remove_block(block_id: String) -> bool:
 	for index in range(connections.size() - 1, -1, -1):
 		var connection = connections[index]
 		if connection.from_block_id == block_id or connection.to_block_id == block_id:
+			affected_block_ids.append(connection.from_block_id)
+			affected_block_ids.append(connection.to_block_id)
 			connections.remove_at(index)
 
+	changed.emit(Change.BLOCK_REMOVED, affected_block_ids)
 	return true
 
 func move_block(block_id: String, new_position: Vector2) -> bool:
@@ -33,6 +51,7 @@ func move_block(block_id: String, new_position: Vector2) -> bool:
 
 	var block = blocks[block_id]
 	block.position = new_position
+	changed.emit(Change.BLOCK_MOVED, PackedStringArray([block_id]))
 	return true
 
 func set_block_condition(block_id: String, condition: ProgramCondition) -> bool:
@@ -41,6 +60,25 @@ func set_block_condition(block_id: String, condition: ProgramCondition) -> bool:
 
 	var block = blocks[block_id]
 	block.condition = condition
+	changed.emit(Change.CONDITION_CHANGED, PackedStringArray([block_id]))
+	return true
+
+func set_block_parameter(block_id: String, key: String, value) -> bool:
+	if not blocks.has(block_id) or key.is_empty():
+		return false
+
+	blocks[block_id].parameters[key] = value
+	changed.emit(Change.PARAMETER_CHANGED, PackedStringArray([block_id]))
+	return true
+
+func set_start_block(block_id: String) -> bool:
+	if not block_id.is_empty() and not blocks.has(block_id):
+		return false
+	if start_block_id == block_id:
+		return true
+
+	start_block_id = block_id
+	changed.emit(Change.START_CHANGED, PackedStringArray([block_id]))
 	return true
 
 func add_connection(connection) -> bool:
@@ -51,6 +89,7 @@ func add_connection(connection) -> bool:
 		return false
 
 	connections.append(connection)
+	changed.emit(Change.CONNECTION_ADDED, PackedStringArray([connection.from_block_id, connection.to_block_id]))
 	return true
 
 func remove_connection(from_block_id: String, from_port: String) -> int:
@@ -61,4 +100,6 @@ func remove_connection(from_block_id: String, from_port: String) -> int:
 			connections.remove_at(index)
 			removed_count += 1
 
+	if removed_count > 0:
+		changed.emit(Change.CONNECTION_REMOVED, PackedStringArray([from_block_id]))
 	return removed_count

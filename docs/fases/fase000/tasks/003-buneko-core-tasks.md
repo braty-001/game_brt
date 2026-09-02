@@ -41,7 +41,7 @@ Status geral: concluido. PRDs 001 e 002 ja entregam o dominio da linguagem e do 
     - `braty/src/buneko/domain/buneko_attributes.gd`
     - `braty/src/buneko/domain/buneko_attribute_resolver.gd`
   - Regras:
-    - Atributos iniciais incluem velocidade de andar, velocidade de correr, impulso de pulo, gravidade e forca.
+    - Atributos iniciais incluem velocidade de locomocao, desaceleracao, impulso de pulo, gravidade e forca.
     - Os valores podem ser ajustados por prototipo, mas devem existir em um ponto unico de resolucao.
     - Pecas futuras poderao modificar atributos sem alterar o executor ou o editor de cerebro.
   - Aceite:
@@ -57,14 +57,13 @@ Status geral: concluido. PRDs 001 e 002 ja entregam o dominio da linguagem e do 
     - `braty/src/buneko/runtime/buneko_motor.gd`
     - `braty/src/buneko/runtime/buneko_action_dispatcher.gd`
   - Regras:
-    - `ProgramBlockKind.WALK` solicita andar.
-    - `ProgramBlockKind.RUN` solicita correr.
+    - `ProgramBlockKind.WALK` solicita andar com o ritmo configurado.
     - `ProgramBlockKind.JUMP` solicita pular.
     - `ProgramBlockKind.TURN` solicita virar.
     - O dispatcher retorna `ActionDispatchResult.YIELDED` quando a intencao foi aceita para a simulacao.
     - Pulo recusado por falta de apoio nao deve quebrar o programa; deve ser uma acao sem impulso fisico.
   - Aceite:
-    - Andar, correr, virar e pular ficam separados da logica do executor.
+    - Movimento, virar e pular ficam separados da logica do executor.
     - O executor nao depende de cenas Godot nem de `CharacterBody2D`.
   - Testes:
     - `braty/tests/unit/buneko/runtime/test_buneko_action_dispatcher.gd`
@@ -78,19 +77,19 @@ Status geral: concluido. PRDs 001 e 002 ja entregam o dominio da linguagem e do 
     - `braty/src/buneko/physics/buneko_character.gd`
   - Regras:
     - O controlador mantem direcao atual, velocidade atual, estado de apoio e queda.
-    - Andar aplica velocidade horizontal na direcao atual.
-    - Correr aplica velocidade horizontal maior que andar.
+    - Andar aplica velocidade horizontal conforme o ritmo e a capacidade de locomocao.
+    - Ausencia de intencao desacelera no chao e preserva momentum no ar.
     - Virar inverte direcao sem deslocamento direto.
     - Pular aplica impulso somente quando apoiado.
     - A fisica decide o resultado permitido por gravidade, colisao e ambiente.
   - Aceite:
-    - O Buneko responde a andar, correr, virar e pular de acordo com a fisica.
+    - O Buneko responde aos ritmos de andar, virar e pular de acordo com a fisica.
     - Pulo no ar nao produz novo impulso.
     - Colisoes e queda para fora do nivel geram resultados consistentes.
   - Testes:
     - `braty/tests/unit/buneko/physics/test_buneko_physics_controller.gd`
     - Direcao inicial e inversao.
-    - Intencao de andar/correr produz velocidade esperada.
+    - Ritmos de andar produzem velocidades esperadas.
     - Pulo so e aceito quando apoiado.
   - Verificacao manual:
     - Executar cena de teste e validar movimento, impacto, bordas e queda.
@@ -108,7 +107,7 @@ Status geral: concluido. PRDs 001 e 002 ja entregam o dominio da linguagem e do 
     - O personagem tem comportamento de plataforma consistente na fase teste.
     - Queda fora da area jogavel emite sinal ou estado consumivel pela missao.
   - Verificacao:
-    - Movimento observavel para andar e correr.
+    - Movimento observavel para os ritmos normal e rapido.
     - Virar sem deslocamento inesperado.
     - Pulo no chao e tentativa de pulo no ar.
     - Colisao com chao e bordas.

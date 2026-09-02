@@ -54,6 +54,17 @@ func fail_by_execution_limit() -> bool:
 	)
 	return true
 
+func fail_by_program_end() -> bool:
+	if state != MissionStateScript.Value.RUNNING:
+		return false
+
+	state = MissionStateScript.Value.FAILED
+	result = MissionResultScript.new(
+		MissionResultScript.Kind.FAILED_BEFORE_OBJECTIVE,
+		"O programa terminou antes do objetivo"
+	)
+	return true
+
 func return_to_editing() -> bool:
 	if state != MissionStateScript.Value.FAILED:
 		return false

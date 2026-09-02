@@ -88,6 +88,9 @@ func complete() -> bool:
 	state = RuntimeState.Value.COMPLETED
 	return true
 
+func has_finished_execution() -> bool:
+	return state == RuntimeState.Value.RUNNING and current_block_id.is_empty()
+
 func tick() -> void:
 	if state != RuntimeState.Value.RUNNING:
 		return
@@ -137,7 +140,7 @@ func _execute_control_block(block: ProgramBlock) -> void:
 
 func _execute_action_block(block: ProgramBlock) -> bool:
 	has_last_condition_result = false
-	var result := action_dispatcher.dispatch(block.kind)
+	var result := action_dispatcher.dispatch(block)
 	_move_to_output(block.id, "next")
 	if result == ActionDispatchResult.Value.YIELDED:
 		last_refused_action_block_id = ""

@@ -15,7 +15,7 @@ func test_valid_program_uses_reachable_blocks_for_ram() -> void:
 	program.start_block_id = "walk"
 	program.add_block(ProgramBlockScript.new("walk", BlockKind.Value.WALK))
 	program.add_block(ProgramBlockScript.new("jump", BlockKind.Value.JUMP))
-	program.add_block(ProgramBlockScript.new("unused", BlockKind.Value.RUN))
+	program.add_block(ProgramBlockScript.new("unused", BlockKind.Value.TURN))
 	program.add_connection(ProgramConnectionScript.new("walk", "next", "jump"))
 
 	assert_eq(ProgramRamCalculatorScript.used_ram(program), 2)

@@ -29,8 +29,8 @@ class FakeActionDispatcher extends ActionDispatcher:
 	var action_kinds: Array[int] = []
 	var results: Array[int] = []
 
-	func dispatch(action_kind: int) -> int:
-		action_kinds.append(action_kind)
+	func dispatch(block: ProgramBlock) -> int:
+		action_kinds.append(block.kind)
 		if results.is_empty():
 			return ActionDispatchResult.Value.YIELDED
 
@@ -54,13 +54,26 @@ func test_finished_linear_program_does_not_restart_from_its_first_block() -> voi
 	var dispatcher := FakeActionDispatcher.new()
 	var runtime := _create_runtime(FakeSensorReader.new(), dispatcher)
 
-	assert_true(runtime.prepare(_linear_program([BlockKind.Value.RUN])))
+	assert_true(runtime.prepare(_linear_program([BlockKind.Value.WALK])))
 	assert_true(runtime.start())
 	runtime.tick()
 	runtime.tick()
 
-	assert_eq(dispatcher.action_kinds, [BlockKind.Value.RUN])
+	assert_eq(dispatcher.action_kinds, [BlockKind.Value.WALK])
 	assert_true(runtime.current_block_id.is_empty())
+	assert_true(runtime.has_finished_execution())
+
+func test_runtime_only_reports_finished_while_running_at_the_end_of_graph() -> void:
+	var runtime := _create_runtime(FakeSensorReader.new(), FakeActionDispatcher.new())
+
+	assert_false(runtime.has_finished_execution())
+	assert_true(runtime.prepare(_linear_program([BlockKind.Value.WALK])))
+	assert_false(runtime.has_finished_execution())
+	assert_true(runtime.start())
+	runtime.tick()
+	assert_true(runtime.has_finished_execution())
+	assert_true(runtime.stop())
+	assert_false(runtime.has_finished_execution())
 
 func test_if_uses_true_and_false_branches() -> void:
 	var condition := _gap_condition()

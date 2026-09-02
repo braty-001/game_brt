@@ -5,6 +5,7 @@ enum Kind {
 	NONE,
 	FAILED_BY_FALL,
 	FAILED_BY_EXECUTION_LIMIT,
+	FAILED_BEFORE_OBJECTIVE,
 	FAILED_EXTERNALLY,
 	COMPLETED,
 }
@@ -20,6 +21,7 @@ func is_failure() -> bool:
 	return (
 		kind == Kind.FAILED_BY_FALL
 		or kind == Kind.FAILED_BY_EXECUTION_LIMIT
+		or kind == Kind.FAILED_BEFORE_OBJECTIVE
 		or kind == Kind.FAILED_EXTERNALLY
 	)
 

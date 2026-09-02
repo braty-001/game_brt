@@ -28,13 +28,13 @@ func test_rejects_invalid_output_port() -> void:
 func test_rejects_duplicate_output_and_input() -> void:
 	var graph = _graph_with_blocks()
 	var controller = ConnectionControllerScript.new()
-	graph.add_block(EditorBlockStateScript.new("run", BlockKind.Value.RUN))
+	graph.add_block(EditorBlockStateScript.new("turn", BlockKind.Value.TURN))
 
 	assert_true(controller.connect_blocks(graph, "walk", "next", "jump"))
-	assert_false(controller.connect_blocks(graph, "walk", "next", "run"))
+	assert_false(controller.connect_blocks(graph, "walk", "next", "turn"))
 	assert_eq(controller.last_error, ConnectionControllerScript.ErrorCode.DUPLICATE_OUTPUT)
 
-	assert_false(controller.connect_blocks(graph, "run", "next", "jump"))
+	assert_false(controller.connect_blocks(graph, "turn", "next", "jump"))
 	assert_eq(controller.last_error, ConnectionControllerScript.ErrorCode.DUPLICATE_INPUT)
 
 func test_control_block_ports_build_valid_program() -> void:

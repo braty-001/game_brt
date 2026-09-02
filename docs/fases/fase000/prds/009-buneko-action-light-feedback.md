@@ -6,14 +6,13 @@ Substituir o modo `Acompanhar` por um feedback visual imediato e nao intrusivo n
 
 ## Problema
 
-O modo `Acompanhar` criou uma segunda forma de executar o programa. Isso torna o fluxo menos confiavel e pode alterar a leitura de inercia entre `Andar`, `Pular` e `Correr`. Ao mesmo tempo, a execucao normal precisa deixar claro que o Buneko esta obedecendo a uma decisao do brain, especialmente quando muda de comportamento.
+O modo `Acompanhar` criou uma segunda forma de executar o programa. Isso torna o fluxo menos confiavel e pode alterar a leitura de inercia entre movimento e pulo. Ao mesmo tempo, a execucao normal precisa deixar claro que o Buneko esta obedecendo a uma decisao do brain, especialmente quando muda de comportamento.
 
 ## Experiencia desejada
 
 O jogador monta o programa e usa somente `Executar tentativa`. O Buneko se move normalmente e sua cabeca emite um pulso curto de luz quando uma nova acao efetiva comeca:
 
-- `Andar`: luz turquesa discreta.
-- `Correr`: luz amarela mais intensa.
+- `Andar`, em qualquer ritmo: luz turquesa discreta.
 - `Pular`: luz azul-clara curta.
 - `Virar`: luz violeta curta.
 - Acao recusada: luz vermelha curta.
@@ -39,7 +38,7 @@ O Buneko atual possui cabeca simples desenhada em `BunekoVisual`. A luz deve fic
 - `Executar tentativa` funciona sem dependencias de Acompanhar ou `NEXT`.
 - `WHILE -> Andar` produz caminhada continua sem flicker de luz a cada passo.
 - A transicao de `Andar` para `Pular` e visualmente perceptivel e preserva a inercia normal.
-- `Pular -> Correr` continua obedecendo a fisica normal.
+- `Pular -> Andar [rapido]` continua obedecendo a fisica normal.
 - Pulo recusado recebe sinal vermelho perceptivel.
 - O Buneko volta ao visual neutro apos o pulso e ao iniciar nova tentativa.
 - Testes de runtime, fluxo tutorial e visual do Buneko continuam passando.
@@ -49,7 +48,7 @@ O Buneko atual possui cabeca simples desenhada em `BunekoVisual`. A luz deve fic
 - Texto flutuante de nome da acao.
 - Linha do tempo, miniatura do brain ou destaque de bloco durante a fase.
 - Sons, particulas, shakes de camera ou animacoes complexas.
-- Novas acoes, sensores ou parametros de movimento.
+- Novas acoes, sensores ou parametros alem do ritmo de `Andar` definido pela PRD 008.
 
 ## Dependencias e riscos
 
@@ -59,4 +58,4 @@ O Buneko atual possui cabeca simples desenhada em `BunekoVisual`. A luz deve fic
 
 ## Resultado esperado
 
-O jogador enxerga o Buneko reagir ao brain pelo proprio corpo: caminhada repetida segue limpa, mudancas como pulo e corrida ganham uma piscada de luz na cabeca, e erros ficam visiveis sem interromper a tentativa.
+O jogador enxerga o Buneko reagir ao brain pelo proprio corpo: caminhada repetida segue limpa, mudancas como pulo ganham uma piscada de luz na cabeca, e erros ficam visiveis sem interromper a tentativa.

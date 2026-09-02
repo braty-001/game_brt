@@ -6,7 +6,7 @@ Status geral: concluido. A revisao de integracao com o prototipo do editor foi c
   - Aceite: permite representar todos os blocos da PRD 001 sem detalhes de interface.
   - Testes: criacao e serializacao do modelo, se persistencia for introduzida.
 - [x] Implementar o catalogo inicial de blocos e parametros de direcao e condicao.
-  - Aceite: `Andar`, `Correr`, `Pular`, `Virar`, `IF` e `WHILE` podem ser instanciados e configurados.
+  - Aceite: `Andar` com ritmo, `Pular`, `Virar`, `IF` e `WHILE` podem ser instanciados e configurados.
   - Testes: catalogo e valores validos de parametros.
 - [x] Implementar validacao de inicio, conexoes, ramos e ciclos permitidos.
   - Aceite: programas invalidos retornam erros especificos e nao podem executar.

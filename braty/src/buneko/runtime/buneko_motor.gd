@@ -1,6 +1,8 @@
 class_name BunekoMotor
 extends RefCounted
 
+const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
+
 enum Direction {
 	LEFT = -1,
 	RIGHT = 1,
@@ -8,11 +10,12 @@ enum Direction {
 
 var direction: int = Direction.RIGHT
 var can_jump: bool = true
+var last_movement_pace: int = MovementPaceScript.Value.NORMAL
 
-func walk() -> bool:
-	return true
-
-func run() -> bool:
+func walk(pace: int = MovementPaceScript.Value.NORMAL) -> bool:
+	if not MovementPaceScript.is_valid(pace):
+		return false
+	last_movement_pace = pace
 	return true
 
 func jump() -> bool:

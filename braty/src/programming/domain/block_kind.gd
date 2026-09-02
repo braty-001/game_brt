@@ -2,16 +2,15 @@ class_name ProgramBlockKind
 extends RefCounted
 
 enum Value {
-	WALK,
-	RUN,
-	JUMP,
-	TURN,
-	IF,
-	WHILE,
+	WALK = 0,
+	JUMP = 2,
+	TURN = 3,
+	IF = 4,
+	WHILE = 5,
 }
 
 static func is_valid(value: int) -> bool:
-	return value >= Value.WALK and value <= Value.WHILE
+	return value in [Value.WALK, Value.JUMP, Value.TURN, Value.IF, Value.WHILE]
 
 static func requires_condition(value: int) -> bool:
 	return value == Value.IF or value == Value.WHILE

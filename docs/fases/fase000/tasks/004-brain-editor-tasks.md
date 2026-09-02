@@ -66,7 +66,7 @@ Status geral: concluido para o MVP funcional. Polimento visual e refinamentos de
     - `braty/src/brain_editor/block_factory.gd`
     - `braty/scenes/brain_editor/block_node.tscn`
   - Regras:
-    - A paleta oferece `Andar`, `Correr`, `Pular`, `Virar`, `IF` e `WHILE`.
+    - A paleta oferece `Andar`, `Pular`, `Virar`, `IF` e `WHILE`; o ritmo de `Andar` fica no painel de parametros.
     - Cada item criado recebe id estavel para mapear visual e dominio.
     - Blocos de acao possuem porta de saida `next`.
     - `IF` possui saidas `true` e `false`.

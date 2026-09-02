@@ -1,6 +1,8 @@
 extends GutTest
 
 const BlockKind = preload("res://src/programming/domain/block_kind.gd")
+const AttributesScript = preload("res://src/buneko/domain/buneko_attributes.gd")
+const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 
 func test_buneko_scene_instantiates() -> void:
 	var scene: PackedScene = load("res://scenes/buneko/buneko.tscn")
@@ -8,24 +10,32 @@ func test_buneko_scene_instantiates() -> void:
 	var instance = scene.instantiate()
 
 	assert_not_null(instance)
+	var collision_shape: RectangleShape2D = instance.get_node("CollisionShape2D").shape
+	assert_eq(collision_shape.size, Vector2(32, 48))
 	instance.free()
 
 func test_buneko_scene_responds_to_movement_intentions() -> void:
 	var buneko = await _ready_buneko()
 
-	assert_true(buneko.walk())
-	assert_eq(buneko.controller.velocity.x, buneko.walk_speed)
-	buneko.controller.step(buneko.controller.walk_step_duration + 0.01, true)
-	assert_eq(buneko.controller.velocity.x, 0.0)
-
-	assert_true(buneko.run())
-	assert_eq(buneko.controller.velocity.x, buneko.run_speed)
-	buneko.controller.step(buneko.controller.run_step_duration + 0.01, true)
-	assert_eq(buneko.controller.velocity.x, 0.0)
+	assert_true(buneko.walk(MovementPaceScript.Value.NORMAL))
+	assert_eq(buneko.controller.velocity.x, buneko.movement_speed)
+	buneko.controller.stop_horizontal()
+	assert_true(buneko.walk(MovementPaceScript.Value.FAST))
+	assert_eq(buneko.controller.velocity.x, buneko.movement_speed * 2.0)
 
 	assert_true(buneko.turn())
 	assert_eq(buneko.controller.direction, -1)
 
+func test_buneko_scene_uses_attributes_configured_before_ready() -> void:
+	var scene: PackedScene = load("res://scenes/buneko/buneko.tscn")
+	var buneko = scene.instantiate()
+	assert_true(buneko.configure_attributes(AttributesScript.new(210.0, 75.0, 600.0, 800.0, 2.0)))
+	add_child_autofree(buneko)
+	await get_tree().process_frame
+
+	assert_eq(buneko.controller.attributes.movement_speed, 210.0)
+	assert_eq(buneko.controller.attributes.ground_deceleration, 75.0)
+	assert_eq(buneko.controller.attributes.jump_impulse, 600.0)
 func test_buneko_scene_blocks_air_jump_and_allows_ground_jump() -> void:
 	var buneko = await _ready_buneko()
 

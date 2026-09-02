@@ -2,6 +2,7 @@ extends GutTest
 
 const AttributesScript = preload("res://src/buneko/domain/buneko_attributes.gd")
 const ControllerScript = preload("res://src/buneko/physics/buneko_physics_controller.gd")
+const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 
 func test_starts_facing_right_and_turns_without_moving() -> void:
 	var controller = ControllerScript.new()
@@ -12,42 +13,70 @@ func test_starts_facing_right_and_turns_without_moving() -> void:
 	assert_eq(controller.direction, ControllerScript.Direction.LEFT)
 	assert_eq(controller.velocity, Vector2.ZERO)
 
-func test_walk_and_run_apply_short_horizontal_steps_in_current_direction() -> void:
+func test_walk_paces_apply_distinct_speeds_in_current_direction() -> void:
 	var attributes = AttributesScript.new(100.0, 180.0, 250.0, 900.0, 1.0)
 	var controller = ControllerScript.new(attributes)
 
-	controller.walk()
+	assert_true(controller.walk(MovementPaceScript.Value.NORMAL))
 	assert_eq(controller.velocity.x, 100.0)
-	controller.step(controller.walk_step_duration + 0.01, true)
-	assert_eq(controller.velocity.x, 0.0)
-
 	controller.turn()
-	controller.run()
-	assert_eq(controller.velocity.x, -180.0)
-	controller.step(controller.run_step_duration + 0.01, true)
-	assert_eq(controller.velocity.x, 0.0)
+	assert_true(controller.walk(MovementPaceScript.Value.FAST))
+	assert_eq(controller.velocity.x, -200.0)
+	assert_false(controller.walk(99))
 
-func test_repeating_walk_refreshes_step_duration() -> void:
-	var attributes = AttributesScript.new(100.0, 180.0, 250.0, 900.0, 1.0)
+func test_absent_intent_decelerates_on_ground() -> void:
+	var attributes = AttributesScript.new(100.0, 200.0, 250.0, 900.0, 1.0)
 	var controller = ControllerScript.new(attributes)
 
 	controller.walk()
-	controller.step(controller.walk_step_duration * 0.5, true)
-	controller.walk()
-	controller.step(controller.walk_step_duration * 0.5, true)
-
-	assert_eq(controller.velocity.x, 100.0)
-
-func test_horizontal_step_keeps_air_momentum_until_landing() -> void:
-	var attributes = AttributesScript.new(100.0, 180.0, 250.0, 900.0, 1.0)
-	var controller = ControllerScript.new(attributes)
-
-	controller.walk()
-	controller.step(controller.walk_step_duration + 0.01, false)
-	assert_eq(controller.velocity.x, 100.0)
-
 	controller.step(0.016, true)
+	controller.step(0.25, true)
+	assert_eq(controller.velocity.x, 50.0)
+	controller.step(0.25, true)
 	assert_eq(controller.velocity.x, 0.0)
+	assert_true(controller.is_motion_settled())
+
+func test_repeating_intent_maintains_requested_speed() -> void:
+	var attributes = AttributesScript.new(100.0, 180.0, 250.0, 900.0, 1.0)
+	var controller = ControllerScript.new(attributes)
+
+	for cycle in range(4):
+		controller.walk(MovementPaceScript.Value.FAST)
+		controller.step(0.1, true)
+		assert_eq(controller.velocity.x, 200.0, "Cycle %d should renew movement." % cycle)
+
+func test_air_momentum_is_preserved_until_landing() -> void:
+	var attributes = AttributesScript.new(100.0, 200.0, 250.0, 900.0, 1.0)
+	var controller = ControllerScript.new(attributes)
+
+	controller.walk()
+	controller.step(0.016, true)
+	controller.step(0.2, false)
+	assert_eq(controller.velocity.x, 100.0)
+
+	controller.step(0.05, true)
+	assert_eq(controller.velocity.x, 90.0)
+
+func test_intent_does_not_decelerate_during_jump_takeoff() -> void:
+	var attributes = AttributesScript.new(100.0, 180.0, 250.0, 900.0, 1.0)
+	var controller = ControllerScript.new(attributes)
+
+	controller.walk()
+	controller.step(0.016, true)
+	assert_true(controller.jump())
+	controller.step(0.016, true)
+
+	assert_eq(controller.velocity.x, 100.0)
+
+func test_stop_horizontal_clears_pending_intent() -> void:
+	var controller = ControllerScript.new()
+	controller.step(0.016, true)
+	controller.walk()
+
+	controller.stop_horizontal()
+
+	assert_true(controller.is_motion_settled())
+	assert_eq(controller.step(0.016, true).x, 0.0)
 
 func test_jump_only_applies_impulse_when_grounded() -> void:
 	var attributes = AttributesScript.new(100.0, 180.0, 250.0, 900.0, 1.0)
@@ -61,7 +90,7 @@ func test_jump_only_applies_impulse_when_grounded() -> void:
 	assert_eq(controller.velocity.y, -250.0)
 	assert_false(controller.grounded)
 
-func test_run_after_landing_starts_a_fresh_ground_sprint() -> void:
+func test_fast_walk_after_landing_starts_fresh_movement() -> void:
 	var attributes = AttributesScript.new(100.0, 180.0, 250.0, 900.0, 1.0)
 	var controller = ControllerScript.new(attributes)
 
@@ -70,9 +99,9 @@ func test_run_after_landing_starts_a_fresh_ground_sprint() -> void:
 	controller.step(0.2, false)
 	controller.step(0.2, false)
 	controller.step(0.016, true)
-	controller.run()
+	controller.walk(MovementPaceScript.Value.FAST)
 
-	assert_eq(controller.velocity.x, 180.0)
+	assert_eq(controller.velocity.x, 200.0)
 	assert_eq(controller.velocity.y, 0.0)
 
 func test_gravity_applies_while_airborne_and_resets_downward_velocity_on_floor() -> void:

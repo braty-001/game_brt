@@ -23,7 +23,6 @@ func populate() -> void:
 
 	_add_heading("ACOES", Tokens.ACTION)
 	_add_item(ProgramBlockKind.Value.WALK)
-	_add_item(ProgramBlockKind.Value.RUN)
 	_add_item(ProgramBlockKind.Value.JUMP)
 	_add_item(ProgramBlockKind.Value.TURN)
 	_add_heading("CONTROLE", Tokens.CONTROL)

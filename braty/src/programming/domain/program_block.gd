@@ -1,6 +1,8 @@
 class_name ProgramBlock
 extends RefCounted
 
+const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
+
 var id: String
 var kind: int
 var condition: ProgramCondition
@@ -22,6 +24,9 @@ func is_valid() -> bool:
 		return false
 
 	if ProgramBlockKind.requires_condition(kind):
-		return condition != null and condition.is_valid()
+		return condition != null and condition.is_valid() and parameters.is_empty()
 
-	return condition == null
+	if kind == ProgramBlockKind.Value.WALK:
+		return condition == null and MovementPaceScript.parameters_are_valid(parameters)
+
+	return condition == null and parameters.is_empty()

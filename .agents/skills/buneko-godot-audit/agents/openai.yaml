@@ -1,0 +1,4 @@
+interface:
+  display_name: "Buneko Godot Audit"
+  short_description: "Audit Buneko quality, docs, tests, and readiness"
+  default_prompt: "Use $buneko-godot-audit to review this checkout and report prioritized findings without editing files."

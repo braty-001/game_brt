@@ -37,8 +37,6 @@ func _color_for_action(action_kind: int) -> Color:
 	match action_kind:
 		BlockKind.Value.WALK:
 			return Color("35d1c9")
-		BlockKind.Value.RUN:
-			return Color("f5c85d")
 		BlockKind.Value.JUMP:
 			return Color("8dd9ff")
 		BlockKind.Value.TURN:
