@@ -1,0 +1,113 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/menu/main_menu.gd" id="1_menu"]
+[ext_resource type="Theme" path="res://themes/buneko_theme.tres" id="2_theme"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Center" type="CenterContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="MenuCard" type="PanelContainer" parent="Margin/Center"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+
+[node name="Page" type="VBoxContainer" parent="Margin/Center/MenuCard"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Margin/Center/MenuCard/Page"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "BUNEKO"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Margin/Center/MenuCard/Page"]
+layout_mode = 2
+text = "Monte. Programe. Observe."
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="Margin/Center/MenuCard/Page"]
+layout_mode = 2
+
+[node name="MainActions" type="VBoxContainer" parent="Margin/Center/MenuCard/Page"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StartButton" type="Button" parent="Margin/Center/MenuCard/Page/MainActions"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Iniciar"
+
+[node name="SettingsButton" type="Button" parent="Margin/Center/MenuCard/Page/MainActions"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Configuracoes"
+
+[node name="SettingsPanel" type="VBoxContainer" parent="Margin/Center/MenuCard/Page"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SettingsTitle" type="Label" parent="Margin/Center/MenuCard/Page/SettingsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Configuracoes de tela"
+
+[node name="SettingsHint" type="Label" parent="Margin/Center/MenuCard/Page/SettingsPanel"]
+layout_mode = 2
+text = "Escolha o tamanho da janela."
+autowrap_mode = 2
+
+[node name="ResolutionSelector" type="OptionButton" parent="Margin/Center/MenuCard/Page/SettingsPanel"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+
+[node name="CurrentResolutionLabel" type="Label" parent="Margin/Center/MenuCard/Page/SettingsPanel"]
+layout_mode = 2
+text = "Tamanho atual: 1600x900"
+
+[node name="SettingsActions" type="HBoxContainer" parent="Margin/Center/MenuCard/Page/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ApplyButton" type="Button" parent="Margin/Center/MenuCard/Page/SettingsPanel/SettingsActions"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Aplicar"
+
+[node name="BackButton" type="Button" parent="Margin/Center/MenuCard/Page/SettingsPanel/SettingsActions"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Voltar"
