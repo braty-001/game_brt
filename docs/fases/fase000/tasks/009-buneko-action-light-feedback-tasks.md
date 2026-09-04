@@ -73,7 +73,7 @@ Status geral: implementado para validacao visual. Acompanhar e `NEXT` foram remo
 
 - [ ] Validar PRD 009.
   - Testes automatizados:
-    - Executar suite GUT completa. Concluido: 131 testes, 453 asserts.
+    - Executar suite GUT completa. Concluido: 35 scripts, 188 testes e 752 assercoes em 2026-09-04.
     - Cobrir remocao de controles, transicoes de acao e acao recusada.
   - Verificacao manual:
     - Executar `WHILE caminho livre -> Andar` e verificar ausencia de flicker.

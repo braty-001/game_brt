@@ -21,7 +21,7 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
-		if canvas != null:
+		if canvas != null and canvas.anchor_left == canvas.anchor_right and canvas.anchor_top == canvas.anchor_bottom:
 			canvas.size = size
 		queue_redraw()
 
@@ -116,6 +116,9 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 func _ensure_canvas() -> void:
+	if canvas != null:
+		return
+	canvas = get_node_or_null("GraphCanvas")
 	if canvas != null:
 		return
 	canvas = Control.new()

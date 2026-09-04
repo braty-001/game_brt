@@ -33,13 +33,3 @@ func create_condition(modality: int, query: int):
 		return null
 
 	return condition
-
-func apply_condition(graph_state, block_id: String, modality: int, query: int) -> bool:
-	if graph_state == null:
-		return false
-
-	var condition = create_condition(modality, query)
-	if condition == null:
-		return false
-
-	return graph_state.set_block_condition(block_id, condition)

@@ -71,7 +71,7 @@ func test_program_end_returns_to_editor_with_specific_feedback() -> void:
 	assert_eq(mission.evaluator.state, MissionStateScript.Value.FAILED)
 	assert_eq(mission.evaluator.result.kind, MissionResultScript.Kind.FAILED_BEFORE_OBJECTIVE)
 	assert_not_null(mission.brain_editor)
-	assert_eq(mission.brain_editor.graph_state.blocks.size(), 1)
+	assert_eq(mission.brain_editor.block_count(), 1)
 	assert_true(mission.feedback_label.text.contains("terminou"))
 
 func test_false_while_with_empty_next_explains_the_exit_and_selects_the_block() -> void:
@@ -93,8 +93,8 @@ func test_false_while_with_empty_next_explains_the_exit_and_selects_the_block() 
 	assert_eq(mission.evaluator.state, MissionStateScript.Value.FAILED)
 	assert_true(mission.feedback_label.text.contains("WHILE avaliou a condicao como falsa"))
 	assert_true(mission.feedback_label.text.contains("Depois"))
-	assert_eq(mission.brain_editor.selected_block_id, while_block_id)
-	assert_eq(mission.brain_editor.graph_state.connections.size(), 0)
+	assert_eq(mission.brain_editor.selected_block(), while_block_id)
+	assert_eq(mission.brain_editor.connection_count(), 0)
 
 func test_editor_execute_button_starts_real_mission_attempt() -> void:
 	var mission = await _ready_mission()
@@ -144,7 +144,7 @@ func test_runtime_return_button_returns_to_editor_preserving_program() -> void:
 	assert_eq(mission.evaluator.state, MissionStateScript.Value.EDITING)
 	assert_not_null(mission.brain_editor)
 	assert_eq(mission.current_program, program)
-	assert_eq(mission.brain_editor.graph_state.blocks.size(), 1)
+	assert_eq(mission.brain_editor.block_count(), 1)
 	assert_true(mission.feedback_label.text.contains("voltou"))
 
 func test_fall_returns_to_editor_preserving_program_and_assembly() -> void:
@@ -162,8 +162,8 @@ func test_fall_returns_to_editor_preserving_program_and_assembly() -> void:
 	assert_not_null(mission.brain_editor)
 	assert_eq(mission.current_assembly, assembly)
 	assert_eq(mission.current_program, program)
-	assert_eq(mission.brain_editor.graph_state.blocks.size(), 1)
-	assert_eq(mission.brain_editor.block_nodes.size(), 1)
+	assert_eq(mission.brain_editor.block_count(), 1)
+	assert_eq(mission.brain_editor.visual_block_count(), 1)
 	assert_true(mission.feedback_label.text.contains("caiu"))
 	assert_true(mission.hint_label.text.contains("sensor visual"))
 
@@ -193,7 +193,7 @@ func test_reference_examples_wait_for_landing_before_the_action_after_jump() -> 
 		var mission = await _ready_mission()
 		mission.install_base_assembly()
 		assert_true(mission.enter_editor())
-		mission.brain_editor.load_tutorial_example(example)
+		mission.brain_editor.load_example(example)
 		assert_true(mission.start_attempt())
 
 		for frame in range(120):
@@ -213,7 +213,7 @@ func test_while_reference_program_completes_the_tutorial() -> void:
 	var mission = await _ready_mission()
 	mission.install_base_assembly()
 	assert_true(mission.enter_editor())
-	mission.brain_editor.load_tutorial_example(
+	mission.brain_editor.load_example(
 		TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR
 	)
 	assert_true(mission.start_attempt())

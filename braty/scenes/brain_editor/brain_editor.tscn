@@ -1,10 +1,247 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/brain_editor/brain_editor.gd" id="1_editor"]
+[ext_resource type="Theme" path="res://themes/buneko_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://src/ui/mission_step_header.gd" id="3_header"]
+[ext_resource type="Script" path="res://src/brain_editor/editor_workspace.gd" id="4_workspace"]
+[ext_resource type="Script" path="res://src/brain_editor/block_drawer.gd" id="5_drawer"]
+[ext_resource type="Script" path="res://src/brain_editor/pseudocode_panel.gd" id="6_pseudocode"]
+[ext_resource type="Script" path="res://src/brain_editor/block_parameter_panel.gd" id="7_parameters"]
 
 [node name="BrainEditor" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
 script = ExtResource("1_editor")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="Page" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EditorHeader" type="PanelContainer" parent="Margin/Page"]
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+script = ExtResource("3_header")
+
+[node name="Body" type="HBoxContainer" parent="Margin/Page"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Center" type="VBoxContainer" parent="Margin/Page/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="CanvasToolbar" type="PanelContainer" parent="Margin/Page/Body/Center"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+
+[node name="CanvasToolbarRow" type="HBoxContainer" parent="Margin/Page/Body/Center/CanvasToolbar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PrimaryTools" type="HBoxContainer" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DrawerButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/PrimaryTools"]
+layout_mode = 2
+toggle_mode = true
+text = "Blocos"
+
+[node name="OrganizeButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/PrimaryTools"]
+layout_mode = 2
+text = "Organizar"
+
+[node name="PseudocodeButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/PrimaryTools"]
+layout_mode = 2
+text = "Código"
+
+[node name="Spacer" type="Control" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NavigationTools" type="HBoxContainer" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PanButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/NavigationTools"]
+layout_mode = 2
+toggle_mode = true
+text = "Mover"
+
+[node name="ZoomOutButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/NavigationTools"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "-"
+
+[node name="ZoomLabelButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/NavigationTools"]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+disabled = true
+text = "100%"
+
+[node name="ZoomInButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/NavigationTools"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "+"
+
+[node name="CenterViewButton" type="Button" parent="Margin/Page/Body/Center/CanvasToolbar/CanvasToolbarRow/NavigationTools"]
+layout_mode = 2
+text = "Centralizar"
+
+[node name="WorkspacePanel" type="PanelContainer" parent="Margin/Page/Body/Center"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Workspace" type="Control" parent="Margin/Page/Body/Center/WorkspacePanel"]
+custom_minimum_size = Vector2(480, 360)
+layout_mode = 2
+script = ExtResource("4_workspace")
+
+[node name="GraphCanvas" type="Control" parent="Margin/Page/Body/Center/WorkspacePanel/Workspace"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="StartMarker" type="PanelContainer" parent="Margin/Page/Body/Center/WorkspacePanel/Workspace"]
+custom_minimum_size = Vector2(130, 54)
+layout_mode = 0
+offset_left = 22.0
+offset_top = 24.0
+offset_right = 152.0
+offset_bottom = 78.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Margin/Page/Body/Center/WorkspacePanel/Workspace/StartMarker"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.152941, 0.780392, 0.741176, 1)
+text = "INICIO   ●"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BlockDrawer" type="PanelContainer" parent="Margin/Page/Body/Center/WorkspacePanel/Workspace"]
+visible = false
+layout_mode = 0
+script = ExtResource("5_drawer")
+
+[node name="PseudocodePanel" type="PanelContainer" parent="Margin/Page/Body/Center/WorkspacePanel/Workspace"]
+visible = false
+layout_mode = 0
+script = ExtResource("6_pseudocode")
+
+[node name="RuntimeToolbarPanel" type="PanelContainer" parent="Margin/Page/Body/Center"]
+layout_mode = 2
+
+[node name="RuntimeToolbar" type="HBoxContainer" parent="Margin/Page/Body/Center/RuntimeToolbarPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ValidationLabel" type="Label" parent="Margin/Page/Body/Center/RuntimeToolbarPanel/RuntimeToolbar"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="StartButton" type="Button" parent="Margin/Page/Body/Center/RuntimeToolbarPanel/RuntimeToolbar"]
+layout_mode = 2
+disabled = true
+text = "Executar tentativa"
+
+[node name="PauseButton" type="Button" parent="Margin/Page/Body/Center/RuntimeToolbarPanel/RuntimeToolbar"]
+layout_mode = 2
+text = "Pausar"
+
+[node name="ResumeButton" type="Button" parent="Margin/Page/Body/Center/RuntimeToolbarPanel/RuntimeToolbar"]
+layout_mode = 2
+text = "Retomar"
+
+[node name="StopButton" type="Button" parent="Margin/Page/Body/Center/RuntimeToolbarPanel/RuntimeToolbar"]
+layout_mode = 2
+text = "Parar"
+
+[node name="RestartButton" type="Button" parent="Margin/Page/Body/Center/RuntimeToolbarPanel/RuntimeToolbar"]
+layout_mode = 2
+text = "Executar novamente"
+
+[node name="InspectorPanel" type="PanelContainer" parent="Margin/Page/Body"]
+custom_minimum_size = Vector2(195, 0)
+layout_mode = 2
+
+[node name="Inspector" type="VBoxContainer" parent="Margin/Page/Body/InspectorPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="InspectorTitle" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+text = "PROPRIEDADES"
+
+[node name="ParameterPanel" type="VBoxContainer" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+script = ExtResource("7_parameters")
+
+[node name="Separator" type="HSeparator" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+
+[node name="ConnectionFeedback" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Adicione um bloco para comecar"
+autowrap_mode = 2
+
+[node name="ExampleSelector" type="OptionButton" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+
+[node name="ExampleButton" type="Button" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+tooltip_text = "Substitui o grafo atual por uma solucao curta que voce pode editar"
+text = "Carregar exemplo"
+
+[node name="ResetBrainButton" type="Button" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+tooltip_text = "Remove todos os blocos e conexoes do cerebro atual"
+text = "Zerar cerebro"
+
+[node name="RamLabel" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+visible = false
+layout_mode = 2
+
+[node name="StateLabel" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+visible = false
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+visible = false
+layout_mode = 2
+text = "Voltar para montagem"

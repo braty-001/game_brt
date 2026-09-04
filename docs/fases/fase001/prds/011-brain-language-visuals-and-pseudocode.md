@@ -25,6 +25,7 @@ Um botao `Ver pseudocodigo` abre uma visualizacao somente leitura do programa at
 - Posicoes dos blocos continuam no espaco do grafo; zoom e pan sao transformacoes visuais e nunca alteram conexoes, RAM ou semantica.
 - O cerebro usa um canvas vetorial hibrido: grade e conexoes sao desenhadas por primitivas do canvas; blocos e portas sao views que obedecem ao mesmo sistema de coordenadas do grafo.
 - Inserir por clique exige uma saida selecionada; inserir por arraste destaca somente encaixes compativeis.
+- Insercao por clique e por arraste percorrem o mesmo comando atomico; uma conexao recusada nao deixa bloco orfao no grafo.
 - Clicar em uma saida vazia abre a gaveta diretamente no contexto daquela saida.
 - Remover um bloco apenas remove o bloco e suas conexoes; o editor nao presume substituicao nem reconecta o fluxo automaticamente.
 - Ramos e corpos podem permanecer vazios durante a edicao, ainda que o programa incompleto nao possa ser executado.
@@ -49,6 +50,7 @@ Esta PRD altera somente o cerebro: o estado visual do grafo, seu canvas, suas in
 - `IF` apresenta ramos positivo e alternativo com cor, icone e posicao consistentes.
 - `WHILE` deixa claro corpo repetido e saida posterior.
 - Gaveta lateral permite inserir todos os blocos atuais por clique ou arraste.
+- O caminho completo de arraste da gaveta ate uma porta possui cobertura automatizada para sucesso, saida ocupada e dado invalido.
 - `Ver pseudocodigo` reproduz exatamente o grafo atual e nao permite edicao.
 - Mover blocos depois da insercao preserva conexoes e leitura visual.
 - Os exemplos do tutorial permanecem validos e compreensiveis em 960x540, 1440x810 e 1600x900.

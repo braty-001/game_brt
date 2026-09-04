@@ -1,6 +1,8 @@
 # Tarefas: PRD 010 - Fundacao Reativa do Editor de Cerebro
 
-Status geral: em execucao. Esta PRD estabiliza a arquitetura antes de alterar a linguagem visual do editor.
+Status geral: implementacao e validacao automatizada concluidas. A fundacao reativa e a view dedicada estao integradas; falta concluir o roteiro manual.
+
+A PRD 012 complementa esta fundacao ao tornar operacoes compostas atomicas e restringir as mutacoes ao controlador de comandos.
 
 ## Ordem de implementacao
 
@@ -9,7 +11,8 @@ Status geral: em execucao. Esta PRD estabiliza a arquitetura antes de alterar a 
 3. Migrar RAM, validacao e workspace para a atualizacao centralizada.
 4. Preservar arraste e separar layout de semantica.
 5. Adicionar organizacao automatica.
-6. Cobrir regressao e validar manualmente o fluxo completo.
+6. Extrair a construcao da view sem alterar o contrato do editor.
+7. Cobrir regressao e validar manualmente o fluxo completo.
 
 ## Modificacoes planejadas
 
@@ -95,9 +98,25 @@ Status geral: em execucao. Esta PRD estabiliza a arquitetura antes de alterar a 
     - O programa de referencia passou a ser a unica fonte dos exemplos; o importador converte dominio para `EditorGraphState` sem remontar blocos e conexoes em `BrainEditor`.
     - O exemplo `IF + WHILE` usa 5 RAM e o exemplo `WHILE` usa 4 RAM, com estruturas realmente diferentes e execucao preservada na missao.
 
+- [x] Extrair a composicao visual de `BrainEditor`.
+  - Arquivos previstos:
+    - `braty/src/brain_editor/brain_editor.gd`
+    - `braty/src/brain_editor/brain_editor_view.gd`
+    - `braty/tests/unit/brain_editor/test_brain_editor_scene.gd`
+  - Regras:
+    - `BrainEditor` continua responsavel por coordenar estado, comandos, runtime e integracao com a missao.
+    - O novo componente cria e expoe a hierarquia visual, sem mutar `EditorGraphState`.
+    - Nomes de nos, sinais e referencias publicas usadas pelos testes e pela missao permanecem compativeis.
+  - Testes:
+    - A cena continua expondo todas as regioes e controles esperados.
+    - Criacao, conexao, remocao, organizacao, zoom e pseudocodigo continuam passando.
+  - Resultado:
+    - `BrainEditorView` passou a construir e expor a hierarquia visual; `BrainEditor` preserva sua API publica e conecta a view ao estado, aos comandos e ao runtime.
+    - `BrainEditor` deixou de construir diretamente toolbar, workspace, paineis e inspetor.
+
 - [ ] Validar PRD 010.
   - Testes automatizados:
-    - [x] Executar suite GUT completa: 159 testes, 596 assercoes.
+    - [x] Executar suite GUT completa: 35 scripts, 188 testes e 752 assercoes em 2026-09-04.
     - Cobrir comandos, eventos, RAM, conexoes, arraste e organizacao.
   - Verificacao manual:
     - Criar cinco blocos, conectar, mover todos e executar.

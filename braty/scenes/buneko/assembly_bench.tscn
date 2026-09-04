@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/buneko/assembly/assembly_bench.gd" id="1_bench"]
+[ext_resource type="Theme" path="res://themes/buneko_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://src/buneko/assembly/buneko_assembly_preview.gd" id="3_preview"]
 
 [node name="AssemblyBench" type="Control"]
 layout_mode = 3
@@ -9,4 +11,115 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_theme")
 script = ExtResource("1_bench")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="Page" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/Page"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Monte seu Buneko"
+
+[node name="Subtitle" type="Label" parent="Margin/Page"]
+layout_mode = 2
+text = "Instale cabeca, corpo e locomocao. A cabeca leva o cerebro que executa seu programa."
+
+[node name="Content" type="HBoxContainer" parent="Margin/Page"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="TrayPanel" type="PanelContainer" parent="Margin/Page/Content"]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+
+[node name="Tray" type="VBoxContainer" parent="Margin/Page/Content/TrayPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TrayTitle" type="Label" parent="Margin/Page/Content/TrayPanel/Tray"]
+layout_mode = 2
+text = "PECAS DISPONIVEIS"
+
+[node name="PartList" type="VBoxContainer" parent="Margin/Page/Content/TrayPanel/Tray"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TrayHint" type="Label" parent="Margin/Page/Content/TrayPanel/Tray"]
+layout_mode = 2
+text = "Clique em uma peca para instalar. Clique novamente para inspecionar."
+autowrap_mode = 2
+
+[node name="PreviewPanel" type="PanelContainer" parent="Margin/Page/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AssemblyPreview" type="Control" parent="Margin/Page/Content/PreviewPanel"]
+custom_minimum_size = Vector2(280, 240)
+layout_mode = 2
+script = ExtResource("3_preview")
+
+[node name="InspectorPanel" type="PanelContainer" parent="Margin/Page/Content"]
+custom_minimum_size = Vector2(245, 0)
+layout_mode = 2
+
+[node name="Inspector" type="VBoxContainer" parent="Margin/Page/Content/InspectorPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="InspectorHeading" type="Label" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+layout_mode = 2
+text = "PECA SELECIONADA"
+
+[node name="InspectorTitle" type="Label" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="InspectorDetail" type="Label" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 2
+
+[node name="RemoveButton" type="Button" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+layout_mode = 2
+text = "Remover peca"
+
+[node name="Separator" type="HSeparator" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+layout_mode = 2
+
+[node name="ProgressLabel" type="Label" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="StatusLabel" type="Label" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="ConfirmButton" type="Button" parent="Margin/Page/Content/InspectorPanel/Inspector"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+text = "Confirmar montagem"

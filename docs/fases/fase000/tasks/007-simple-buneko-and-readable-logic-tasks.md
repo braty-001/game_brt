@@ -1,6 +1,6 @@
 # Tarefas: PRD 007 - Buneko Simples e Logica Visual Legivel
 
-Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exemplos de `IF`/`WHILE`, seletor do editor e Buneko 2D simples estao integrados; falta validacao manual de layout, leitura do personagem e revisao qualitativa do brain antes de fechar a PRD.
+Status geral: implementacao e validacao automatizada concluidas. `PATH_CLEAR_AHEAD`, exemplos de `IF`/`WHILE`, seletor do editor e Buneko 2D simples estao integrados; falta validacao manual de layout, leitura do personagem e revisao qualitativa do brain antes de fechar a PRD.
 
 ## Ordem de implementacao
 
@@ -147,7 +147,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
   - Aceite:
     - O jogador entende por que o Buneko nao executou o corpo do `WHILE`.
     - A mensagem orienta alterar a condicao ou preencher a saida `Depois`.
-  - Status: implementado sem alterar validade ou semantica do programa. O retorno seleciona o `WHILE` e explica condicao falsa, caminho `Depois` e saida vazia. Teste focado com 14 testes/82 asserts e suite completa com 181 testes/703 asserts passaram; leitura visual da mensagem permanece para validacao manual.
+  - Status: implementado sem alterar validade ou semantica do programa. O retorno seleciona o `WHILE` e explica condicao falsa, caminho `Depois` e saida vazia. A suite atual passou com 35 scripts, 188 testes e 752 assercoes; leitura visual da mensagem permanece para validacao manual.
 
 - [x] Permitir escolher o programa de exemplo no editor.
   - Arquivos previstos:
@@ -217,7 +217,7 @@ Status geral: implementado para validacao automatizada. `PATH_CLEAR_AHEAD`, exem
     - Bancada e fase usam o mesmo placeholder.
     - As tres pecas continuam distinguiveis quando instaladas separadamente.
     - A troca nao altera o tamanho da colisao nem o comportamento do tutorial.
-  - Status: implementado com tres caixas neutras compartilhadas entre bancada e fase, marca de direcao e pulso funcional preservados. Validacao automatizada: 39 testes/109 asserts de Buneko, 4 testes/13 asserts de experiencia visual e suite completa com 180 testes/694 asserts. Aceite visual manual ainda pendente.
+  - Status: implementado com tres caixas neutras compartilhadas entre bancada e fase, marca de direcao e pulso funcional preservados. Validacao automatizada focada: 39 testes/109 asserts de Buneko e 4 testes/13 asserts de experiencia visual; a suite atual passou com 188 testes/752 assercoes. Aceite visual manual ainda pendente.
 
 - [x] Calibrar os dois exemplos na fase tutorial.
   - Arquivos previstos:

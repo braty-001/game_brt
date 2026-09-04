@@ -1,6 +1,8 @@
 # Tarefas: PRD 011 - Linguagem Visual do Cerebro e Pseudocodigo
 
-Status geral: em execucao. Depende da conclusao da PRD 010.
+Status geral: implementacao e validacao automatizada concluidas. Depende apenas do roteiro manual compartilhado com a PRD 010.
+
+A PRD 012 estabiliza as fronteiras internas antes da continuidade do produto, sem alterar a linguagem visual definida aqui.
 
 ## Ordem de implementacao
 
@@ -137,7 +139,7 @@ Status geral: em execucao. Depende da conclusao da PRD 010.
   - Aceite:
     - Inserir por clique respeita portas compativeis e RAM.
 
-- [x] Implementar insercao por arraste.
+- [x] Consolidar e testar insercao por arraste.
   - Arquivos previstos:
     - `braty/src/brain_editor/block_drawer.gd`
     - `braty/src/brain_editor/editor_workspace.gd`
@@ -146,6 +148,11 @@ Status geral: em execucao. Depende da conclusao da PRD 010.
     - Destinos compativeis destacam durante o arraste.
     - Soltar em local invalido nao modifica o programa.
     - Resultado no modelo e igual ao da insercao por clique.
+    - Falha ao conectar remove atomicamente o bloco criado.
+  - Testes:
+    - Arrastar item da gaveta para saida vazia cria bloco e conexao.
+    - Saida ocupada e dado invalido nao alteram blocos, conexoes ou RAM.
+  - Status: caminho da gaveta ate a porta coberto; saida ocupada preserva grafo e estado pendente, e falha de conexao desfaz atomicamente o bloco criado.
 
 - [x] Criar presenter de pseudocodigo.
   - Arquivos previstos:
@@ -178,7 +185,7 @@ Status geral: em execucao. Depende da conclusao da PRD 010.
 
 - [ ] Validar PRD 011.
   - Testes automatizados:
-    - [x] Executar suite GUT completa: 179 testes, 689 assercoes.
+    - [x] Executar suite GUT completa: 35 scripts, 188 testes e 752 assercoes em 2026-09-04.
     - Cobrir registro visual, portas de `IF` e `WHILE`, gaveta, insercao e pseudocodigo.
   - Verificacao manual:
     - Criar programa por clique.
@@ -192,4 +199,4 @@ Status geral: em execucao. Depende da conclusao da PRD 010.
 - Gaveta e workspace tornam a construcao mais confortavel sem remover o arraste.
 - Pseudocodigo reflete o mesmo programa visual.
 - Extensoes futuras de acao nao exigem outro editor.
-- Suite automatizada passa e validacao manual aprova os dois tamanhos alvo.
+- Suite automatizada passa e validacao manual aprova os tres tamanhos alvo.

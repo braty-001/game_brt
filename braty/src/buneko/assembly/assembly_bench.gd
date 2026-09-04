@@ -5,7 +5,6 @@ const AssemblyScript = preload("res://src/buneko/domain/buneko_assembly.gd")
 const AssemblyValidatorScript = preload("res://src/buneko/domain/buneko_assembly_validator.gd")
 const BasePartsScript = preload("res://src/buneko/domain/base_buneko_parts.gd")
 const PartItemScript = preload("res://src/buneko/assembly/assembly_part_item.gd")
-const PreviewScript = preload("res://src/buneko/assembly/buneko_assembly_preview.gd")
 const SlotScript = preload("res://src/buneko/domain/part_slot.gd")
 const Tokens = preload("res://src/ui/design_tokens.gd")
 
@@ -79,111 +78,40 @@ func _build_ui() -> void:
 	if confirm_button != null:
 		return
 
-	anchors_preset = PRESET_FULL_RECT
-	anchor_right = 1.0
-	anchor_bottom = 1.0
-
-	var background := ColorRect.new()
+	var background: ColorRect = get_node("Background")
 	background.color = Tokens.BACKGROUND
-	background.set_anchors_preset(PRESET_FULL_RECT)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
-
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 18)
-	margin.add_theme_constant_override("margin_right", 18)
-	margin.add_theme_constant_override("margin_top", 14)
-	margin.add_theme_constant_override("margin_bottom", 14)
-	add_child(margin)
-
-	var page := VBoxContainer.new()
-	page.add_theme_constant_override("separation", 12)
-	margin.add_child(page)
-
-	var title := Label.new()
-	title.text = "Monte seu Buneko"
-	title.add_theme_font_size_override("font_size", 26)
-	page.add_child(title)
-
-	var subtitle := Label.new()
-	subtitle.text = "Instale cabeca, corpo e locomocao. A cabeca leva o cerebro que executa seu programa."
+	var subtitle: Label = get_node("Margin/Page/Subtitle")
 	subtitle.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
-	page.add_child(subtitle)
-
-	var content := HBoxContainer.new()
-	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content.add_theme_constant_override("separation", 12)
-	page.add_child(content)
-
-	var tray_panel := PanelContainer.new()
-	tray_panel.custom_minimum_size.x = 230.0
+	var tray_panel: PanelContainer = get_node("Margin/Page/Content/TrayPanel")
 	Tokens.apply_panel(tray_panel)
-	content.add_child(tray_panel)
-	var tray := VBoxContainer.new()
-	tray.add_theme_constant_override("separation", 8)
-	tray_panel.add_child(tray)
-	var tray_title := Label.new()
-	tray_title.text = "PECAS DISPONIVEIS"
+	var tray_title: Label = get_node("Margin/Page/Content/TrayPanel/Tray/TrayTitle")
 	tray_title.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
-	tray.add_child(tray_title)
-	_add_part_item(tray, SlotScript.Value.HEAD, "Cabeca base", "Cerebro - 5 RAM")
-	_add_part_item(tray, SlotScript.Value.BODY, "Corpo base", "Estrutura equilibrada")
-	_add_part_item(tray, SlotScript.Value.LOCOMOTION, "Locomocao base", "Pernas de plataforma")
-	var tray_hint := Label.new()
-	tray_hint.text = "Clique em uma peca para instalar. Clique novamente para inspecionar."
-	tray_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var part_list: VBoxContainer = get_node("Margin/Page/Content/TrayPanel/Tray/PartList")
+	_add_part_item(part_list, SlotScript.Value.HEAD, "Cabeca base", "Cerebro - 5 RAM")
+	_add_part_item(part_list, SlotScript.Value.BODY, "Corpo base", "Estrutura equilibrada")
+	_add_part_item(part_list, SlotScript.Value.LOCOMOTION, "Locomocao base", "Pernas de plataforma")
+	var tray_hint: Label = get_node("Margin/Page/Content/TrayPanel/Tray/TrayHint")
 	tray_hint.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
-	tray.add_child(tray_hint)
-
-	var preview_panel := PanelContainer.new()
-	preview_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var preview_panel: PanelContainer = get_node("Margin/Page/Content/PreviewPanel")
 	Tokens.apply_panel(preview_panel, Color("202b31"))
-	content.add_child(preview_panel)
-	preview = PreviewScript.new()
-	preview.name = "AssemblyPreview"
+	preview = get_node("Margin/Page/Content/PreviewPanel/AssemblyPreview")
 	preview.part_dropped.connect(_on_part_dropped)
-	preview_panel.add_child(preview)
-
-	var inspector_panel := PanelContainer.new()
-	inspector_panel.custom_minimum_size.x = 245.0
+	var inspector_panel: PanelContainer = get_node("Margin/Page/Content/InspectorPanel")
 	Tokens.apply_panel(inspector_panel)
-	content.add_child(inspector_panel)
-	var inspector := VBoxContainer.new()
-	inspector.add_theme_constant_override("separation", 6)
-	inspector_panel.add_child(inspector)
-	var inspector_heading := Label.new()
-	inspector_heading.text = "PECA SELECIONADA"
+	var inspector_heading: Label = get_node("Margin/Page/Content/InspectorPanel/Inspector/InspectorHeading")
 	inspector_heading.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
-	inspector.add_child(inspector_heading)
-	inspector_title = Label.new()
-	inspector_title.add_theme_font_size_override("font_size", 20)
-	inspector.add_child(inspector_title)
-	inspector_detail = Label.new()
-	inspector_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	inspector_detail.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	inspector.add_child(inspector_detail)
-	remove_button = Button.new()
-	remove_button.text = "Remover peca"
+	inspector_title = get_node("Margin/Page/Content/InspectorPanel/Inspector/InspectorTitle")
+	inspector_detail = get_node("Margin/Page/Content/InspectorPanel/Inspector/InspectorDetail")
+	remove_button = get_node("Margin/Page/Content/InspectorPanel/Inspector/RemoveButton")
 	Tokens.apply_secondary_button(remove_button)
 	remove_button.pressed.connect(_on_remove_pressed)
-	inspector.add_child(remove_button)
-	var inspector_separator := HSeparator.new()
-	inspector.add_child(inspector_separator)
-	progress_label = Label.new()
-	progress_label.add_theme_font_size_override("font_size", 16)
-	inspector.add_child(progress_label)
-	status_label = Label.new()
-	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	progress_label = get_node("Margin/Page/Content/InspectorPanel/Inspector/ProgressLabel")
+	status_label = get_node("Margin/Page/Content/InspectorPanel/Inspector/StatusLabel")
 	status_label.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
-	inspector.add_child(status_label)
-	confirm_button = Button.new()
+	confirm_button = get_node("Margin/Page/Content/InspectorPanel/Inspector/ConfirmButton")
 	confirm_button.name = "ConfirmButton"
-	confirm_button.text = "Confirmar montagem"
-	confirm_button.custom_minimum_size.x = 220.0
 	Tokens.apply_primary_button(confirm_button)
 	confirm_button.pressed.connect(confirm)
-	inspector.add_child(confirm_button)
 
 func _add_part_item(parent: VBoxContainer, slot: int, title: String, detail: String) -> void:
 	var item = PartItemScript.new()

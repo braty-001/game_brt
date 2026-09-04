@@ -10,4 +10,4 @@ GDScript atende o ritmo de iteracao do MVP. GUT 9.4.0 e a versao compativel com 
 
 ## Consequencias
 
-Logica deterministica deve ser implementada em scripts que possam ser testados sem cenas. A suite roda a partir da raiz Godot `braty/`.
+Logica deterministica deve ser implementada em scripts que possam ser testados sem cenas. A suite roda a partir da raiz Godot `braty/`. O repositorio deve executar o mesmo comando em um workflow de CI fixado em Godot 4.4.1; o GUT permanece vendorizado no projeto.

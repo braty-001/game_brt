@@ -19,4 +19,7 @@ func _get_drag_data(_at_position: Vector2):
 	preview.text = text
 	Tokens.apply_panel(preview, Tokens.SURFACE_RAISED)
 	set_drag_preview(preview)
+	return drag_payload()
+
+func drag_payload() -> Dictionary:
 	return {"type": "brain_block", "kind": block_kind}

@@ -1,0 +1,44 @@
+name: Godot tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gut:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GODOT_VERSION: 4.4.1
+      XDG_DATA_HOME: /tmp/buneko-ci-data
+      XDG_CONFIG_HOME: /tmp/buneko-ci-config
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Godot
+        run: |
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" \
+            --output /tmp/godot.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+
+      - name: Run GUT suite
+        run: |
+          "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --headless \
+            --path braty \
+            -s addons/gut/gut_cmdln.gd \
+            -gdir=res://tests/unit \
+            -ginclude_subdirs \
+            -gexit
+
+      - name: Load main scene headlessly
+        run: |
+          "/tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --headless \
+            --path braty \
+            --quit-after 2

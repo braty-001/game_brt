@@ -9,6 +9,14 @@ var result = MissionResultScript.new()
 var assembly
 var program
 
+func enter_assembly(current_assembly = null, current_program = null) -> void:
+	state = MissionStateScript.Value.ASSEMBLY
+	result = MissionResultScript.new()
+	if current_assembly != null:
+		assembly = current_assembly
+	if current_program != null:
+		program = current_program
+
 func enter_editing(current_assembly = null, current_program = null) -> void:
 	state = MissionStateScript.Value.EDITING
 	result = MissionResultScript.new()

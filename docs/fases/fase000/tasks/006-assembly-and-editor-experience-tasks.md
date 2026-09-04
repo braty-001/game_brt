@@ -233,9 +233,9 @@ Cada marco deve terminar com testes automatizados e abertura do projeto para ins
     - Nenhum texto, botao, bloco ou painel se sobrepoe nos tamanhos alvo.
     - Estados de foco, selecao, compatibilidade, erro e execucao sao distinguiveis.
   - Testes automatizados:
-    - Executar toda a suite GUT.
-    - Adicionar testes de carregamento das cenas alteradas.
-    - Adicionar testes para estados deterministicos de toolbar, preview e progresso.
+    - [x] Executar toda a suite GUT: 35 scripts, 188 testes e 752 assercoes em 2026-09-04.
+    - [x] Adicionar testes de carregamento das cenas alteradas.
+    - [x] Adicionar testes para estados deterministicos de toolbar, preview e progresso.
   - Verificacao manual:
     - Capturar montagem vazia, parcial e completa em 1152x648 e 960x540.
     - Capturar editor vazio, programa valido, conexao em andamento e execucao.

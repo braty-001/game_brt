@@ -3,30 +3,25 @@ extends Control
 
 const BlockFactoryScript = preload("res://src/brain_editor/block_factory.gd")
 const BlockNodeScript = preload("res://src/brain_editor/block_node.gd")
-const BlockDrawerScript = preload("res://src/brain_editor/block_drawer.gd")
-const BlockParameterPanelScript = preload("res://src/brain_editor/block_parameter_panel.gd")
-const BunekoActionDispatcherScript = preload("res://src/buneko/runtime/buneko_action_dispatcher.gd")
-const BunekoMotorScript = preload("res://src/buneko/runtime/buneko_motor.gd")
-const BunekoSensorReaderScript = preload("res://src/buneko/runtime/buneko_sensor_reader.gd")
+const ActionDispatcherScript = preload("res://src/programming/runtime/action_dispatcher.gd")
+const BrainEditorSnapshotScript = preload("res://src/brain_editor/brain_editor_snapshot.gd")
 const ConditionSelectorScript = preload("res://src/brain_editor/condition_selector.gd")
 const ConnectionControllerScript = preload("res://src/brain_editor/connection_controller.gd")
 const EditorCommandControllerScript = preload("res://src/brain_editor/editor_command_controller.gd")
 const EditorGraphStateScript = preload("res://src/brain_editor/editor_graph_state.gd")
 const EditorLayoutControllerScript = preload("res://src/brain_editor/editor_layout_controller.gd")
-const MissionHeaderScript = preload("res://src/ui/mission_step_header.gd")
+const EditorViewScript = preload("res://src/brain_editor/brain_editor_view.gd")
 const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 const ProgramGraphBuilderScript = preload("res://src/brain_editor/program_graph_builder.gd")
 const ProgramGraphImporterScript = preload("res://src/brain_editor/program_graph_importer.gd")
-const PseudocodePanelScript = preload("res://src/brain_editor/pseudocode_panel.gd")
 const PseudocodePresenterScript = preload("res://src/brain_editor/pseudocode_presenter.gd")
 const RamPanelScript = preload("res://src/brain_editor/ram_panel.gd")
 const RuntimeStatePresenterScript = preload("res://src/brain_editor/runtime_state_presenter.gd")
 const ProgramRuntimeScript = preload("res://src/programming/runtime/program_runtime.gd")
 const RuntimeControlsScript = preload("res://src/brain_editor/runtime_controls.gd")
+const SensorReaderScript = preload("res://src/programming/runtime/sensor_reader.gd")
 const Tokens = preload("res://src/ui/design_tokens.gd")
-const TutorialReferenceProgramScript = preload("res://src/tutorial/tutorial_reference_program.gd")
 const ValidationPanelScript = preload("res://src/brain_editor/validation_panel.gd")
-const WorkspaceScript = preload("res://src/brain_editor/editor_workspace.gd")
 
 const DEFAULT_SPAWN_POSITION := Vector2(230, 108)
 const SPAWN_OFFSET := Vector2(24, 82)
@@ -49,6 +44,8 @@ var layout_controller
 var runtime
 var runtime_controls
 var pseudocode_presenter
+var editor_view
+var example_provider
 
 var block_nodes: Dictionary = {}
 var selected_block_id := ""
@@ -98,6 +95,16 @@ func _ready() -> void:
 func set_external_attempt_runner(enabled: bool) -> void:
 	external_attempt_runner = enabled
 
+func configure_example_provider(provider) -> void:
+	if workspace != null:
+		return
+	example_provider = provider
+
+func configure_runtime(runtime_instance) -> void:
+	if runtime_controls != null:
+		return
+	runtime = runtime_instance
+
 func set_embedded_mode(enabled: bool) -> void:
 	_ensure_ui()
 	editor_header.visible = not enabled
@@ -116,16 +123,14 @@ func create_block(kind: int, block_position: Vector2 = Vector2.INF):
 		spawn_position = next_spawn_position
 		next_spawn_position += Vector2(24, 82)
 
-	var result: Dictionary = command_controller.insert_block(kind, spawn_position)
-	if not result["is_success"]:
+	var result = command_controller.insert_block(kind, spawn_position)
+	if not result.is_success:
 		return null
-	var block_state = result["value"]
-
-	var block_node = _add_block_node(block_state)
+	var block_state = result.value
 	_refresh_next_spawn_position()
 	select_block(block_state.id)
 	_sync_editor_from_graph_state()
-	return block_node
+	return block_nodes.get(block_state.id)
 
 func load_graph_state(saved_graph_state) -> bool:
 	if saved_graph_state == null:
@@ -139,9 +144,7 @@ func load_graph_state(saved_graph_state) -> bool:
 	pending_connection_from_block_id = ""
 	pending_connection_from_port = ""
 
-	for block_id in graph_state.blocks:
-		_add_block_node(graph_state.blocks[block_id])
-
+	_reconcile_block_nodes()
 	_refresh_next_spawn_position()
 	_sync_editor_from_graph_state()
 	if graph_state.blocks.is_empty():
@@ -168,7 +171,7 @@ func apply_condition_to_selected(modality: int, query: int) -> bool:
 	var condition = condition_selector.create_condition(modality, query)
 	if condition == null:
 		return false
-	var applied: bool = command_controller.set_condition(selected_block_id, condition)["is_success"]
+	var applied: bool = command_controller.set_condition(selected_block_id, condition).is_success
 	if applied and block_nodes.has(selected_block_id):
 		block_nodes[selected_block_id].refresh_from_state()
 	_sync_editor_from_graph_state()
@@ -186,7 +189,7 @@ func apply_movement_pace_to_selected(pace: int) -> bool:
 		selected_block_id,
 		MovementPaceScript.PARAMETER_KEY,
 		pace
-	)["is_success"]
+	).is_success
 	if applied and block_nodes.has(selected_block_id):
 		block_nodes[selected_block_id].refresh_from_state()
 	_sync_editor_from_graph_state()
@@ -207,12 +210,12 @@ func complete_connection(target_block_id: String) -> bool:
 	if pending_connection_from_block_id.is_empty():
 		return false
 
-	var connection_result: Dictionary = command_controller.connect_blocks(
+	var connection_result = command_controller.connect_blocks(
 		pending_connection_from_block_id,
 		pending_connection_from_port,
 		target_block_id
 	)
-	var connected: bool = connection_result["is_success"]
+	var connected: bool = connection_result.is_success
 	pending_connection_from_block_id = ""
 	pending_connection_from_port = ""
 	if block_drawer != null:
@@ -230,7 +233,7 @@ func move_selected_block(new_position: Vector2) -> bool:
 	if selected_block_id.is_empty():
 		return false
 
-	var moved: bool = command_controller.move_block(selected_block_id, new_position)["is_success"]
+	var moved: bool = command_controller.move_block(selected_block_id, new_position).is_success
 	if moved and block_nodes.has(selected_block_id):
 		block_nodes[selected_block_id].move_to(new_position)
 	_sync_editor_from_graph_state()
@@ -244,8 +247,39 @@ func remove_selected_block() -> bool:
 func current_program():
 	return graph_builder.build(graph_state)
 
-func load_tutorial_example(example := TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR) -> void:
-	var example_program = TutorialReferenceProgramScript.build_example(example)
+func block_count() -> int:
+	return graph_state.blocks.size()
+
+func connection_count() -> int:
+	return graph_state.connections.size()
+
+func visual_block_count() -> int:
+	return block_nodes.size()
+
+func selected_block() -> String:
+	return selected_block_id
+
+func capture_snapshot():
+	_initialize_models()
+	var program = current_program()
+	var ram_summary: Dictionary = ram_panel.summary_for_program(program)
+	var validation_summary: Dictionary = validation_panel.summary_for_program(program)
+	return BrainEditorSnapshotScript.new(
+		graph_state,
+		program,
+		ram_summary["label"],
+		runtime_state_presenter.label_for_state(runtime.state, runtime.failure_reason),
+		validation_summary["is_valid"]
+	)
+
+func load_example(example_id := -1) -> bool:
+	if example_provider == null:
+		return false
+	if example_id < 0:
+		example_id = example_provider.default_example_id()
+	var example_program = example_provider.build_program(example_id)
+	if example_program == null:
+		return false
 	var example_graph = graph_importer.import_program(example_program)
 	var positions: Dictionary = layout_controller.positions_for(example_graph)
 	for block_id in positions:
@@ -257,6 +291,7 @@ func load_tutorial_example(example := TutorialReferenceProgramScript.Example.WHI
 
 	connection_feedback_label.text = "Exemplo carregado. Mova os blocos e observe as conexoes."
 	connection_feedback_label.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
+	return true
 
 func reset_brain() -> void:
 	_reset_graph_state()
@@ -338,10 +373,7 @@ func _initialize_models() -> void:
 	if condition_selector == null:
 		condition_selector = ConditionSelectorScript.new()
 	if runtime == null:
-		var motor = BunekoMotorScript.new()
-		var dispatcher = BunekoActionDispatcherScript.new(motor)
-		var sensor_reader = BunekoSensorReaderScript.new()
-		runtime = ProgramRuntimeScript.new(sensor_reader, dispatcher)
+		runtime = ProgramRuntimeScript.new(SensorReaderScript.new(), ActionDispatcherScript.new())
 	if runtime_controls == null:
 		runtime_controls = RuntimeControlsScript.new(runtime, graph_builder)
 	if pseudocode_presenter == null:
@@ -350,120 +382,52 @@ func _initialize_models() -> void:
 func _ensure_ui() -> void:
 	if workspace != null:
 		return
+	editor_view = EditorViewScript.new()
+	var example_entries: Array[Dictionary] = []
+	if example_provider != null:
+		example_entries = example_provider.entries()
+	editor_view.bind(self, block_factory, example_entries)
+	_bind_view_references()
+	_connect_view_signals()
 
-	theme = load("res://themes/buneko_theme.tres")
-	anchors_preset = PRESET_FULL_RECT
-	anchor_right = 1.0
-	anchor_bottom = 1.0
+func _bind_view_references() -> void:
+	editor_header = editor_view.editor_header
+	palette = editor_view.palette
+	block_drawer = editor_view.block_drawer
+	pseudocode_panel = editor_view.pseudocode_panel
+	canvas_toolbar = editor_view.canvas_toolbar
+	canvas_primary_tools = editor_view.canvas_primary_tools
+	canvas_navigation_tools = editor_view.canvas_navigation_tools
+	workspace = editor_view.workspace
+	inspector_panel = editor_view.inspector_panel
+	ram_label = editor_view.ram_label
+	validation_label = editor_view.validation_label
+	state_label = editor_view.state_label
+	connection_feedback_label = editor_view.connection_feedback_label
+	parameter_panel = editor_view.parameter_panel
+	start_button = editor_view.start_button
+	pause_button = editor_view.pause_button
+	resume_button = editor_view.resume_button
+	stop_button = editor_view.stop_button
+	restart_button = editor_view.restart_button
+	organize_button = editor_view.organize_button
+	pan_button = editor_view.pan_button
+	zoom_out_button = editor_view.zoom_out_button
+	zoom_label_button = editor_view.zoom_label_button
+	zoom_in_button = editor_view.zoom_in_button
+	center_view_button = editor_view.center_view_button
+	drawer_button = editor_view.drawer_button
+	pseudocode_button = editor_view.pseudocode_button
+	back_button = editor_view.back_button
+	example_selector = editor_view.example_selector
+	example_button = editor_view.example_button
+	reset_brain_button = editor_view.reset_brain_button
 
-	var background := ColorRect.new()
-	background.color = Tokens.BACKGROUND
-	background.set_anchors_preset(PRESET_FULL_RECT)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
-
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 14)
-	margin.add_theme_constant_override("margin_right", 14)
-	margin.add_theme_constant_override("margin_top", 12)
-	margin.add_theme_constant_override("margin_bottom", 12)
-	add_child(margin)
-
-	var page := VBoxContainer.new()
-	page.add_theme_constant_override("separation", 10)
-	margin.add_child(page)
-
-	editor_header = MissionHeaderScript.new()
-	editor_header.name = "EditorHeader"
-	editor_header.configure("ETAPA 2/3  PROGRAMACAO", "Atravesse o buraco e alcance o objetivo", "Editando", "0/5 RAM")
-	page.add_child(editor_header)
-
-	var body := HBoxContainer.new()
-	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	body.add_theme_constant_override("separation", 10)
-	page.add_child(body)
-
-	var center := VBoxContainer.new()
-	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	center.add_theme_constant_override("separation", 8)
-	body.add_child(center)
-
-	canvas_toolbar = PanelContainer.new()
-	canvas_toolbar.name = "CanvasToolbar"
-	canvas_toolbar.custom_minimum_size.y = 44.0
-	Tokens.apply_panel(canvas_toolbar, Color("202d33"))
-	center.add_child(canvas_toolbar)
-	var canvas_toolbar_row := HBoxContainer.new()
-	canvas_toolbar_row.name = "CanvasToolbarRow"
-	canvas_toolbar_row.add_theme_constant_override("separation", 8)
-	canvas_toolbar.add_child(canvas_toolbar_row)
-	canvas_primary_tools = HBoxContainer.new()
-	canvas_primary_tools.name = "PrimaryTools"
-	canvas_primary_tools.add_theme_constant_override("separation", 6)
-	canvas_toolbar_row.add_child(canvas_primary_tools)
-	var canvas_toolbar_spacer := Control.new()
-	canvas_toolbar_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	canvas_toolbar_row.add_child(canvas_toolbar_spacer)
-	canvas_navigation_tools = HBoxContainer.new()
-	canvas_navigation_tools.name = "NavigationTools"
-	canvas_navigation_tools.add_theme_constant_override("separation", 6)
-	canvas_toolbar_row.add_child(canvas_navigation_tools)
-
-	drawer_button = _add_control_button(canvas_primary_tools, "DrawerButton", "Blocos")
-	drawer_button.toggle_mode = true
-	organize_button = _add_control_button(canvas_primary_tools, "OrganizeButton", "Organizar")
-	pseudocode_button = _add_control_button(canvas_primary_tools, "PseudocodeButton", "Código")
-	pan_button = _add_control_button(canvas_navigation_tools, "PanButton", "Mover")
-	pan_button.toggle_mode = true
-	zoom_out_button = _add_control_button(canvas_navigation_tools, "ZoomOutButton", "-")
-	zoom_out_button.custom_minimum_size.x = 40.0
-	zoom_label_button = _add_control_button(canvas_navigation_tools, "ZoomLabelButton", "100%")
-	zoom_label_button.custom_minimum_size.x = 56.0
-	zoom_label_button.disabled = true
-	zoom_in_button = _add_control_button(canvas_navigation_tools, "ZoomInButton", "+")
-	zoom_in_button.custom_minimum_size.x = 40.0
-	center_view_button = _add_control_button(canvas_navigation_tools, "CenterViewButton", "Centralizar")
-	_configure_canvas_toolbar_tooltips()
-
-	var workspace_panel := PanelContainer.new()
-	workspace_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	workspace_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	Tokens.apply_panel(workspace_panel, Color("1b252a"))
-	center.add_child(workspace_panel)
-	workspace = WorkspaceScript.new()
-	workspace.name = "Workspace"
-	workspace.custom_minimum_size = Vector2(480, 360)
-	workspace_panel.add_child(workspace)
-	_add_start_marker()
-	block_drawer = BlockDrawerScript.new()
-	block_drawer.configure(block_factory)
+func _connect_view_signals() -> void:
 	block_drawer.block_requested.connect(_on_drawer_block_requested)
 	block_drawer.close_requested.connect(_close_drawer)
-	block_drawer.visible = false
-	workspace.add_child(block_drawer)
-	palette = block_drawer.palette
-	pseudocode_panel = PseudocodePanelScript.new()
-	pseudocode_panel.visible = false
-	workspace.add_child(pseudocode_panel)
-
-	var toolbar_panel := PanelContainer.new()
-	Tokens.apply_panel(toolbar_panel)
-	center.add_child(toolbar_panel)
-	var toolbar := HBoxContainer.new()
-	toolbar.add_theme_constant_override("separation", 8)
-	toolbar_panel.add_child(toolbar)
-	validation_label = Label.new()
-	validation_label.name = "ValidationLabel"
-	validation_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	validation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	toolbar.add_child(validation_label)
-	start_button = _add_control_button(toolbar, "StartButton", "Executar tentativa", true)
-	pause_button = _add_control_button(toolbar, "PauseButton", "Pausar")
-	resume_button = _add_control_button(toolbar, "ResumeButton", "Retomar", true)
-	stop_button = _add_control_button(toolbar, "StopButton", "Parar")
-	restart_button = _add_control_button(toolbar, "RestartButton", "Executar novamente", true)
+	parameter_panel.condition_selected.connect(apply_condition_to_selected)
+	parameter_panel.movement_pace_selected.connect(apply_movement_pace_to_selected)
 	start_button.pressed.connect(_on_start_pressed)
 	pause_button.pressed.connect(_on_pause_pressed)
 	resume_button.pressed.connect(_on_resume_pressed)
@@ -477,103 +441,9 @@ func _ensure_ui() -> void:
 	zoom_in_button.pressed.connect(workspace.zoom_in)
 	center_view_button.pressed.connect(workspace.center_viewport)
 	workspace.viewport_changed.connect(_on_workspace_viewport_changed)
-
-	inspector_panel = PanelContainer.new()
-	inspector_panel.custom_minimum_size.x = 195.0
-	Tokens.apply_panel(inspector_panel)
-	body.add_child(inspector_panel)
-	var inspector := VBoxContainer.new()
-	inspector.add_theme_constant_override("separation", 10)
-	inspector_panel.add_child(inspector)
-	var inspector_title := Label.new()
-	inspector_title.text = "PROPRIEDADES"
-	inspector_title.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
-	inspector.add_child(inspector_title)
-	parameter_panel = BlockParameterPanelScript.new()
-	parameter_panel.name = "ParameterPanel"
-	parameter_panel.condition_selected.connect(apply_condition_to_selected)
-	parameter_panel.movement_pace_selected.connect(apply_movement_pace_to_selected)
-	inspector.add_child(parameter_panel)
-	var separator := HSeparator.new()
-	inspector.add_child(separator)
-	connection_feedback_label = Label.new()
-	connection_feedback_label.name = "ConnectionFeedback"
-	connection_feedback_label.text = "Adicione um bloco para comecar"
-	connection_feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	connection_feedback_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	connection_feedback_label.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
-	inspector.add_child(connection_feedback_label)
-	example_selector = OptionButton.new()
-	example_selector.name = "ExampleSelector"
-	example_selector.add_item("Exemplo com IF + WHILE")
-	example_selector.set_item_metadata(0, TutorialReferenceProgramScript.Example.IF_GAP)
-	example_selector.add_item("Exemplo com WHILE")
-	example_selector.set_item_metadata(1, TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
-	example_selector.select(1)
-	inspector.add_child(example_selector)
-	example_button = Button.new()
-	example_button.name = "ExampleButton"
-	example_button.text = "Carregar exemplo"
-	example_button.tooltip_text = "Substitui o grafo atual por uma solucao curta que voce pode editar"
-	Tokens.apply_secondary_button(example_button)
 	example_button.pressed.connect(_on_example_pressed)
-	inspector.add_child(example_button)
-	reset_brain_button = Button.new()
-	reset_brain_button.name = "ResetBrainButton"
-	reset_brain_button.text = "Zerar cerebro"
-	reset_brain_button.tooltip_text = "Remove todos os blocos e conexoes do cerebro atual"
-	Tokens.apply_secondary_button(reset_brain_button)
 	reset_brain_button.pressed.connect(reset_brain)
-	inspector.add_child(reset_brain_button)
-	ram_label = Label.new()
-	ram_label.name = "RamLabel"
-	ram_label.visible = false
-	inspector.add_child(ram_label)
-	state_label = Label.new()
-	state_label.name = "StateLabel"
-	state_label.visible = false
-	inspector.add_child(state_label)
-	back_button = Button.new()
-	back_button.text = "Voltar para montagem"
-	back_button.visible = false
-	Tokens.apply_secondary_button(back_button)
 	back_button.pressed.connect(back_to_assembly_requested.emit)
-	inspector.add_child(back_button)
-
-func _add_start_marker() -> void:
-	var marker := PanelContainer.new()
-	marker.name = "StartMarker"
-	marker.position = Vector2(22, 24)
-	marker.custom_minimum_size = Vector2(130, 54)
-	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	marker.add_theme_stylebox_override("panel", Tokens.panel_style(Color("173b3c"), 6, Tokens.TEAL))
-	var label := Label.new()
-	label.text = "INICIO   ●"
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", Tokens.TEAL)
-	marker.add_child(label)
-	workspace.add_child(marker)
-
-func _add_control_button(parent: Node, button_name: String, button_text: String, primary := false) -> Button:
-	var button := Button.new()
-	button.name = button_name
-	button.text = button_text
-	if primary:
-		Tokens.apply_primary_button(button)
-	else:
-		Tokens.apply_secondary_button(button)
-	parent.add_child(button)
-	return button
-
-func _configure_canvas_toolbar_tooltips() -> void:
-	organize_button.tooltip_text = "Organizar blocos"
-	drawer_button.tooltip_text = "Abrir blocos"
-	pseudocode_button.tooltip_text = "Ver pseudocodigo"
-	pan_button.tooltip_text = "Mover canvas"
-	zoom_out_button.tooltip_text = "Diminuir zoom"
-	zoom_in_button.tooltip_text = "Aumentar zoom"
-	center_view_button.tooltip_text = "Centralizar canvas"
 
 func _on_palette_block_requested(kind: int) -> void:
 	create_block(kind)
@@ -592,13 +462,12 @@ func _on_drawer_block_requested(kind: int) -> void:
 	var spawn_position := next_spawn_position
 	if source_node != null:
 		spawn_position = source_node.position + Vector2(210, 0)
-	var result: Dictionary = command_controller.insert_connected_block(kind, spawn_position, pending_connection_from_block_id, pending_connection_from_port)
-	if not result["is_success"]:
+	var result = command_controller.insert_connected_block(kind, spawn_position, pending_connection_from_block_id, pending_connection_from_port)
+	if not result.is_success:
 		connection_feedback_label.text = "Nao foi possivel inserir nessa saida"
 		connection_feedback_label.add_theme_color_override("font_color", Tokens.ERROR)
 		return
-	var block_state = result["value"]
-	_add_block_node(block_state)
+	var block_state = result.value
 	pending_connection_from_block_id = ""
 	pending_connection_from_port = ""
 	block_drawer.show_insertion_hint()
@@ -633,10 +502,9 @@ func _on_restart_pressed() -> void:
 	refresh_panels()
 
 func _on_example_pressed() -> void:
-	var selected_example: int = TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR
-	if example_selector != null:
-		selected_example = int(example_selector.get_selected_metadata())
-	load_tutorial_example(selected_example)
+	if example_selector == null or example_selector.item_count == 0:
+		return
+	load_example(int(example_selector.get_selected_metadata()))
 
 func _on_block_node_moved(block_id: String, new_position: Vector2) -> void:
 	command_controller.move_block(block_id, new_position)
@@ -646,9 +514,8 @@ func _on_remove_block_requested(block_id: String) -> void:
 
 func _remove_block(block_id: String) -> bool:
 	selected_block_id = block_id
-	var removed: bool = command_controller.remove_block(block_id)["is_success"]
+	var removed: bool = command_controller.remove_block(block_id).is_success
 	if removed:
-		_remove_block_node(block_id)
 		selected_block_id = ""
 		pending_connection_from_block_id = ""
 		pending_connection_from_port = ""
@@ -752,10 +619,19 @@ func _on_graph_state_changed(_change: int, _affected_block_ids: PackedStringArra
 func _sync_editor_from_graph_state() -> void:
 	if workspace == null:
 		return
+	_reconcile_block_nodes()
 	_refresh_next_spawn_position()
 	_rebuild_connection_lines()
 	_update_parameter_panel()
 	refresh_panels()
+
+func _reconcile_block_nodes() -> void:
+	for block_id in graph_state.blocks:
+		if not block_nodes.has(block_id):
+			_add_block_node(graph_state.blocks[block_id])
+	for block_id in block_nodes.keys():
+		if not graph_state.blocks.has(block_id):
+			_remove_block_node(block_id)
 
 func _remove_block_node(block_id: String) -> void:
 	if not block_nodes.has(block_id):
@@ -790,6 +666,10 @@ func _on_pseudocode_pressed() -> void:
 	pseudocode_panel.show_text(result["text"])
 
 func _on_block_insert_requested(block_id: String, port: String, kind: int) -> void:
+	if _output_has_connection(block_id, port):
+		connection_feedback_label.text = "Essa saida ja esta conectada. Remova o bloco ligado antes de inserir outro."
+		connection_feedback_label.add_theme_color_override("font_color", Tokens.AMBER)
+		return
 	start_connection(block_id, port)
 	_on_drawer_block_requested(kind)
 

@@ -145,7 +145,7 @@ Status geral: o experimento B foi consolidado como contrato final. `Correr` foi 
     - O jogador nao precisa ajustar numero fino para passar da primeira fase.
   - Status: decisao registrada na ADR 008 e implementada no dominio, editor, runtime, fisica e tutorial.
 
-- [ ] Adicionar feedback minimo para acao recusada.
+- [x] Adicionar feedback minimo para acao recusada.
   - Arquivos previstos:
     - `braty/src/programming/runtime/program_runtime.gd`
     - `braty/src/brain_editor/block_node.gd`
@@ -158,12 +158,12 @@ Status geral: o experimento B foi consolidado como contrato final. `Correr` foi 
   - Aceite:
     - Pulo sem chao fica compreensivel.
     - O jogador sabe qual bloco tentou agir.
-  - Status: parcialmente implementado no runtime e overlay textual da tentativa; ainda falta validar se o feedback e suficiente para jogador.
+  - Status: implementado no runtime e overlay textual da tentativa; a suficiencia para o jogador faz parte da validacao manual final.
 
 - [x] Substituir Acompanhar por feedback visual de transicao.
   - Status: implementado pela PRD 009; o editor e a fase usam apenas tentativa normal, e a cabeca do Buneko recebe pulsos luminosos por mudanca de acao ou recusa.
 
-- [ ] Registrar melhoria futura de miniatura do brain na fase.
+- [x] Registrar melhoria futura de miniatura do brain na fase.
   - Arquivos previstos:
     - `docs/fases/fase000/tasks/008-brain-and-responsive-movement-tasks.md`
     - possivel PRD futura quando virar escopo ativo
@@ -191,7 +191,7 @@ Status geral: o experimento B foi consolidado como contrato final. `Correr` foi 
   - Pendencia identificada:
     - A referencia deve usar `Andar [rapido]` e repeticao explicita depois do pouso para concluir dentro de 5 RAM, sem depender de deslizamento excessivo.
   - Validacao automatizada mais recente:
-    - 34 scripts, 175 testes e 659 asserts passaram em 2026-08-21.
+    - 35 scripts, 188 testes e 752 assercoes passaram em 2026-09-04.
     - O contrato final, os ritmos, a inercia, o encerramento antecipado e o programa de referencia possuem cobertura automatizada.
     - A sensacao da desaceleracao e a usabilidade visual continuam reservadas ao teste manual do usuario.
 

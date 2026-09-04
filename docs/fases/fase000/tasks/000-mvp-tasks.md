@@ -21,7 +21,7 @@ Status geral: implementacao funcional concluida; refinamento visual, validacao m
 - [ ] Executar a lista 007 para o Buneko simples e a logica visual legivel.
   - Implementacao integrada; falta validacao manual de layout/leitura e fechamento apos revisao do brain.
 - [ ] Executar a lista 008 para brain e movimento responsivo.
-  - Planejada para acertar a sensacao de comando entre blocos, runtime e Buneko antes de declarar o MVP pronto.
+  - Implementacao e cobertura automatizada integradas; falta validar manualmente resposta, inercia e clareza do feedback.
 - [ ] Executar a lista 009 para sinal luminoso de acao.
   - Implementacao automatizada concluida; falta validacao visual de contraste e ritmo na fase.
 - [ ] Executar os testes automatizados e a verificacao manual dos criterios da PRD 000.

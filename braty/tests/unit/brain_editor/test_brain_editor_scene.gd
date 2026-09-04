@@ -7,10 +7,12 @@ const EditorGraphStateScript = preload("res://src/brain_editor/editor_graph_stat
 const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 const Tokens = preload("res://src/ui/design_tokens.gd")
 const TutorialReferenceProgramScript = preload("res://src/tutorial/tutorial_reference_program.gd")
+const TutorialExampleProviderScript = preload("res://src/tutorial/tutorial_brain_example_provider.gd")
 
 func test_brain_editor_scene_instantiates_with_main_regions() -> void:
 	var editor = await _ready_editor()
 
+	assert_not_null(editor.editor_view)
 	assert_not_null(editor.palette)
 	assert_not_null(editor.workspace)
 	assert_not_null(editor.ram_label)
@@ -97,7 +99,7 @@ func test_drawer_opens_with_all_blocks_without_scroll() -> void:
 
 func test_removing_while_body_leaves_it_empty_and_clicking_output_opens_drawer() -> void:
 	var editor = await _ready_editor()
-	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))
 	var while_node = editor.block_nodes[editor.graph_state.start_block_id]
 	var removed_block_id := _target_for_output(editor, while_node.block_id, "body")
 	var initial_block_count: int = editor.graph_state.blocks.size()
@@ -126,7 +128,7 @@ func test_removing_while_body_leaves_it_empty_and_clicking_output_opens_drawer()
 
 func test_clicking_an_occupied_output_does_not_open_the_drawer() -> void:
 	var editor = await _ready_editor()
-	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))
 	var while_node = editor.block_nodes[editor.graph_state.start_block_id]
 
 	while_node._port_buttons["body"].pressed.emit()
@@ -147,6 +149,51 @@ func test_drawer_click_inserts_and_connects_to_the_selected_output() -> void:
 	assert_eq(editor.ram_label.text, "2/5 RAM")
 	assert_eq(editor.connection_feedback_label.text, "Bloco inserido e conectado")
 	assert_false(editor.block_drawer.visible)
+
+func test_palette_drag_to_empty_output_inserts_and_connects_atomically() -> void:
+	var editor = await _ready_editor()
+	var walk = editor.create_block(BlockKind.Value.WALK, Vector2(100, 100))
+	var palette_item = editor.palette.item_for_kind(BlockKind.Value.JUMP)
+	var output_port = walk._port_buttons["next"]
+	var drag_data = palette_item.drag_payload()
+
+	assert_true(output_port._can_drop_data(Vector2.ZERO, drag_data))
+	output_port._drop_data(Vector2.ZERO, drag_data)
+
+	assert_eq(editor.graph_state.blocks.size(), 2)
+	assert_eq(editor.graph_state.connections.size(), 1)
+	assert_eq(editor.ram_label.text, "2/5 RAM")
+	assert_eq(_target_for_output(editor, walk.block_id, "next"), editor.selected_block_id)
+	assert_eq(editor.connection_feedback_label.text, "Bloco inserido e conectado")
+
+func test_palette_drag_to_occupied_output_preserves_graph_and_pending_state() -> void:
+	var editor = await _ready_editor()
+	var walk = editor.create_block(BlockKind.Value.WALK, Vector2(100, 100))
+	var output_port = walk._port_buttons["next"]
+	var jump_drag = editor.palette.item_for_kind(BlockKind.Value.JUMP).drag_payload()
+	output_port._drop_data(Vector2.ZERO, jump_drag)
+	var initial_blocks: int = editor.graph_state.blocks.size()
+	var initial_connections: int = editor.graph_state.connections.size()
+	var turn_drag = editor.palette.item_for_kind(BlockKind.Value.TURN).drag_payload()
+
+	output_port._drop_data(Vector2.ZERO, turn_drag)
+
+	assert_eq(editor.graph_state.blocks.size(), initial_blocks)
+	assert_eq(editor.graph_state.connections.size(), initial_connections)
+	assert_eq(editor.pending_connection_from_block_id, "")
+	assert_eq(editor.pending_connection_from_port, "")
+	assert_true(editor.connection_feedback_label.text.contains("ja esta conectada"))
+
+func test_palette_drag_rejects_invalid_data_without_changing_graph() -> void:
+	var editor = await _ready_editor()
+	var walk = editor.create_block(BlockKind.Value.WALK, Vector2(100, 100))
+	var output_port = walk._port_buttons["next"]
+	var initial_blocks: int = editor.graph_state.blocks.size()
+
+	assert_false(output_port._can_drop_data(Vector2.ZERO, {"type": "other", "kind": BlockKind.Value.JUMP}))
+	assert_false(output_port._can_drop_data(Vector2.ZERO, null))
+	assert_eq(editor.graph_state.blocks.size(), initial_blocks)
+	assert_eq(editor.graph_state.connections.size(), 0)
 
 func test_drawer_explains_that_a_while_needs_a_selected_output() -> void:
 	var editor = await _ready_editor()
@@ -230,7 +277,7 @@ func test_removing_connected_block_removes_its_connection_visuals_immediately() 
 
 func test_remove_button_returns_ram_for_a_connected_block() -> void:
 	var editor = await _ready_editor()
-	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))
 	var jump_node = _block_node_for_kind(editor, BlockKind.Value.JUMP)
 
 	assert_eq(editor.ram_label.text, "5/5 RAM")
@@ -323,7 +370,7 @@ func test_invalid_control_block_is_highlighted_with_specific_message() -> void:
 func test_tutorial_example_builds_compact_valid_program() -> void:
 	var editor = await _ready_editor()
 
-	editor.load_tutorial_example()
+	assert_true(editor.load_example())
 
 	assert_eq(editor.graph_state.blocks.size(), 5)
 	assert_eq(editor.graph_state.connections.size(), 4)
@@ -342,7 +389,7 @@ func test_tutorial_example_builds_compact_valid_program() -> void:
 func test_tutorial_while_example_builds_compact_valid_program() -> void:
 	var editor = await _ready_editor()
 
-	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))
 
 	assert_eq(editor.graph_state.blocks.size(), 5)
 	assert_eq(editor.graph_state.connections.size(), 4)
@@ -369,7 +416,7 @@ func test_example_selector_loads_while_example() -> void:
 
 func test_reset_brain_button_clears_blocks_connections_and_ram() -> void:
 	var editor = await _ready_editor()
-	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))
 
 	editor.reset_brain_button.pressed.emit()
 
@@ -397,7 +444,7 @@ func test_loading_a_graph_stops_observing_the_previous_graph() -> void:
 
 func test_organize_button_repositions_blocks_without_changing_the_program() -> void:
 	var editor = await _ready_editor()
-	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))
 	var initial_connections: Array = editor.graph_state.connections.duplicate()
 	var initial_ram: String = editor.ram_label.text
 	var initial_visual_count := _connection_visual_count(editor)
@@ -430,7 +477,7 @@ func test_zoom_buttons_change_only_the_viewport() -> void:
 
 func test_pseudocode_panel_reads_the_current_graph_without_editing_it() -> void:
 	var editor = await _ready_editor()
-	editor.load_tutorial_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR)
+	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))
 	var initial_ram: String = editor.ram_label.text
 
 	editor.pseudocode_button.pressed.emit()
@@ -486,6 +533,7 @@ func _target_for_output(editor, block_id: String, port: String) -> String:
 func _ready_editor():
 	var scene: PackedScene = load("res://scenes/brain_editor/brain_editor.tscn")
 	var editor = scene.instantiate()
+	editor.configure_example_provider(TutorialExampleProviderScript.new())
 	add_child_autofree(editor)
 	await get_tree().process_frame
 	return editor

@@ -18,6 +18,7 @@ O jogador arrasta blocos pelo workspace por prazer e para organizar visualmente 
 - O estado emite uma notificacao de mudanca com o tipo de alteracao e os ids afetados.
 - Acoes da interface viram comandos pequenos de editor: inserir, conectar, desconectar, mover, remover, redefinir e carregar exemplo.
 - Um controlador aplica comandos ao estado; componentes visuais nao mutam o modelo diretamente.
+- `BrainEditor` coordena o fluxo e a integracao; a construcao da arvore visual pertence a um componente de view dedicado.
 - RAM, validacao, pseudocodigo e workspace observam a mesma mudanca de estado.
 - A posicao de um bloco pertence ao layout visual, mas conexoes pertencem ao grafo. O layout nao pode ser usado para inferir fluxo.
 - O workspace desenha conexoes somente a partir do estado atual e das posicoes atuais dos blocos.
@@ -31,6 +32,7 @@ O jogador arrasta blocos pelo workspace por prazer e para organizar visualmente 
 - Arraste preservado como organizacao visual.
 - Botao `Organizar` que aplica um layout automatico deterministico, sem mudar o programa.
 - Cobertura automatizada para os fluxos de insercao, conexao, arraste, remocao e reorganizacao.
+- Composicao visual extraida do orquestrador sem alterar nomes de nos, sinais ou o contrato publico usado pela missao.
 
 ## Criterios de aceite
 
@@ -39,6 +41,7 @@ O jogador arrasta blocos pelo workspace por prazer e para organizar visualmente 
 - RAM, validacao, contador de conexoes e pseudocodigo derivam do mesmo estado apos qualquer comando.
 - `Organizar` altera somente posicoes; programa, RAM e resultado da validacao permanecem iguais.
 - Nenhum componente visual mantem uma lista propria de conexoes logicas.
+- O orquestrador nao constroi diretamente toda a hierarquia de controles do editor.
 - Testes de dominio nao dependem de cenas Godot; testes de cena cobrem os sinais dos botoes e o arraste real.
 
 ## Fora do escopo

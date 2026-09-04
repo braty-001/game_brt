@@ -38,7 +38,7 @@ Aplicar SOLID de forma pratica, sem criar camadas artificiais:
 
 ## PRDs e tarefas
 
-Cada fase fica em `docs/fases/faseNNN/`, com PRDs em `prds/` e listas correspondentes em `tasks/`. Exemplo: `docs/fases/fase000/prds/001-brain-editor.md` e `docs/fases/fase000/tasks/001-brain-editor-tasks.md`.
+Cada fase fica em `docs/fases/faseNNN/`, com PRDs em `prds/` e listas correspondentes em `tasks/`. Exemplo: `docs/fases/fase000/prds/004-brain-editor.md` e `docs/fases/fase000/tasks/004-brain-editor-tasks.md`.
 
 Uma PRD descreve problema, experiencia do jogador, escopo, regras, criterios de aceite, riscos e limites. A lista de tarefas traduz essa definicao em trabalho executavel, com dependencias, status, criterio de conclusao e testes exigidos. Nenhuma PRD ou lista deve ser criada apenas para preencher estrutura: elas surgem quando o trabalho precisa delas.
 
@@ -47,6 +47,8 @@ Uma PRD descreve problema, experiencia do jogador, escopo, regras, criterios de 
 Todo comportamento deterministico e sem interface deve ter testes automatizados: orcamento de RAM, validacao de programas, estruturas de controle, leituras de sensores, objetivos de missao e regras de progressao quando existirem. Integracoes entre editor, representacao do programa e executor devem ter testes automatizados quando a ferramenta escolhida permitir.
 
 Interacoes visuais, animacao, colisao e usabilidade exigem verificacao manual documentada na tarefa correspondente. Antes da primeira tarefa de codigo, a PRD tecnica deve registrar a ferramenta de testes compativel com a versao de Godot escolhida e como ela sera executada localmente e em CI.
+
+O mesmo comando da suite completa deve ser executado no CI com Godot 4.4.1. O workflow versionado e a referencia executavel; a ADR da pilha registra versoes e responsabilidades.
 
 Os testes GUT devem ser executados a partir da raiz do repositorio com:
 
