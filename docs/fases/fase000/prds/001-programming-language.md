@@ -16,7 +16,7 @@ O jogador conecta blocos para formar um fluxo. Ao iniciar a missao, o executor p
 - `IF`: avalia uma condicao e direciona o fluxo para o ramo verdadeiro ou falso.
 - `WHILE`: continua executando seu ramo enquanto a condicao for verdadeira.
 
-Cada bloco colocado consome 1 RAM. O ponto inicial, as conexoes e os parametros de um bloco nao consomem RAM. O programa nao pode ultrapassar 5 RAM.
+Cada bloco colocado consome 1 RAM quando alcancavel a partir do inicio. O ponto inicial, as conexoes e os parametros de um bloco nao consomem RAM. O programa nao pode ultrapassar a capacidade do Buneko: 5 no tutorial; 10 na preparacao da campanha (PRD 014 e ADR 010).
 
 O ritmo padrao de `Andar` e `normal`. O ritmo `rapido` solicita uma velocidade maior sem criar outro bloco nem aumentar o custo de RAM. O resultado fisico depende da capacidade da peca de locomocao instalada.
 
@@ -32,6 +32,8 @@ O MVP suporta as condicoes visuais necessarias para o tutorial:
 - `Audicao: sinal ouvido`.
 
 Audicao deve existir como tipo de condicao selecionavel, mesmo que a primeira fase use apenas uma fonte simples de som ou apenas demonstre sua indisponibilidade de forma clara. Consultas e alvos futuros devem poder ser adicionados sem modificar os blocos de controle.
+
+Extensao de campanha (PRD 015): `Visao: degrau a frente` alimenta os mesmos IF/WHILE, sem custo adicional. Seletor recebe consultas do contexto: tutorial preserva as quatro acima; laboratorio oferece as tres visuais originais e degrau, sem audicao jogavel. Contrato de alcance/oclusao e testes ficam na PRD 015 e ADR 010.
 
 ## Regras de fluxo
 

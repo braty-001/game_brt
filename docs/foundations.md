@@ -14,12 +14,12 @@ Buneko e um jogo 2D de plataforma em que o jogador construi e programa um Buneko
 
 ## Escopo atual
 
-O objetivo imediato e um MVP tutorial com um Buneko basico, editor de cerebro, uma fase simples e o conjunto minimo de blocos necessario para concluir a fase. Sistemas de equipamentos, atributos, upgrades, economia e editor de fases pertencem ao futuro, mas a arquitetura deve permitir sua inclusao sem reescrever o nucleo.
+O MVP tutorial estabelece montagem, editor e execucao. A Fase 002 expande para selecao/preparacao da campanha, laboratorio, combate basico e save com recompensa unica, conforme `docs/fases/fase002/README.md` e PRDs 014 a 017. A PRD 014 e o percurso/visao da PRD 015 estao implementados e testados automaticamente. A PRD 016 possui combate, inimigos, bastao e checkpoint integrados no checkout; regras e fluxos focados passam, mas a rota completa de combate e fuga em 10 RAM ainda termina antes da saida e impede a suite completa de ficar verde. Aceite manual ampliado permanece pendente. Save/recompensa pertencem a 017. Loja, upgrades compraveis, audicao jogavel e editor de fases permanecem futuros; aceite manual ampliado do MVP continua nas listas anteriores.
 
 ## Regras de design ja decididas
 
 - O programa e visual e composto por blocos.
-- O cerebro inicia com 5 unidades de RAM.
+- O cerebro inicia com 5 RAM no tutorial; recebe 10 na preparacao da primeira missao da campanha. A capacidade e contexto do Buneko (ADR 010).
 - Cada bloco colocado consome 1 unidade de RAM. Parametros selecionados dentro de um bloco, como o sentido ou a condicao de um sensor, nao consomem RAM adicional.
 - O programa e executado continuamente durante a fase.
 - O Buneko percebe o mundo por sensores inspirados nos humanos, como visao e audicao, configurados como condicoes selecionaveis em blocos de controle.

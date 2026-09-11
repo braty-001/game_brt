@@ -15,6 +15,8 @@ func presentation_for(kind: int) -> Dictionary:
 			return _action("Pular", "PULAR")
 		ProgramBlockKind.Value.TURN:
 			return _action("Virar", "VIRAR")
+		ProgramBlockKind.Value.ATTACK:
+			return _action("Atacar", "ATACAR")
 		ProgramBlockKind.Value.IF:
 			return {
 				"label": "IF",

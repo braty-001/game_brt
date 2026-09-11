@@ -32,6 +32,9 @@ func _draw() -> void:
 		var glow_color := Color(_pulse_color, 0.18 + intensity * 0.30)
 		draw_circle(Vector2(0, -40), 34.0 + intensity * 8.0, glow_color)
 	SimpleParts.draw_complete(self, Vector2.ZERO, 0.82)
+	if get_parent().has_method("has_baton") and get_parent().has_baton():
+		draw_line(Vector2(11, -31), Vector2(31, -53), Color("dab171"), 6)
+		draw_circle(Vector2(33, -55), 4, Color("9e704d"))
 
 func _color_for_action(action_kind: int) -> Color:
 	match action_kind:

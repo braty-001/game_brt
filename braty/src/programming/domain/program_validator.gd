@@ -1,13 +1,13 @@
 class_name ProgramValidator
 extends RefCounted
 
-static func validate(program: ProgramDefinition) -> Array[ProgramValidationError]:
+static func validate(program: ProgramDefinition, ram_capacity: int = ProgramRamCalculator.RAM_LIMIT) -> Array[ProgramValidationError]:
 	var errors: Array[ProgramValidationError] = []
 	_validate_start(program, errors)
 	_validate_blocks(program, errors)
 	_validate_connections(program, errors)
 	_validate_cycles(program, errors)
-	_validate_ram(program, errors)
+	_validate_ram(program, errors, ram_capacity)
 	return errors
 
 static func _validate_start(
@@ -125,7 +125,8 @@ static func _has_cycle_from(
 
 static func _validate_ram(
 	program: ProgramDefinition,
-	errors: Array[ProgramValidationError]
+	errors: Array[ProgramValidationError],
+	ram_capacity: int
 ) -> void:
-	if not ProgramRamCalculator.is_within_limit(program):
+	if not ProgramRamCalculator.is_within_limit(program, ram_capacity):
 		errors.append(ProgramValidationError.new(ProgramValidationError.Code.RAM_LIMIT_EXCEEDED))

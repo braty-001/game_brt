@@ -11,9 +11,9 @@ func _init(feedback_mapper = null) -> void:
 	else:
 		mapper = feedback_mapper
 
-func summary_for_program(program: ProgramDefinition) -> Dictionary:
-	var errors := ProgramValidator.validate(program)
-	var messages: PackedStringArray = mapper.messages_for_errors(errors)
+func summary_for_program(program: ProgramDefinition, ram_capacity: int = ProgramRamCalculator.RAM_LIMIT) -> Dictionary:
+	var errors := ProgramValidator.validate(program, ram_capacity)
+	var messages: PackedStringArray = mapper.messages_for_errors(errors, ram_capacity)
 	return {
 		"is_valid": errors.is_empty(),
 		"errors": errors,

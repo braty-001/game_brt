@@ -7,9 +7,10 @@ const PresentationRegistryScript = preload("res://src/brain_editor/block_present
 
 var _next_id := 1
 var presentation_registry = PresentationRegistryScript.new()
+var allowed_kinds: Array[int] = []
 
 func create_block(kind: int, position: Vector2 = Vector2.ZERO, condition: ProgramCondition = null):
-	if not ProgramBlockKind.is_valid(kind):
+	if not ProgramBlockKind.is_valid(kind) or not palette_kinds().has(kind):
 		return null
 
 	var block_id := "editor_block_%d" % _next_id
@@ -29,6 +30,8 @@ func output_ports_for_kind(kind: int) -> PackedStringArray:
 	return presentation_registry.presentation_for(kind).get("ports", PackedStringArray())
 
 func palette_kinds() -> Array[int]:
+	if not allowed_kinds.is_empty():
+		return allowed_kinds.duplicate()
 	return [
 		ProgramBlockKind.Value.WALK,
 		ProgramBlockKind.Value.JUMP,

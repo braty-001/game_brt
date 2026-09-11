@@ -2,6 +2,8 @@
 
 Status geral: concluido. A integracao com a fisica foi entregue pela PRD 003.
 
+Capacidade de RAM parametrizada e coberta adicionalmente na PRD 014, sem mudar fluxo nem guardas do executor.
+
 - [x] Definir contratos de leitura de sensores, despacho de acoes e estado do programa.
   - Aceite: o executor pode ser exercitado sem cenas do Godot.
   - Testes: dublas de mundo e de acoes para cada contrato.

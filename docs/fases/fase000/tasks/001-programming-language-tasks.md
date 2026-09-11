@@ -2,6 +2,10 @@
 
 Status geral: concluido. A revisao de integracao com o prototipo do editor foi concluida na PRD 004 sem alterar a semantica da linguagem.
 
+Evolucao de capacidade na PRD 014: validacao recebe limite explicito, com padrao 5 e campanha 10; cobertura e aceite adicionais ficam nas tarefas 014.
+
+Extensao PRD 015: consulta visual `STEP_AHEAD` e selecao por contexto, mantendo IF/WHILE e catalogo do tutorial. Cobertura adicional em `test_laboratory_vision.gd` e tarefas 015.
+
 - [x] Definir o modelo independente do Godot para programa, bloco, conexao, parametro e condicao.
   - Aceite: permite representar todos os blocos da PRD 001 sem detalhes de interface.
   - Testes: criacao e serializacao do modelo, se persistencia for introduzida.

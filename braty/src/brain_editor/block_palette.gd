@@ -21,13 +21,17 @@ func populate() -> void:
 		child.queue_free()
 	item_buttons.clear()
 
-	_add_heading("ACOES", Tokens.ACTION)
-	_add_item(ProgramBlockKind.Value.WALK)
-	_add_item(ProgramBlockKind.Value.JUMP)
-	_add_item(ProgramBlockKind.Value.TURN)
-	_add_heading("CONTROLE", Tokens.CONTROL)
-	_add_item(ProgramBlockKind.Value.IF)
-	_add_item(ProgramBlockKind.Value.WHILE)
+	var kinds: Array[int] = factory.palette_kinds()
+	var actions := kinds.filter(func(kind): return not ProgramBlockKind.requires_condition(kind))
+	var controls := kinds.filter(func(kind): return ProgramBlockKind.requires_condition(kind))
+	if not actions.is_empty():
+		_add_heading("ACOES", Tokens.ACTION)
+		for kind in actions:
+			_add_item(kind)
+	if not controls.is_empty():
+		_add_heading("CONTROLE", Tokens.CONTROL)
+		for kind in controls:
+			_add_item(kind)
 
 func item_for_kind(kind: int) -> Button:
 	for item in item_buttons:

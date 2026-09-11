@@ -7,10 +7,11 @@ enum Value {
 	TURN = 3,
 	IF = 4,
 	WHILE = 5,
+	ATTACK = 6,
 }
 
 static func is_valid(value: int) -> bool:
-	return value in [Value.WALK, Value.JUMP, Value.TURN, Value.IF, Value.WHILE]
+	return value in [Value.WALK, Value.JUMP, Value.TURN, Value.IF, Value.WHILE, Value.ATTACK]
 
 static func requires_condition(value: int) -> bool:
 	return value == Value.IF or value == Value.WHILE

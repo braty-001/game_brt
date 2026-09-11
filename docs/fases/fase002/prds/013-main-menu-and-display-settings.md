@@ -2,6 +2,8 @@
 
 Status: concluida em 2026-09-04; validacoes automatizada e visual aprovadas.
 
+Evolucao: PRD 014 envolve este menu numa raiz de navegacao para conduzir tutorial e campanha. Esta PRD registra a entrega original de menu/configuracoes; a nova integracao e validada nas tarefas 014.
+
 ## Problema
 
 O jogo inicia diretamente na montagem do tutorial. Isso funciona para o MVP, mas nao oferece uma entrada clara para o jogador nem um lugar seguro para configuracoes compartilhadas pelas proximas missoes.

@@ -25,6 +25,10 @@ class FakeMotor:
 		direction *= -1
 		return true
 
+	func attack() -> bool:
+		calls.append("attack")
+		return true
+
 func test_dispatches_action_blocks_to_motor() -> void:
 	var motor := FakeMotor.new()
 	var dispatcher = DispatcherScript.new(motor)
@@ -40,7 +44,8 @@ func test_dispatches_action_blocks_to_motor() -> void:
 	)
 	assert_eq(dispatcher.dispatch(_block("jump", BlockKind.Value.JUMP)), ActionDispatchResultScript.Value.YIELDED)
 	assert_eq(dispatcher.dispatch(_block("turn", BlockKind.Value.TURN)), ActionDispatchResultScript.Value.YIELDED)
-	assert_eq(motor.calls, ["walk:1", "jump", "turn"])
+	assert_eq(dispatcher.dispatch(_block("attack", BlockKind.Value.ATTACK)), ActionDispatchResultScript.Value.YIELDED)
+	assert_eq(motor.calls, ["walk:1", "jump", "turn", "attack"])
 
 func test_jump_without_ground_reports_no_progress() -> void:
 	var motor := FakeMotor.new()

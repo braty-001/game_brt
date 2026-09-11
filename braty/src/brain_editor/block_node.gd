@@ -197,6 +197,8 @@ func _refresh_style() -> void:
 
 func _condition_label(query: int) -> String:
 	match query:
+		ConditionCatalog.Query.STEP_AHEAD:
+			return "Degrau a frente"
 		ConditionCatalog.Query.PATH_CLEAR_AHEAD:
 			return "Visao: caminho livre a frente"
 		ConditionCatalog.Query.GAP_AHEAD:
@@ -205,11 +207,17 @@ func _condition_label(query: int) -> String:
 			return "Visao: objetivo a frente"
 		ConditionCatalog.Query.SIGNAL_HEARD:
 			return "Audicao: sinal ouvido"
+		ConditionCatalog.Query.ENEMY_VISIBLE:
+			return "Visao: inimigo visivel"
+		ConditionCatalog.Query.ENEMY_IN_MELEE_RANGE:
+			return "Visao: inimigo ao alcance"
 		_:
 			return "Condicao"
 
 func _condition_question(query: int) -> String:
 	match query:
+		ConditionCatalog.Query.STEP_AHEAD:
+			return "ha degrau a frente?"
 		ConditionCatalog.Query.PATH_CLEAR_AHEAD:
 			return "caminho livre a frente?"
 		ConditionCatalog.Query.GAP_AHEAD:
@@ -218,6 +226,10 @@ func _condition_question(query: int) -> String:
 			return "objetivo visivel?"
 		ConditionCatalog.Query.SIGNAL_HEARD:
 			return "sinal ouvido?"
+		ConditionCatalog.Query.ENEMY_VISIBLE:
+			return "inimigo visivel?"
+		ConditionCatalog.Query.ENEMY_IN_MELEE_RANGE:
+			return "inimigo ao alcance?"
 		_:
 			return "condicao?"
 

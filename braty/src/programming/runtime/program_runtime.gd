@@ -15,6 +15,7 @@ var last_refused_action_kind := -1
 var has_last_condition_result := false
 var last_condition_result := false
 var instruction_limit: int = DEFAULT_INSTRUCTION_LIMIT
+var ram_capacity: int = ProgramRamCalculator.RAM_LIMIT
 
 var _program: ProgramDefinition
 var _frames: Array[RuntimeFrame] = []
@@ -22,14 +23,16 @@ var _instructions_without_progress := 0
 
 func _init(
 	runtime_sensor_reader: SensorReader,
-	runtime_action_dispatcher: ActionDispatcher
+	runtime_action_dispatcher: ActionDispatcher,
+	runtime_ram_capacity: int = ProgramRamCalculator.RAM_LIMIT
 ) -> void:
 	sensor_reader = runtime_sensor_reader
 	action_dispatcher = runtime_action_dispatcher
+	ram_capacity = runtime_ram_capacity
 
 func prepare(program: ProgramDefinition) -> bool:
 	_program = program
-	validation_errors = ProgramValidator.validate(program)
+	validation_errors = ProgramValidator.validate(program, ram_capacity)
 	if not validation_errors.is_empty():
 		state = RuntimeState.Value.EDITING
 		failure_reason = RuntimeFailureReason.Value.INVALID_PROGRAM

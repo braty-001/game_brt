@@ -11,6 +11,7 @@ const EditorCommandControllerScript = preload("res://src/brain_editor/editor_com
 const EditorGraphStateScript = preload("res://src/brain_editor/editor_graph_state.gd")
 const EditorLayoutControllerScript = preload("res://src/brain_editor/editor_layout_controller.gd")
 const EditorViewScript = preload("res://src/brain_editor/brain_editor_view.gd")
+const FloatingPanelsScene = preload("res://scenes/brain_editor/editor_floating_panels.tscn")
 const MovementPaceScript = preload("res://src/programming/domain/movement_pace.gd")
 const ProgramGraphBuilderScript = preload("res://src/brain_editor/program_graph_builder.gd")
 const ProgramGraphImporterScript = preload("res://src/brain_editor/program_graph_importer.gd")
@@ -53,6 +54,10 @@ var pending_connection_from_block_id := ""
 var pending_connection_from_port := ""
 var next_spawn_position := DEFAULT_SPAWN_POSITION
 var external_attempt_runner := false
+var ram_capacity: int = ProgramRamCalculator.RAM_LIMIT
+var preparation_mode := false
+var condition_queries: Array[int] = []
+var allowed_block_kinds: Array[int] = []
 var is_sync_suspended := false
 
 var editor_header
@@ -94,6 +99,31 @@ func _ready() -> void:
 
 func set_external_attempt_runner(enabled: bool) -> void:
 	external_attempt_runner = enabled
+
+func configure_ram_capacity(capacity: int) -> bool:
+	if runtime_controls != null or capacity <= 0:
+		return false
+	ram_capacity = capacity
+	return true
+
+func configure_preparation_mode() -> void:
+	preparation_mode = true
+	external_attempt_runner = true
+
+func configure_condition_queries(queries: Array[int]) -> bool:
+	if workspace != null:
+		return false
+	condition_queries = queries.duplicate()
+	return true
+
+func configure_block_kinds(kinds: Array[int]) -> bool:
+	if workspace != null or kinds.is_empty():
+		return false
+	for kind in kinds:
+		if not ProgramBlockKind.is_valid(kind):
+			return false
+	allowed_block_kinds = kinds.duplicate()
+	return true
 
 func configure_example_provider(provider) -> void:
 	if workspace != null:
@@ -262,8 +292,8 @@ func selected_block() -> String:
 func capture_snapshot():
 	_initialize_models()
 	var program = current_program()
-	var ram_summary: Dictionary = ram_panel.summary_for_program(program)
-	var validation_summary: Dictionary = validation_panel.summary_for_program(program)
+	var ram_summary: Dictionary = ram_panel.summary_for_program(program, ram_capacity)
+	var validation_summary: Dictionary = validation_panel.summary_for_program(program, ram_capacity)
 	return BrainEditorSnapshotScript.new(
 		graph_state,
 		program,
@@ -305,8 +335,8 @@ func refresh_panels() -> void:
 		return
 
 	var program = current_program()
-	var ram_summary: Dictionary = ram_panel.summary_for_program(program)
-	var validation_summary: Dictionary = validation_panel.summary_for_program(program)
+	var ram_summary: Dictionary = ram_panel.summary_for_program(program, ram_capacity)
+	var validation_summary: Dictionary = validation_panel.summary_for_program(program, ram_capacity)
 	var runtime_state: int = runtime.state
 	var runtime_failure_reason: int = runtime.failure_reason
 	var control_state: Dictionary = runtime_state_presenter.controls_for_state(runtime_state, validation_summary["is_valid"])
@@ -320,7 +350,7 @@ func refresh_panels() -> void:
 			block_nodes[error.subject_id].set_invalid(true)
 
 	if validation_summary["is_valid"]:
-		validation_label.text = "Programa pronto para executar"
+		validation_label.text = "Programa pronto para preparar" if preparation_mode else "Programa pronto para executar"
 		validation_label.add_theme_color_override("font_color", Tokens.SUCCESS)
 	else:
 		validation_label.text = "\n".join(_validation_messages(validation_summary["errors"]))
@@ -353,6 +383,8 @@ func _initialize_models() -> void:
 		graph_state = EditorGraphStateScript.new()
 	if block_factory == null:
 		block_factory = BlockFactoryScript.new()
+		if not allowed_block_kinds.is_empty():
+			block_factory.allowed_kinds = allowed_block_kinds.duplicate()
 	if graph_builder == null:
 		graph_builder = ProgramGraphBuilderScript.new()
 	if graph_importer == null:
@@ -372,8 +404,11 @@ func _initialize_models() -> void:
 	_configure_graph_state()
 	if condition_selector == null:
 		condition_selector = ConditionSelectorScript.new()
+		if not condition_queries.is_empty():
+			condition_selector.queries = condition_queries.duplicate()
 	if runtime == null:
-		runtime = ProgramRuntimeScript.new(SensorReaderScript.new(), ActionDispatcherScript.new())
+		runtime = ProgramRuntimeScript.new(SensorReaderScript.new(), ActionDispatcherScript.new(), ram_capacity)
+	runtime.ram_capacity = ram_capacity
 	if runtime_controls == null:
 		runtime_controls = RuntimeControlsScript.new(runtime, graph_builder)
 	if pseudocode_presenter == null:
@@ -388,7 +423,17 @@ func _ensure_ui() -> void:
 		example_entries = example_provider.entries()
 	editor_view.bind(self, block_factory, example_entries)
 	_bind_view_references()
+	parameter_panel.configure_selector(condition_selector)
 	_connect_view_signals()
+	if preparation_mode:
+		start_button.text = "Confirmar preparo"
+		back_button.text = "Voltar a missao"
+		workspace.custom_minimum_size.y = 180
+		inspector_panel.get_node("Inspector/DetailsScroll").vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+		editor_header.configure("PREPARACAO DO CEREBRO", "", "Editando", "0/%d RAM" % ram_capacity)
+		var floating_panels = FloatingPanelsScene.instantiate()
+		add_child(floating_panels)
+		floating_panels.configure(block_drawer, pseudocode_panel, workspace)
 
 func _bind_view_references() -> void:
 	editor_header = editor_view.editor_header
@@ -479,7 +524,8 @@ func _on_drawer_block_requested(kind: int) -> void:
 
 func _on_start_pressed() -> void:
 	if external_attempt_runner:
-		attempt_requested.emit()
+		if capture_snapshot().is_valid:
+			attempt_requested.emit()
 		return
 	if runtime_controls.prepare_from_graph(graph_state):
 		runtime_controls.start()
@@ -662,7 +708,7 @@ func _close_drawer() -> void:
 	drawer_button.set_pressed_no_signal(false)
 
 func _on_pseudocode_pressed() -> void:
-	var result: Dictionary = pseudocode_presenter.present(graph_state)
+	var result: Dictionary = pseudocode_presenter.present(graph_state, ram_capacity)
 	pseudocode_panel.show_text(result["text"])
 
 func _on_block_insert_requested(block_id: String, port: String, kind: int) -> void:
@@ -692,7 +738,7 @@ func _validation_messages(errors: Array) -> PackedStringArray:
 			if ProgramBlockKind.requires_condition(block_state.kind):
 				messages.append("%s precisa de uma condicao. Selecione o bloco e escolha ao lado." % block_factory.label_for_kind(block_state.kind))
 				continue
-		var message: String = validation_panel.mapper.message_for_error(error)
+		var message: String = validation_panel.mapper.message_for_error(error, ram_capacity)
 		if not message.is_empty():
 			messages.append(message)
 	return messages

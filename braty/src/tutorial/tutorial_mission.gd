@@ -16,6 +16,8 @@ const MissionStateScript = preload("res://src/tutorial/mission_state.gd")
 const AttemptSessionScript = preload("res://src/tutorial/tutorial_attempt_session.gd")
 const Tokens = preload("res://src/ui/design_tokens.gd")
 
+signal tutorial_completed(assembly, graph_state)
+
 var flow
 var evaluator
 var hint_presenter
@@ -161,6 +163,7 @@ func complete_goal() -> bool:
 	mission_header.configure("ETAPA 3/3  RESULTADO", "Atravesse o buraco e alcance o objetivo", "Concluido", "")
 	_show_success_message()
 	_refresh_runtime_overlay()
+	tutorial_completed.emit(current_assembly, current_graph_state)
 	return true
 
 func fail_from_runtime() -> bool:

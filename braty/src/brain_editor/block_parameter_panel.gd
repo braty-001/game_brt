@@ -13,6 +13,15 @@ var title_label: Label
 var condition_dropdown: OptionButton
 var movement_pace_dropdown: OptionButton
 
+func configure_selector(condition_selector) -> void:
+	selector = condition_selector
+	_build_ui()
+	condition_dropdown.clear()
+	condition_options = selector.available_options()
+	for option in condition_options:
+		condition_dropdown.add_item(option["label"])
+	show_no_selection()
+
 func _ready() -> void:
 	if selector == null:
 		selector = ConditionSelectorScript.new()

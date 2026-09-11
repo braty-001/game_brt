@@ -203,18 +203,30 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="InspectorTitle" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+[node name="DetailsScroll" type="ScrollContainer" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 0
+
+[node name="Details" type="VBoxContainer" parent="Margin/Page/Body/InspectorPanel/Inspector/DetailsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="InspectorTitle" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector/DetailsScroll/Details"]
 layout_mode = 2
 text = "PROPRIEDADES"
 
-[node name="ParameterPanel" type="VBoxContainer" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+[node name="ParameterPanel" type="VBoxContainer" parent="Margin/Page/Body/InspectorPanel/Inspector/DetailsScroll/Details"]
 layout_mode = 2
 script = ExtResource("7_parameters")
 
-[node name="Separator" type="HSeparator" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+[node name="Separator" type="HSeparator" parent="Margin/Page/Body/InspectorPanel/Inspector/DetailsScroll/Details"]
 layout_mode = 2
 
-[node name="ConnectionFeedback" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector"]
+[node name="ConnectionFeedback" type="Label" parent="Margin/Page/Body/InspectorPanel/Inspector/DetailsScroll/Details"]
 layout_mode = 2
 size_flags_vertical = 3
 text = "Adicione um bloco para comecar"

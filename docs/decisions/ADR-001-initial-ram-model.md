@@ -11,3 +11,5 @@ O limite cria desde o tutorial uma restricao legivel e estimula programas compac
 ## Consequencias
 
 O editor deve mostrar o total usado e impedir ou sinalizar programas que excedam o limite. Aumento de RAM sera uma via de progressao futura.
+
+Complemento da Fase 002: ADR 010 mantem 5 no tutorial e fornece 10 antes da primeira missao. Limite e contexto explicito do Buneko; custo e alcance dos blocos seguem PRD 001.

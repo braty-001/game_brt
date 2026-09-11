@@ -28,6 +28,8 @@ O executor deve limitar instrucoes consecutivas sem progresso de simulacao. Ao a
 
 O executor recebe uma abstracao de estado do mundo para ler sensores e uma abstracao de acoes para comandar o Buneko. Ele nao deve depender diretamente de cenas, controles visuais ou detalhes do nivel.
 
+A PRD 014 acrescenta capacidade de RAM explicita ao runtime, mantendo 5 como padrao. A composicao fornece a mesma capacidade ao editor e ao executor (ADR 010).
+
 ## Criterios de aceite
 
 - Um programa valido inicia, pausa, retoma, para e reinicia sem perder integridade.

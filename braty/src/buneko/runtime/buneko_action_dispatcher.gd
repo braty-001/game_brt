@@ -19,6 +19,8 @@ func dispatch(block: ProgramBlock) -> int:
 			return _dispatch_motor_call("jump")
 		ProgramBlockKind.Value.TURN:
 			return _dispatch_motor_call("turn")
+		ProgramBlockKind.Value.ATTACK:
+			return _dispatch_motor_call("attack")
 		_:
 			return ActionDispatchResult.Value.NO_PROGRESS
 

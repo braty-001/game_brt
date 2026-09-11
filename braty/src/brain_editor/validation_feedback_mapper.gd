@@ -1,7 +1,7 @@
 class_name ValidationFeedbackMapper
 extends RefCounted
 
-func message_for_error(error: ProgramValidationError) -> String:
+func message_for_error(error: ProgramValidationError, ram_capacity: int = ProgramRamCalculator.RAM_LIMIT) -> String:
 	if error == null:
 		return ""
 
@@ -25,14 +25,14 @@ func message_for_error(error: ProgramValidationError) -> String:
 		ProgramValidationError.Code.ARBITRARY_CYCLE:
 			return "Use WHILE para repetir; ciclos livres nao sao permitidos."
 		ProgramValidationError.Code.RAM_LIMIT_EXCEEDED:
-			return "O programa conectado ultrapassa 5 RAM."
+			return "O programa conectado ultrapassa %d RAM." % ram_capacity
 		_:
 			return "Revise o programa antes de iniciar."
 
-func messages_for_errors(errors: Array) -> PackedStringArray:
+func messages_for_errors(errors: Array, ram_capacity: int = ProgramRamCalculator.RAM_LIMIT) -> PackedStringArray:
 	var messages := PackedStringArray()
 	for error in errors:
-		var message := message_for_error(error)
+		var message := message_for_error(error, ram_capacity)
 		if not message.is_empty():
 			messages.append(message)
 

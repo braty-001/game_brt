@@ -58,3 +58,14 @@ func test_invalid_kind_returns_null_and_empty_metadata() -> void:
 	assert_null(factory.create_block(999))
 	assert_eq(factory.label_for_kind(999), "")
 	assert_eq(factory.output_ports_for_kind(999), PackedStringArray())
+
+func test_attack_is_valid_but_only_created_when_context_unlocks_it() -> void:
+	var factory = BlockFactoryScript.new()
+	assert_true(BlockKind.is_valid(BlockKind.Value.ATTACK))
+	assert_null(factory.create_block(BlockKind.Value.ATTACK))
+	factory.allowed_kinds = factory.palette_kinds()
+	factory.allowed_kinds.append(BlockKind.Value.ATTACK)
+	var attack = factory.create_block(BlockKind.Value.ATTACK)
+	assert_not_null(attack)
+	assert_eq(attack.kind, BlockKind.Value.ATTACK)
+	assert_eq(factory.label_for_kind(BlockKind.Value.ATTACK), "Atacar")

@@ -26,6 +26,12 @@ func _evaluate_vision(query: int) -> bool:
 			return _call_sensor_bool("has_gap_ahead")
 		ConditionCatalog.Query.GOAL_VISIBLE:
 			return _call_sensor_bool("can_see_goal")
+		ConditionCatalog.Query.STEP_AHEAD:
+			return _call_sensor_bool("has_step_ahead")
+		ConditionCatalog.Query.ENEMY_VISIBLE:
+			return _call_sensor_bool("can_see_enemy")
+		ConditionCatalog.Query.ENEMY_IN_MELEE_RANGE:
+			return _call_sensor_bool("has_enemy_in_melee_range")
 		_:
 			return false
 
