@@ -5,11 +5,14 @@ Escopo aprovado: selecao e preparacao, laboratorio, combate corpo a corpo e save
 ## Entregas e ordem
 
 1. [PRD 014](prds/014-campaign-selection-and-preparation.md): selecao e preparacao com 10 RAM. Implementada e testada; selecao/mapa aprovados pelo usuario, aceite manual ampliado pendente.
-2. [PRD 015](prds/015-laboratory-escape-and-vision.md): laboratorio de dois andares, percurso de fuga e visao. Percurso implementado e testado; integrado ao combate no checkout, com aceite completo bloqueado pela rota da 016 e pelo roteiro manual.
-3. [PRD 016](prds/016-melee-combat-and-checkpoint.md): combate, inimigos e checkpoint didatico. Implementacao parcial integrada; regras e fluxos focados passam, mas a rota completa de combate e fuga em 10 RAM ainda falha.
+2. [PRD 015](prds/015-laboratory-escape-and-vision.md): laboratorio de dois andares, percurso de fuga e visao. Percurso implementado, integrado ao combate e validado automaticamente; roteiro manual pendente.
+3. [PRD 016](prds/016-melee-combat-and-checkpoint.md): combate, inimigos e checkpoint didatico. Implementacao automatizada integrada, incluindo rota repetivel de combate e fuga em exatamente 10 RAM; aceite manual pendente.
 4. [PRD 017](prds/017-progress-save-and-rewards.md): save persistente e recompensa unica. Planejada.
+5. [PRD 018](prds/018-character-readability-and-combat-weight.md): visibilidade do Buneko, peso corporal, feedback de combate e encontros demonstraveis. Implementacao automatizada concluida; [tarefas](tasks/018-character-readability-and-combat-weight-tasks.md) de aceite manual pendentes.
 
-Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cerebro, entrar no laboratorio com tres inimigos, coletar o bastao, pausar para adaptar o programa e restaurar o checkpoint apos derrota. A conclusao repetivel da rota integrada ainda depende de finalizar a 016; persistencia e recompensa dependem da 017.
+Ordem recomendada apos o retorno de 2026-09-14: aceitar manualmente a experiencia da 018 antes de iniciar a 017. A numeracao existente permanece preservada. A [ADR 013](../../decisions/ADR-013-character-presentation-and-impact-timing.md) registra os contratos implementados de apresentacao/tempo que complementam 015 e 016.
+
+Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cerebro, entrar no laboratorio com tres inimigos, coletar o bastao, pausar para adaptar o programa, restaurar o checkpoint apos derrota e concluir repetidamente a rota integrada. Persistencia e recompensa dependem da 017.
 
 ## Decisoes aprovadas
 
@@ -20,7 +23,7 @@ Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cere
 - Tres inimigos: um no terreo e dois no superior. Abates opcionais; chegar a saida vence.
 - Buneko: vida 10. Inimigos: vida 2. Todos usam bastao de dano 2, corpo a corpo e sem municao. Somente golpe causa dano; contato nao fere e e possivel saltar sobre inimigos.
 - Cerebros inimigos definidos pelos autores: patrulha curta, aproxima/ataca ao ver Buneko, volta a patrulha ao perder visao, sem memoria de perseguicao.
-- Visao basica da cabeca: circulo centrado no Buneko, limitado por raio e bloqueado por paredes/pisos. Tudo fora da visao atual volta a nevoa. Minimap e inteligencia aproximada, nao rastreamento.
+- Visao basica da cabeca: cone frontal de 120 graus, alcance de 240 unidades e bloqueio por paredes/pisos. Virar muda imediatamente sensores e nevoa; tudo fora da visao atual volta a ficar encoberto. Minimap e inteligencia aproximada, nao rastreamento.
 - Bastao no comeco ativa checkpoint e pausa didatica para editar. Excecao de apresentacao desta missao, nao regra automatica de toda coleta.
 - Derrota ou reabertura no checkpoint: vida 10, bastao e ultimo programa; tres inimigos vivos nas posicoes iniciais. Apresentacao nao repete. Antes da coleta, reinicio da missao.
 - Save preserva dinheiro, montagem/capacidades da cabeca e corpo, programa, fase, checkpoint e primeiras conclusoes. Primeira conclusao paga 10; repeticoes nao pagam.
@@ -29,4 +32,4 @@ Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cere
 
 Audicao/`Escutar` (parar para prestar atencao com feedback visual), upgrades de visao, RAM compravel, perseguidores, armas a distancia e missoes 1.2/1.3 ficam para futuras PRDs.
 
-Calibrar raio, alcance/intervalos dos golpes, velocidade/patrulha e degraus. O bloqueio atual e provar a solucao completa de combate e fuga em 10 RAM: o programa de referencia chega ao andar superior, mas termina antes da saida. Novas consultas de navegacao dependem dessa prova; nao adicionar automaticamente blocos como `Bater ate cair` ou `Andar dez passos`.
+A rota integrada de combate e fuga em 10 RAM ja foi comprovada automaticamente; o fechamento visual permanece pendente. O retorno de 2026-09-14 originou a PRD 018 para visibilidade, peso e clareza dos ataques. Sua primeira etapa preserva fisica, alcance/tempos de combate e geometria; calibra apresentacao e orientacao/patrulha com regressao da rota. Novas consultas de navegacao precisam de necessidade demonstrada; nao adicionar automaticamente blocos como `Bater ate cair` ou `Andar dez passos`.

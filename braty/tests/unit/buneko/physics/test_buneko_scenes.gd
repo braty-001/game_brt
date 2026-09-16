@@ -26,6 +26,20 @@ func test_buneko_scene_responds_to_movement_intentions() -> void:
 	assert_true(buneko.turn())
 	assert_eq(buneko.controller.direction, -1)
 
+func test_facing_visual_survives_physics_between_repeated_turns() -> void:
+	var buneko = await _ready_buneko()
+	buneko.set_physics_process(false)
+	var visual = buneko.get_node("Visual")
+	for direction in [-1, 1, -1, 1]:
+		assert_true(buneko.face_direction(direction))
+		buneko._physics_process(1.0 / 60.0)
+		await get_tree().physics_frame
+		await get_tree().process_frame
+		assert_eq(buneko.facing_direction(), direction)
+		assert_almost_eq(visual.global_transform.x.x, float(direction), 0.0001, "Rendered forward must follow logical facing after physics")
+		assert_almost_eq(visual.global_transform.y.y, 1.0, 0.0001)
+		assert_almost_eq(buneko.get_node("CollisionShape2D").global_transform.x.x, 1.0, 0.0001)
+
 func test_buneko_scene_uses_attributes_configured_before_ready() -> void:
 	var scene: PackedScene = load("res://scenes/buneko/buneko.tscn")
 	var buneko = scene.instantiate()
@@ -64,6 +78,46 @@ func test_buneko_scene_shows_and_clears_action_pulses() -> void:
 
 	visual._process(visual.PULSE_DURATION + 0.01)
 	assert_false(visual.is_pulsing())
+
+func test_buneko_visual_tracks_attack_damage_landing_and_defeat_events() -> void:
+	var buneko = await _ready_buneko()
+	var visual = buneko.get_node("Visual")
+	buneko.equip_baton()
+	assert_true(buneko.attack())
+	assert_eq(visual.presentation_snapshot().attack_phase, "windup")
+	buneko.melee.advance(buneko.melee.WINDUP_SECONDS)
+	assert_eq(visual.presentation_snapshot().attack_phase, "strike")
+	buneko.receive_damage(2)
+	assert_true(visual.presentation_snapshot().damage_reacting)
+	buneko.landed.emit(buneko)
+	assert_true(visual.presentation_snapshot().landing_reacting)
+	buneko.receive_damage(20)
+	assert_true(visual.presentation_snapshot().defeated)
+
+func test_baton_reaches_contact_at_damage_time_and_recovers_continuously() -> void:
+	var buneko = await _ready_buneko()
+	buneko.set_physics_process(false)
+	buneko.equip_baton()
+	var visual = buneko.get_node("Visual")
+	for direction in [1, -1]:
+		buneko.face_direction(direction)
+		assert_true(buneko.attack())
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, -0.82, 0.0001)
+		assert_false(buneko.melee.advance(0.12))
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, -1.75, 0.0001)
+		assert_false(buneko.melee.advance(0.0799))
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, 0.28, 0.003)
+		assert_true(buneko.melee.advance(0.0002))
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, 0.28, 0.0001)
+		visual._process(0.06)
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, 0.28, 0.0001, "Presentation time must not advance the suspended attack")
+		assert_false(buneko.melee.advance(0.16))
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, 0.28, 0.001)
+		assert_false(buneko.melee.advance(0.4398))
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, -0.82, 0.001)
+		assert_false(buneko.melee.advance(0.0002))
+		assert_eq(visual.presentation_snapshot().attack_phase, "idle")
+		assert_almost_eq(visual.presentation_snapshot().baton_angle, -0.82, 0.0001)
 
 func test_buneko_test_stage_instantiates() -> void:
 	var scene: PackedScene = load("res://scenes/buneko/buneko_test_stage.tscn")

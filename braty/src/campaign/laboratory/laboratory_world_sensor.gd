@@ -22,9 +22,10 @@ func configure_combat(enemy_source: Callable, weapon_source: Callable) -> void:
 	weapon_provider = weapon_source
 
 func update_from_buneko(buneko) -> void:
-	buneko_position = buneko.position
-	direction = buneko.controller.direction
+	buneko_position = buneko.combat_position()
+	direction = buneko.facing_direction()
 	vision.origin = buneko_position
+	vision.facing_direction = direction
 
 func is_path_clear_ahead() -> bool:
 	var target := buneko_position + Vector2(direction * 56, 0)
@@ -44,8 +45,11 @@ func has_step_ahead() -> bool:
 		var distance := (edge - buneko_position.x) * direction
 		if distance < 0 or distance > 100:
 			continue
-		var surface := Vector2(edge - direction * 0.5, rect.position.y + 2)
-		if vision.can_see(surface):
+		var visible_face := Vector2(
+			edge - direction * 0.5,
+			clampf(buneko_position.y, rect.position.y + 0.5, rect.end.y - 0.5)
+		)
+		if vision.can_see(visible_face):
 			return true
 	return false
 
@@ -69,11 +73,11 @@ func _nearest_visible_enemy(require_melee_range: bool):
 	var nearest
 	var nearest_distance := INF
 	for enemy in enemies_provider.call():
-		if enemy == null or not enemy.health.is_alive() or not vision.can_see(enemy.position):
+		if enemy == null or not enemy.is_alive() or not vision.can_see(enemy.combat_position()):
 			continue
-		if require_melee_range and not MeleeAttackScript.can_reach(buneko_position, direction, enemy.position):
+		if require_melee_range and not MeleeAttackScript.can_reach(buneko_position, direction, enemy.combat_position()):
 			continue
-		var distance := buneko_position.distance_squared_to(enemy.position)
+		var distance := buneko_position.distance_squared_to(enemy.combat_position())
 		if distance < nearest_distance:
 			nearest = enemy
 			nearest_distance = distance

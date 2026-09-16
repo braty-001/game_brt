@@ -7,6 +7,9 @@ const GraphBuilder = preload("res://src/brain_editor/program_graph_builder.gd")
 const Catalog = preload("res://src/campaign/campaign_mission_catalog.gd")
 const Tokens = preload("res://src/ui/design_tokens.gd")
 
+const IMPACT_PAUSE_MSEC := 60
+const DEFEAT_PRESENTATION_MSEC := 600
+
 signal editing_requested
 
 var session
@@ -16,6 +19,14 @@ var attempt
 var outcome := ""
 var paused := false
 var restart_count := 0
+var last_restart_position := Vector2.INF
+var impact_pause_active := false
+var defeat_presentation_active := false
+var _impact_deadline_msec := 0
+var _defeat_deadline_msec := 0
+var _defeat_pending := false
+var _defeat_ready_to_restart := false
+var _resume_after_impact := false
 @onready var stage: Control = $Margin/Page/Stage
 @onready var display: SubViewportContainer = $Margin/Page/Stage/Display
 @onready var world: SubViewport = $Margin/Page/Stage/Display/World
@@ -48,6 +59,7 @@ func _start_attempt(program) -> void:
 	level = LevelScene.instantiate()
 	level.baton_checkpoint_reached.connect(_on_baton_checkpoint_reached)
 	level.buneko_defeated.connect(_on_buneko_defeated)
+	level.combat_batch_resolved.connect(_on_combat_batch_resolved)
 	world.add_child(level)
 	buneko = level.spawn(session.assembly, session.baton_checkpoint_active)
 	attempt = AttemptScript.new()
@@ -57,12 +69,23 @@ func _start_attempt(program) -> void:
 	else:
 		attempt.action_pulse_requested.connect(buneko.show_action_pulse)
 
+func _process(_delta: float) -> void:
+	var now := Time.get_ticks_msec()
+	if impact_pause_active and now >= _impact_deadline_msec:
+		_finish_impact_pause()
+	if defeat_presentation_active and not _defeat_ready_to_restart and now >= _defeat_deadline_msec:
+		if paused:
+			_defeat_ready_to_restart = true
+			status_label.text = "Derrota apresentada. Continue para restaurar o checkpoint."
+		else:
+			_finish_defeat_presentation()
+
 func _physics_process(_delta: float) -> void:
-	if attempt == null or paused or not outcome.is_empty():
+	if attempt == null or paused or impact_pause_active or defeat_presentation_active or not outcome.is_empty():
 		return
 	if level.reached_exit():
 		attempt.complete()
-		_finish("escaped", "Saida alcancada! Percurso concluido. Combate e recompensa ainda nao estao ativos.")
+		_finish("escaped", "Saida alcancada! Missao concluida com combate ativo.")
 		return
 	if buneko.position.y > level.WORLD_SIZE.y + 60:
 		attempt.fail_externally()
@@ -74,23 +97,36 @@ func _physics_process(_delta: float) -> void:
 	elif result == AttemptScript.TickResult.PROGRAM_FINISHED:
 		_finish("finished", "O programa terminou antes da saida. Volte ao cerebro para revisar.")
 	else:
-		status_label.text = "Vida %d/10 | Inimigos %d/3 | Executando: %s" % [buneko.health.current, level.living_enemy_count(), attempt.runtime.last_executed_block_id]
+		status_label.text = "Vida %d/10 | Inimigos %d/3 | Executando: %s" % [buneko.current_health(), level.living_enemy_count(), attempt.runtime.last_executed_block_id]
 
 func toggle_pause() -> void:
 	if attempt == null or not outcome.is_empty():
 		return
 	if paused:
-		if attempt.resume():
+		paused = false
+		pause_button.text = "Pausar"
+		if defeat_presentation_active and _defeat_ready_to_restart:
+			_finish_defeat_presentation()
+		elif impact_pause_active or defeat_presentation_active:
+			status_label.text = "Apresentacao de combate em andamento."
+		elif attempt.resume():
 			paused = false
 			level.process_mode = Node.PROCESS_MODE_INHERIT
+			level.set_simulation_suspended(false)
 			pause_button.text = "Pausar"
+	elif impact_pause_active or defeat_presentation_active:
+		paused = true
+		pause_button.text = "Continuar"
+		status_label.text = "Pausado. A tentativa nao retomara ao fim do efeito."
 	elif attempt.pause():
 		paused = true
 		level.process_mode = Node.PROCESS_MODE_DISABLED
+		level.stop_presentation_audio()
 		pause_button.text = "Continuar"
 		status_label.text = "Pausado. O programa e o movimento continuam do mesmo ponto."
 
 func _finish(result: String, message: String) -> void:
+	_cancel_combat_presentation()
 	outcome = result
 	if attempt != null and result == "finished":
 		attempt.stop()
@@ -100,8 +136,11 @@ func _finish(result: String, message: String) -> void:
 		level.process_mode = Node.PROCESS_MODE_DISABLED
 
 func _request_editing() -> void:
+	_cancel_combat_presentation()
 	if attempt != null:
 		attempt.stop()
+	if level != null:
+		level.process_mode = Node.PROCESS_MODE_DISABLED
 	if buneko != null:
 		buneko.set_physics_process(false)
 	editing_requested.emit()
@@ -110,6 +149,7 @@ func _on_baton_checkpoint_reached() -> void:
 	if session == null or session.baton_checkpoint_active:
 		return
 	session.activate_baton_checkpoint()
+	_cancel_combat_presentation()
 	attempt.stop()
 	level.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 	status_label.text = "Bastao equipado! Abrindo o cerebro no checkpoint..."
@@ -122,9 +162,61 @@ func _on_buneko_defeated() -> void:
 	if not outcome.is_empty():
 		return
 	attempt.fail_externally()
-	level.process_mode = Node.PROCESS_MODE_DISABLED
+	_defeat_pending = true
+	level.set_simulation_suspended(true)
+	status_label.text = "Buneko derrotado. Confirmando o impacto..."
+	if not impact_pause_active:
+		_begin_defeat_presentation()
+
+func _on_combat_batch_resolved(results: Array) -> void:
+	if not outcome.is_empty() or impact_pause_active or defeat_presentation_active:
+		return
+	if not results.any(func(result): return bool(result.get("hit", false))):
+		return
+	impact_pause_active = true
+	_impact_deadline_msec = Time.get_ticks_msec() + IMPACT_PAUSE_MSEC
+	_resume_after_impact = attempt != null and not paused and attempt.pause()
+	level.set_simulation_suspended(true)
+	status_label.text = "Impacto!"
+
+func _finish_impact_pause() -> void:
+	impact_pause_active = false
+	_impact_deadline_msec = 0
+	if _defeat_pending:
+		_begin_defeat_presentation()
+		return
+	level.set_simulation_suspended(false)
+	if paused:
+		level.process_mode = Node.PROCESS_MODE_DISABLED
+		status_label.text = "Pausado. O programa e o movimento continuam do mesmo ponto."
+	elif _resume_after_impact and attempt != null:
+		attempt.resume()
+	_resume_after_impact = false
+
+func _begin_defeat_presentation() -> void:
+	impact_pause_active = false
+	defeat_presentation_active = true
+	_defeat_deadline_msec = Time.get_ticks_msec() + DEFEAT_PRESENTATION_MSEC
+	level.set_simulation_suspended(true)
 	status_label.text = "Buneko derrotado. Restaurando checkpoint..."
-	call_deferred("_restart_from_checkpoint")
+
+func _finish_defeat_presentation() -> void:
+	defeat_presentation_active = false
+	_defeat_deadline_msec = 0
+	_defeat_pending = false
+	_restart_from_checkpoint()
+
+func _cancel_combat_presentation() -> void:
+	impact_pause_active = false
+	defeat_presentation_active = false
+	_impact_deadline_msec = 0
+	_defeat_deadline_msec = 0
+	_defeat_pending = false
+	_defeat_ready_to_restart = false
+	_resume_after_impact = false
+	if level != null and is_instance_valid(level):
+		level.stop_presentation_audio()
+		level.set_simulation_suspended(false)
 
 func _restart_from_checkpoint() -> void:
 	if session == null or not session.baton_checkpoint_active or session.graph_state == null:
@@ -140,11 +232,13 @@ func _restart_from_checkpoint() -> void:
 	buneko = null
 	attempt = null
 	paused = false
+	_cancel_combat_presentation()
 	outcome = ""
 	restart_count += 1
 	pause_button.disabled = false
 	pause_button.text = "Pausar"
 	_start_attempt(program)
+	last_restart_position = buneko.position
 	status_label.text = "Checkpoint restaurado: vida 10, bastao e tres inimigos reiniciados."
 
 func _fit_world() -> void:

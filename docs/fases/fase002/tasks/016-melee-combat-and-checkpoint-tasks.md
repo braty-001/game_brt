@@ -1,6 +1,8 @@
 # Tarefas: PRD 016 - Combate e checkpoint
 
-Status geral: implementacao parcial integrada em 2026-09-11. Componentes e fluxos focados passam; rota completa de 10 RAM, suite verde e aceite manual pendentes.
+Status geral: comportamento automatizado, composicao reutilizavel de inimigos e deteccao frontal integrados ate 2026-09-14; aceite manual pendente.
+
+Melhorias de peso, leitura de ataques/dano/derrota e demonstracao de ataque inimigo foram implementadas automaticamente nas [tarefas 018](018-character-readability-and-combat-weight-tasks.md). O aceite manual desta PRD permanece aberto.
 
 Ordem: atualizar contratos; ampliar linguagem/editor por contexto; implementar regras deterministicas de vida/golpe; integrar Buneko/inimigos/nivel; ligar coleta-editor-checkpoint; testar fisica/IA/pausa/restauracao e suite completa.
 
@@ -15,15 +17,30 @@ Riscos: ultrapassar 10 RAM, dano duplicado ou atraves de piso, inimigo preso em 
 - [x] Integrar deteccao a oclusao 015.
 - [x] Implementar coleta, pausa didatica, edicao e retomada do programa.
 - [x] Restaurar checkpoint, vida/inimigos e preservar arma/programa na derrota.
-- [ ] Concluir a cobertura integrada: dano/contato/alcance/morte/pausa/AI/guardas passam; a solucao completa de 10 RAM ainda termina antes da saida.
-- [ ] Obter suite GUT verde. O carregamento headless e `git diff --check` ja passam.
+- [x] Concluir a cobertura integrada: dano/contato/alcance/morte/pausa/AI/guardas e solucao completa de 10 RAM passam.
+  - O grafo de referencia preserva 10 RAM e a regressao verifica explicitamente salto aceito, saida do chao e pouso durante a travessia.
+  - A correcao permaneceu no exemplo da missao, sem mudar o runtime compartilhado.
+- [x] Obter suite GUT verde e carregamento headless.
+- [x] Extrair o personagem inimigo reutilizavel e manter cerebro, estado de combate e visual com responsabilidades separadas.
+- [x] Declarar arquetipo, patrulhas e direcoes nos pontos de surgimento da cena do laboratorio.
+- [x] Fazer sensores e resolucao simultanea de golpes dependerem apenas do contrato publico dos combatentes.
+- [x] Cobrir configuracao, isolamento entre instancias, contrato de combate e regressao integral da missao.
+- [x] Integrar o cone frontal compartilhado a deteccao de cada inimigo sem aplicar a geometria visual aos golpes.
+- [x] Cobrir deteccao pela frente, aproximacao pelas costas, virada, perda de visao e regressao de simultaneidade/oclusao.
 - [ ] Aceite manual: bater, esquivar, fugir sem matar, perder/retentar e conferir feedback.
 
-## Resultado automatizado de 2026-09-11
+## Resultado automatizado final de 2026-09-11
 
-- Godot 4.4.1 / GUT 9.4.0: 44 scripts, 239 testes e 1645 assercoes.
-- 238 testes aprovados e 1 teste reprovado; processo encerrado com codigo 1.
-- O unico teste reprovado e `test_combat_route_uses_exactly_ten_ram_kills_and_escapes_repeatedly`: nas cinco repeticoes internas, o resultado foi `finished` em vez de `escaped`, aproximadamente em `x=643`, no piso superior.
-- Os outros 10 testes de `test_laboratory_combat.gd` passam, incluindo checkpoint, capacidades, dano, simultaneidade, oclusao, contato inofensivo, restauracao e pausa.
-- Cena principal carregada em headless com codigo 0; `git diff --check` sem erros.
+- Godot 4.4.1 / GUT 9.4.0: 44 scripts, 243 testes e 1677 assercoes, todos aprovados com codigo 0.
+- `test_combat_route_uses_exactly_ten_ram_kills_and_escapes_repeatedly` conclui as cinco repeticoes internas e comprova salto aceito, saida do chao, pouso, ao menos um inimigo derrotado e chegada com vida.
+- Suite de campanha: 6 scripts, 40 testes e 850 assercoes, todos aprovados.
+- Cena principal carregada em headless com codigo 0.
+- `git diff --check` concluido sem erros.
 - Nenhuma janela grafica foi aberta. Aceite visual e de sensacao de jogo permanece pendente.
+
+## Evidencias direcionais de 2026-09-14
+
+- Cada inimigo consulta visibilidade com sua propria posicao e direcao; um alvo atras permanece indetectado ate entrar no cone apos a virada.
+- A resolucao de golpes usa uma consulta separada de linha desobstruida e preserva alcance/direcao do ataque, simultaneidade e bloqueio por parede/piso.
+- O exemplo curto de combate passou a aproximar enquanto ve e atacar apenas ao alcance, usando 4/10 RAM; a rota integrada continua com exatamente 10/10 RAM.
+- Testes focados de combate: 15 testes e 93 assercoes; campanha e suite completa passaram com os totais registrados nas tarefas 015.

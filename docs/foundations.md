@@ -14,7 +14,9 @@ Buneko e um jogo 2D de plataforma em que o jogador construi e programa um Buneko
 
 ## Escopo atual
 
-O MVP tutorial estabelece montagem, editor e execucao. A Fase 002 expande para selecao/preparacao da campanha, laboratorio, combate basico e save com recompensa unica, conforme `docs/fases/fase002/README.md` e PRDs 014 a 017. A PRD 014 e o percurso/visao da PRD 015 estao implementados e testados automaticamente. A PRD 016 possui combate, inimigos, bastao e checkpoint integrados no checkout; regras e fluxos focados passam, mas a rota completa de combate e fuga em 10 RAM ainda termina antes da saida e impede a suite completa de ficar verde. Aceite manual ampliado permanece pendente. Save/recompensa pertencem a 017. Loja, upgrades compraveis, audicao jogavel e editor de fases permanecem futuros; aceite manual ampliado do MVP continua nas listas anteriores.
+O MVP tutorial estabelece montagem, editor e execucao. A Fase 002 expande para selecao/preparacao da campanha, laboratorio, combate basico e save com recompensa unica, conforme `docs/fases/fase002/README.md` e PRDs 014 a 017. A PRD 014, o percurso/visao da PRD 015 e a implementacao automatizada de combate/checkpoint da PRD 016 estao integrados e com a suite verde. A rota de combate e fuga usa exatamente 10 RAM e conclui repetidamente; aceite manual ampliado permanece pendente. Save/recompensa pertencem a 017. Loja, upgrades compraveis, audicao jogavel e editor de fases permanecem futuros; aceite manual ampliado do MVP continua nas listas anteriores.
+
+A [PRD 018](fases/fase002/prds/018-character-readability-and-combat-weight.md) implementa visibilidade do corpo proprio, peso e clareza do combate, com regressao automatizada concluida em 2026-09-14 e aceite visual/sonoro pendente. A [ADR 013](decisions/ADR-013-character-presentation-and-impact-timing.md) registra os contratos de apresentacao e tempo, preservando percepcao e regras de combate existentes.
 
 ## Regras de design ja decididas
 

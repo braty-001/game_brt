@@ -56,8 +56,12 @@ func _build_melee_program():
 	var program := ProgramDefinition.new()
 	program.start_block_id = "fight"
 	_control(program, "fight", ConditionCatalog.Query.ENEMY_VISIBLE)
+	_action(program, "approach_enemy", ProgramBlockKind.Value.WALK)
+	_control(program, "enemy_in_range", ConditionCatalog.Query.ENEMY_IN_MELEE_RANGE)
 	_action(program, "strike", ProgramBlockKind.Value.ATTACK)
-	program.add_connection(ProgramConnection.new("fight", "body", "strike"))
+	program.add_connection(ProgramConnection.new("fight", "body", "approach_enemy"))
+	program.add_connection(ProgramConnection.new("approach_enemy", "next", "enemy_in_range"))
+	program.add_connection(ProgramConnection.new("enemy_in_range", "body", "strike"))
 	return program
 
 func _build_combat_route_program():
@@ -67,18 +71,18 @@ func _build_combat_route_program():
 	_action(program, "walk_in", ProgramBlockKind.Value.WALK, true)
 	_action(program, "strike", ProgramBlockKind.Value.ATTACK)
 	_control(program, "stairs", ConditionCatalog.Query.STEP_AHEAD)
+	_action(program, "walk_step", ProgramBlockKind.Value.WALK)
 	_action(program, "jump_step", ProgramBlockKind.Value.JUMP)
 	_action(program, "turn", ProgramBlockKind.Value.TURN)
 	_action(program, "run_back", ProgramBlockKind.Value.WALK, true)
 	_action(program, "jump_back", ProgramBlockKind.Value.JUMP)
 	_control(program, "escape", ConditionCatalog.Query.PATH_CLEAR_AHEAD)
-	_action(program, "walk_out", ProgramBlockKind.Value.WALK, true)
 	for edge in [
 		["approach", "body", "walk_in"], ["walk_in", "next", "strike"],
-		["approach", "next", "stairs"], ["stairs", "body", "jump_step"],
-		["stairs", "next", "turn"], ["turn", "next", "run_back"],
-		["run_back", "next", "jump_back"], ["jump_back", "next", "escape"],
-		["escape", "body", "walk_out"],
+		["approach", "next", "stairs"], ["stairs", "body", "walk_step"],
+		["walk_step", "next", "jump_step"], ["stairs", "next", "turn"],
+		["turn", "next", "escape"], ["escape", "body", "run_back"],
+		["run_back", "next", "jump_back"],
 	]:
 		program.add_connection(ProgramConnection.new(edge[0], edge[1], edge[2]))
 	return program
