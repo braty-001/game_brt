@@ -5,6 +5,81 @@ const SelectionScript = preload("res://src/campaign/campaign_selection.gd")
 const TutorialScript = preload("res://src/tutorial/tutorial_mission.gd")
 const LaboratoryScript = preload("res://src/campaign/laboratory/laboratory_mission.gd")
 
+func test_baton_notice_confirmation_opens_editor_and_reentry_skips_notice() -> void:
+	var flow = _prepared_flow()
+	var graph = flow.session.graph_state
+	var assembly = flow.session.assembly
+	assert_true(flow.show_laboratory())
+	var mission = flow.current_screen
+	for frame in 180:
+		await get_tree().physics_frame
+		if mission.milestone_overlay.visible:
+			break
+	assert_true(mission.milestone_overlay.visible)
+	await get_tree().process_frame
+	assert_same(flow.current_screen, mission)
+	mission.milestone_primary.pressed.emit()
+	mission.milestone_primary.pressed.emit()
+	await get_tree().process_frame
+	var selection = flow.current_screen
+	assert_true(selection is SelectionScript)
+	assert_not_null(selection.brain_editor)
+	assert_same(flow.session.graph_state, graph)
+	assert_same(flow.session.assembly, assembly)
+	assert_true(flow.session.baton_checkpoint_active)
+	assert_not_null(selection.brain_editor.palette.item_for_kind(ProgramBlockKind.Value.ATTACK))
+	assert_true(selection.return_to_briefing(true))
+	assert_true(flow.show_laboratory())
+	assert_true(flow.current_screen.buneko.has_baton())
+	assert_eq(flow.current_screen.buneko.position, Vector2(180, 594))
+	assert_false(flow.current_screen.milestone_overlay.visible)
+	flow.queue_free()
+	await get_tree().process_frame
+
+func test_victory_choices_preserve_session_and_navigate_once() -> void:
+	for open_editor in [false, true]:
+		var flow = _prepared_flow()
+		flow.session.activate_baton_checkpoint()
+		flow.session.preparation_confirmed = true
+		var graph = flow.session.graph_state
+		var assembly = flow.session.assembly
+		assert_true(flow.show_laboratory())
+		var mission = flow.current_screen
+		watch_signals(mission)
+		mission.buneko.position = mission.level.exit_rect().get_center()
+		for frame in 10:
+			await get_tree().physics_frame
+			if not mission.outcome.is_empty():
+				break
+		assert_eq(mission.outcome, "escaped")
+		if mission.outcome != "escaped":
+			return
+		assert_true(mission.milestone_overlay.visible)
+		var chosen: Button = mission.milestone_secondary if open_editor else mission.milestone_primary
+		chosen.pressed.emit()
+		chosen.pressed.emit()
+		assert_signal_emit_count(mission, "editing_requested" if open_editor else "selection_requested", 1)
+		await get_tree().process_frame
+		var selection = flow.current_screen
+		assert_true(selection is SelectionScript)
+		assert_eq(selection.brain_editor != null, open_editor)
+		assert_same(flow.session.graph_state, graph)
+		assert_same(flow.session.assembly, assembly)
+		assert_true(flow.session.baton_checkpoint_active)
+		flow.queue_free()
+		await get_tree().process_frame
+
+func _prepared_flow():
+	var flow = FlowScene.instantiate()
+	add_child_autofree(flow)
+	flow.session.complete_tutorial(BaseBunekoParts.complete_assembly(), null)
+	flow.show_campaign()
+	var selection = flow.current_screen
+	selection.open_preparation()
+	selection.brain_editor.load_example()
+	selection.return_to_briefing(true)
+	return flow
+
 func test_campaign_confirmation_entry_and_return_preserve_graph_and_body() -> void:
 	var flow = FlowScene.instantiate()
 	add_child_autofree(flow)

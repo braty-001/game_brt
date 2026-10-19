@@ -10,9 +10,11 @@ Escopo aprovado: selecao e preparacao, laboratorio, combate corpo a corpo e save
 4. [PRD 017](prds/017-progress-save-and-rewards.md): save persistente e recompensa unica. Planejada.
 5. [PRD 018](prds/018-character-readability-and-combat-weight.md): visibilidade do Buneko, peso corporal, feedback de combate e encontros demonstraveis. Implementacao automatizada concluida; [tarefas](tasks/018-character-readability-and-combat-weight-tasks.md) de aceite manual pendentes.
 
-Ordem recomendada apos o retorno de 2026-09-14: aceitar manualmente a experiencia da 018 antes de iniciar a 017. A numeracao existente permanece preservada. A [ADR 013](../../decisions/ADR-013-character-presentation-and-impact-timing.md) registra os contratos implementados de apresentacao/tempo que complementam 015 e 016.
+Ordem recomendada apos o retorno de 2026-09-14: aceitar manualmente a experiencia da 018 e os marcos da 019 antes de iniciar a 017. A numeracao existente permanece preservada. A [ADR 013](../../decisions/ADR-013-character-presentation-and-impact-timing.md) registra os contratos implementados de apresentacao/tempo que complementam 015 e 016.
 
 Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cerebro, entrar no laboratorio com tres inimigos, coletar o bastao, pausar para adaptar o programa, restaurar o checkpoint apos derrota e concluir repetidamente a rota integrada. Persistencia e recompensa dependem da 017.
+
+A [PRD 019](prds/019-baton-pickup-and-mission-completion.md) e suas [tarefas](tasks/019-baton-pickup-and-mission-completion-tasks.md) tratam da coleta perceptivel e conclusao evidente, implementadas e validadas em 2026-09-16 com 272 testes aprovados; aceite manual pendente.
 
 ## Decisoes aprovadas
 
@@ -29,6 +31,8 @@ Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cere
 - Save preserva dinheiro, montagem/capacidades da cabeca e corpo, programa, fase, checkpoint e primeiras conclusoes. Primeira conclusao paga 10; repeticoes nao pagam.
 
 ## Futuro e calibracao
+
+Retorno de 2026-09-16: o usuario priorizou agora a clareza da coleta do bastao e da conclusao. A PRD 019 concentra o plano aprovado e sua execucao, complementando 015/016. A liberdade de composicao e futuras funcoes do cerebro ficam registradas em [FUT-001](../../backlog.md#fut-001---composicao-livre-e-funcoes-opcionais-no-cerebro), como recursos sempre opcionais, sem data definida.
 
 Audicao/`Escutar` (parar para prestar atencao com feedback visual), upgrades de visao, RAM compravel, perseguidores, armas a distancia e missoes 1.2/1.3 ficam para futuras PRDs.
 

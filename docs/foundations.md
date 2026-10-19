@@ -18,6 +18,8 @@ O MVP tutorial estabelece montagem, editor e execucao. A Fase 002 expande para s
 
 A [PRD 018](fases/fase002/prds/018-character-readability-and-combat-weight.md) implementa visibilidade do corpo proprio, peso e clareza do combate, com regressao automatizada concluida em 2026-09-14 e aceite visual/sonoro pendente. A [ADR 013](decisions/ADR-013-character-presentation-and-impact-timing.md) registra os contratos de apresentacao e tempo, preservando percepcao e regras de combate existentes.
 
+A [PRD 019](fases/fase002/prds/019-baton-pickup-and-mission-completion.md) acrescenta paineis persistentes de coleta do bastao e conclusao da missao, com navegacao por escolha e simulacao suspensa. O aceite manual da apresentacao permanece separado.
+
 ## Regras de design ja decididas
 
 - O programa e visual e composto por blocos.
@@ -26,6 +28,7 @@ A [PRD 018](fases/fase002/prds/018-character-readability-and-combat-weight.md) i
 - O programa e executado continuamente durante a fase.
 - O Buneko percebe o mundo por sensores inspirados nos humanos, como visao e audicao, configurados como condicoes selecionaveis em blocos de controle.
 - O jogador podera melhorar o Buneko no futuro, incluindo a capacidade de RAM, velocidade e forca.
+- Liberdade de programacao e um valor do jogo: estruturas avancadas, incluindo futuras funcoes, devem ampliar as escolhas sem tornar seu uso obrigatorio. A [ADR 014](decisions/ADR-014-optional-programming-expressiveness.md) registra a diretriz; o planejamento futuro esta em [FUT-001](backlog.md#fut-001---composicao-livre-e-funcoes-opcionais-no-cerebro).
 
 ## Principios de arquitetura
 

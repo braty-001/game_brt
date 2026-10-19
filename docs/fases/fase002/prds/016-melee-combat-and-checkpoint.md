@@ -34,7 +34,7 @@ Apresentar combate programavel e revisao do codigo durante a fuga, com 10 RAM an
 - WHILE com Atacar repete golpes; Depois com Andar retoma caminhada. Nao caminhar automaticamente apos matar.
 - Cerebros autorais patrulham trechos curtos, aproximam/atacam ao ver e voltam a patrulha ao perder visao, respeitando paredes/pisos; sem memoria/busca.
 - Bastao inicial ativa checkpoint e pausa simulacao para apresentar arma e editar. Avisado no briefing; excecao didatica, nao regra de toda coleta.
-- A preparacao anterior a entrada nao mostra `Atacar` nem consultas de combate. A coleta equipa o bastao, marca o checkpoint, interrompe a tentativa e abre o mesmo editor com `Atacar`, `inimigo visivel` e `inimigo ao alcance`. Continuar reinicia o programa confirmado no checkpoint; fisica, AI e golpes nao continuam fora da tentativa.
+- A preparacao anterior a entrada nao mostra `Atacar` nem consultas de combate. A coleta equipa o bastao, marca o checkpoint, interrompe a tentativa e apresenta o painel da PRD 019; somente ao confirmar `Editar cerebro` abre o mesmo editor com `Atacar`, `inimigo visivel` e `inimigo ao alcance`. Continuar reinicia o programa confirmado no checkpoint; fisica, AI e golpes nao continuam fora da tentativa.
 - Derrota: checkpoint, vida 10, arma e ultimo programa; tres inimigos vivos nas posicoes iniciais. Apresentacao nao repete. Antes da coleta, reinicio da missao.
 - Vitoria somente por saida; abates opcionais.
 
@@ -60,6 +60,10 @@ Apresentar combate programavel e revisao do codigo durante a fuga, com 10 RAM an
 Testar dano exato/uma vez por golpe, alcance, contato inofensivo, alvo morto, intervalo, pausa, reinicio, patrulha/deteccao frontal/perda e preservacao. Provar que aproximacao pelas costas nao detecta, sem alterar a oclusao propria do golpe. Provar combate/fuga em 10 RAM com guardas de execucao. Aceite manual para leitura dos golpes, esquiva, vida e pausa.
 
 Riscos: golpes incompreensiveis, dano por paredes, ataque sem arma, AI presa e simulacao rodando no editor. Separar regras de vida/ataque, adaptadores e apresentacao.
+
+## Melhoria de coleta aprovada em 2026-09-16
+
+Contrato e implementacao concentrados na [PRD 019](019-baton-pickup-and-mission-completion.md), com [tarefas proprias](../tasks/019-baton-pickup-and-mission-completion-tasks.md). Implementada e validada automaticamente em 2026-09-16; aceite manual pendente nas tarefas 019.
 
 ## Fora do escopo
 

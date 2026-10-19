@@ -20,7 +20,7 @@ func after_each() -> void:
 	Engine.physics_ticks_per_second = previous_ticks
 	Engine.time_scale = previous_time_scale
 
-func test_initial_pickup_equips_baton_marks_checkpoint_and_requests_editor() -> void:
+func test_initial_pickup_waits_for_confirmation_with_simulation_frozen() -> void:
 	var session = _session(Examples.new().build_program())
 	var mission = MissionScene.instantiate()
 	mission.configure_session(session)
@@ -35,8 +35,36 @@ func test_initial_pickup_equips_baton_marks_checkpoint_and_requests_editor() -> 
 	assert_true(mission.buneko.has_baton())
 	assert_false(session.preparation_confirmed)
 	await get_tree().process_frame
-	assert_signal_emitted(mission, "editing_requested")
+	assert_signal_not_emitted(mission, "editing_requested")
+	assert_true(mission.milestone_overlay.visible)
+	assert_eq(mission.milestone_title.text, "Bastao adquirido!")
+	assert_string_contains(mission.milestone_description.text, "Atacar")
+	assert_string_contains(mission.milestone_description.text, "checkpoint")
+	assert_false(mission.milestone_secondary.visible)
+	assert_true(mission.pause_button.disabled)
+	assert_true(mission.edit_button.disabled)
 	assert_eq(mission.level.process_mode, Node.PROCESS_MODE_DISABLED)
+	var position: Vector2 = mission.buneko.position
+	var health: int = mission.buneko.current_health()
+	var instruction: String = mission.attempt.runtime.current_block_id
+	var enemy_positions: Array = mission.level.enemies.map(func(enemy): return enemy.position)
+	var graph = session.graph_state
+	mission.pause_button.pressed.emit()
+	mission.edit_button.pressed.emit()
+	for frame in 60:
+		await get_tree().physics_frame
+	assert_eq(mission.buneko.position, position)
+	assert_eq(mission.buneko.current_health(), health)
+	assert_eq(mission.attempt.runtime.current_block_id, instruction)
+	assert_eq(mission.level.enemies.map(func(enemy): return enemy.position), enemy_positions)
+	assert_eq(mission.attempt.runtime.state, RuntimeState.Value.STOPPED)
+	assert_true(mission.level.is_simulation_suspended())
+	assert_signal_not_emitted(mission, "editing_requested")
+	assert_true(mission.milestone_overlay.visible)
+	mission.milestone_primary.pressed.emit()
+	mission.milestone_primary.pressed.emit()
+	assert_signal_emit_count(mission, "editing_requested", 1)
+	assert_same(session.graph_state, graph)
 
 func test_checkpoint_editor_unlocks_only_combat_capabilities_and_example() -> void:
 	var before = SelectionScene.instantiate()
@@ -61,6 +89,28 @@ func test_checkpoint_editor_unlocks_only_combat_capabilities_and_example() -> vo
 	assert_eq(snapshot.ram, "4/10 RAM")
 	assert_true(snapshot.is_valid)
 	assert_true(snapshot.program.blocks.values().any(func(block): return block.kind == ProgramBlockKind.Value.ATTACK))
+
+func test_pickup_cancels_impact_without_resuming_behind_notice() -> void:
+	var mission = MissionScene.instantiate()
+	mission.configure_session(_session(Examples.new().build_program()))
+	add_child_autofree(mission)
+	var enemy = mission.level.enemies[0]
+	enemy.position = mission.buneko.position + Vector2(50, 0)
+	enemy.face_direction(-1)
+	mission.level._queue_strike(enemy)
+	mission.level._resolve_strikes()
+	assert_true(mission.impact_pause_active)
+	assert_eq(mission.buneko.current_health(), 8)
+	mission.level._on_baton_collected()
+	var position: Vector2 = mission.buneko.position
+	await get_tree().create_timer(0.12, true, false, true).timeout
+	assert_true(mission.milestone_overlay.visible)
+	assert_false(mission.impact_pause_active)
+	assert_true(mission.level.is_simulation_suspended())
+	assert_eq(mission.buneko.position, position)
+	assert_eq(mission.buneko.current_health(), 8)
+	assert_eq(mission.attempt.runtime.state, RuntimeState.Value.STOPPED)
+	assert_eq(mission.restart_count, 0)
 
 func test_combat_route_uses_exactly_ten_ram_kills_and_escapes_repeatedly() -> void:
 	var program = Examples.new(true).build_program(Examples.Example.COMBAT_ROUTE)
@@ -91,6 +141,8 @@ func test_combat_route_uses_exactly_ten_ram_kills_and_escapes_repeatedly() -> vo
 		assert_true(crossing_left_ground, "run=%d jump_back never left the floor" % run)
 		assert_true(crossing_landed, "run=%d evaluated escape before landing" % run)
 		assert_eq(mission.outcome, "escaped", "run=%d pos=%s block=%s hp=%d dir=%d path=%s turn=%s" % [run, mission.buneko.position, mission.attempt.runtime.last_executed_block_id, mission.buneko.current_health(), mission.buneko.facing_direction(), mission.level.sensor.is_path_clear_ahead(), first_turn_observation])
+		assert_true(mission.milestone_overlay.visible)
+		assert_eq(mission.milestone_title.text, "Missao concluida!")
 		assert_lte(mission.level.living_enemy_count(), 2)
 		assert_gt(mission.buneko.current_health(), 0)
 		mission.queue_free()
@@ -103,6 +155,7 @@ func test_melee_example_drops_one_enemy_with_one_hit_and_program_finishes() -> v
 		if not mission.outcome.is_empty():
 			break
 	assert_eq(mission.outcome, "finished")
+	assert_false(mission.milestone_overlay.visible)
 	assert_eq(mission.level.living_enemy_count(), 2)
 	assert_eq(mission.level.enemies[0].current_health(), 0)
 	assert_eq(mission.level.enemies[1].current_health(), 2)
@@ -245,6 +298,7 @@ func test_defeat_restores_health_weapon_enemies_and_same_program_at_checkpoint()
 	assert_eq(mission.level.living_enemy_count(), 3)
 	assert_same(mission.session.graph_state, graph)
 	assert_eq(mission.last_restart_position, Vector2(180, 594))
+	assert_false(mission.milestone_overlay.visible)
 
 func test_confirmed_impact_pauses_once_and_miss_does_not_pause() -> void:
 	var mission = _checkpoint_mission(Examples.new().build_program())

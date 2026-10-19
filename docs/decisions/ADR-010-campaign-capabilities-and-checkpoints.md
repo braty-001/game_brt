@@ -23,3 +23,7 @@ O contexto do editor tambem limita acoes: `Atacar` so aparece depois da coleta. 
 - Retomada consistente do checkpoint tem prioridade sobre restaurar cada instante fisico.
 
 Complementa ADRs 001, 003, 006 e 009 para PRDs 014 a 017.
+
+## Apresentacao dos marcos da missao (PRD 019)
+
+Plano aprovado em 2026-09-16: a coleta aguarda confirmacao no painel antes de abrir o editor. A chegada a saida apresenta conclusao com escolhas de selecao ou editor, encaminhadas por sinais para GameFlow. Paineis bloqueiam simulacao e controles ao fundo, preservam a sessao e nao afirmam persistencia ou recompensa. A navegacao por escolha e unica; a introducao nao se repete no checkpoint.

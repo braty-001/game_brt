@@ -42,7 +42,11 @@ Retorno do usuario em 2026-09-09: laboratorio considerado visualmente aprovado e
 - Cena principal `res://scenes/campaign/game_flow.tscn` carregada em headless e `git diff --check` aprovado.
 - Nenhuma janela grafica foi aberta; forma, legibilidade, frestas e sensacao da virada continuam no aceite manual.
 
-## Como testar
+## Melhoria de conclusao aprovada em 2026-09-16
+
+Execucao e aceite centralizados nas [tarefas 019](019-baton-pickup-and-mission-completion-tasks.md). Implementada e validada automaticamente em 2026-09-16; aceite manual pendente. Evidencias historicas desta lista permanecem preservadas.
+
+## Como testar o percurso existente
 
 1. Executar `braty/project.godot` com F5; concluir o tutorial para abrir a campanha.
 2. Preparar cerebro e carregar o exemplo **Percurso do laboratorio**. Conferir 10/10 RAM e a condicao **Visao: degrau a frente** no WHILE da escada.

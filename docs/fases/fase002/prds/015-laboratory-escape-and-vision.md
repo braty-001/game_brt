@@ -38,6 +38,10 @@ Percurso real, repetivel, sem controle direto; solucao completa em 10 RAM e dez 
 
 Cena compoe geometria; adaptador consulta mundo; objetivo e testavel. Riscos: degraus inviaveis, visao vazando entre andares, frestas no desenho da nevoa, imprecisao nas bordas angulares e RAM insuficiente. Calibrar distancias/velocidades sem mudar semantica dos blocos por conveniencia.
 
+## Melhoria de conclusao aprovada em 2026-09-16
+
+Contrato e implementacao concentrados na [PRD 019](019-baton-pickup-and-mission-completion.md), com [tarefas proprias](../tasks/019-baton-pickup-and-mission-completion-tasks.md). Implementada e validada automaticamente em 2026-09-16; aceite manual pendente nas tarefas 019.
+
 ## Fora do escopo
 
 Audicao, memoria de exploracao, upgrades visuais, outras missoes e arte final.

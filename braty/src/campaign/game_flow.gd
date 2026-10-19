@@ -47,6 +47,7 @@ func show_laboratory() -> bool:
 	var mission = LaboratoryScene.instantiate()
 	mission.configure_session(session)
 	mission.editing_requested.connect(_on_editing_requested)
+	mission.selection_requested.connect(_on_selection_requested)
 	_replace_screen(mission)
 	return true
 
@@ -55,6 +56,9 @@ func _on_mission_requested() -> void:
 
 func _on_editing_requested() -> void:
 	call_deferred("show_campaign", true)
+
+func _on_selection_requested() -> void:
+	call_deferred("show_campaign")
 
 func _replace_screen(next_screen: Control) -> void:
 	if current_screen != null:

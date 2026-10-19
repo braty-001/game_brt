@@ -36,6 +36,8 @@ func test_reference_reaches_exit_ten_times_using_real_physics() -> void:
 			if not mission.outcome.is_empty():
 				break
 		assert_eq(mission.outcome, "escaped", "run=%s pos=%s block=%s" % [run, mission.buneko.position, mission.attempt.runtime.last_executed_block_id])
+		assert_true(mission.milestone_overlay.visible)
+		assert_eq(mission.milestone_description.text, "Voce escapou do laboratorio.")
 		assert_true(climbed_right)
 		assert_true(turned_left)
 		assert_eq(mission.attempt.runtime.state, RuntimeState.Value.COMPLETED)
@@ -80,6 +82,7 @@ func test_invalid_and_over_ram_programs_never_spawn_actor() -> void:
 		assert_eq(mission.outcome, "invalid")
 		assert_null(mission.buneko)
 		assert_true(mission.pause_button.disabled)
+		assert_false(mission.milestone_overlay.visible)
 
 func test_finished_program_and_execution_guard_leave_editor_reachable() -> void:
 	for empty_loop in [false, true]:
@@ -101,9 +104,86 @@ func test_finished_program_and_execution_guard_leave_editor_reachable() -> void:
 			if not mission.outcome.is_empty():
 				break
 		assert_eq(mission.outcome, "guard" if empty_loop else "finished")
+		assert_false(mission.milestone_overlay.visible)
 		watch_signals(mission)
 		mission.edit_button.pressed.emit()
 		assert_signal_emitted(mission, "editing_requested")
+
+func test_exit_notice_persists_without_simulation_or_background_navigation() -> void:
+	var mission = _mission()
+	mission.buneko.position = mission.level.exit_rect().get_center()
+	for frame in 10:
+		await get_tree().physics_frame
+		if not mission.outcome.is_empty():
+			break
+	assert_eq(mission.outcome, "escaped")
+	watch_signals(mission)
+	var position: Vector2 = mission.buneko.position
+	var health: int = mission.buneko.current_health()
+	var enemy_positions: Array = mission.level.enemies.map(func(enemy): return enemy.position)
+	mission.pause_button.pressed.emit()
+	mission.edit_button.pressed.emit()
+	for frame in 60:
+		await get_tree().physics_frame
+	assert_true(mission.milestone_overlay.visible)
+	assert_true(mission.level.is_simulation_suspended())
+	assert_eq(mission.attempt.runtime.state, RuntimeState.Value.COMPLETED)
+	assert_eq(mission.buneko.position, position)
+	assert_eq(mission.buneko.current_health(), health)
+	assert_eq(mission.level.enemies.map(func(enemy): return enemy.position), enemy_positions)
+	assert_signal_not_emitted(mission, "selection_requested")
+	assert_signal_not_emitted(mission, "editing_requested")
+	mission.milestone_primary.pressed.emit()
+	mission.milestone_secondary.pressed.emit()
+	mission.milestone_primary.pressed.emit()
+	assert_signal_emit_count(mission, "selection_requested", 1)
+	assert_signal_not_emitted(mission, "editing_requested")
+
+func test_fall_does_not_show_victory() -> void:
+	var mission = _mission()
+	mission.buneko.position.y = mission.level.WORLD_SIZE.y + 70
+	for frame in 10:
+		await get_tree().physics_frame
+		if not mission.outcome.is_empty():
+			break
+	assert_eq(mission.outcome, "fell")
+	assert_false(mission.milestone_overlay.visible)
+	assert_false(mission.edit_button.disabled)
+
+func test_milestone_layout_and_keyboard_focus_fit_supported_sizes() -> void:
+	for target in [Vector2i(960, 540), Vector2i(1440, 810), Vector2i(1600, 900)]:
+		for victory in [false, true]:
+			var viewport := SubViewport.new()
+			viewport.size = target
+			add_child_autofree(viewport)
+			var session = SessionScript.new()
+			session.complete_tutorial(BaseBunekoParts.complete_assembly(), Importer.new().import_program(Examples.new().build_program()))
+			session.preparation_confirmed = true
+			var mission = MissionScene.instantiate()
+			mission.configure_session(session)
+			viewport.add_child(mission)
+			if victory:
+				mission.buneko.position = mission.level.exit_rect().get_center()
+				mission._physics_process(0.0)
+			else:
+				mission.level._on_baton_collected()
+			for frame in 6:
+				await get_tree().process_frame
+			var bounds := Rect2(Vector2.ZERO, Vector2(target))
+			var context := "size=%s victory=%s" % [target, victory]
+			assert_true(mission.milestone_overlay.visible, context)
+			assert_true(bounds.encloses(mission.milestone_panel.get_global_rect()), "%s panel=%s" % [context, mission.milestone_panel.get_global_rect()])
+			for control in [mission.milestone_title, mission.milestone_description, mission.milestone_primary]:
+				assert_true(mission.milestone_panel.get_global_rect().encloses(control.get_global_rect()), "%s control=%s rect=%s" % [context, control.name, control.get_global_rect()])
+				assert_gt(control.size.y, 0.0)
+			assert_true(mission.milestone_primary.has_focus(), "%s focus=%s" % [context, viewport.gui_get_focus_owner()])
+			var next_focus: Control = mission.milestone_secondary if victory else mission.milestone_primary
+			assert_same(mission.milestone_primary.find_next_valid_focus(), next_focus)
+			if victory:
+				assert_true(bounds.encloses(mission.milestone_secondary.get_global_rect()))
+				assert_same(mission.milestone_secondary.find_next_valid_focus(), mission.milestone_primary)
+			viewport.queue_free()
+			await get_tree().process_frame
 
 func test_world_scales_uniformly_and_controls_fit_supported_sizes() -> void:
 	for target in [Vector2i(960, 540), Vector2i(1440, 810), Vector2i(1600, 900)]:

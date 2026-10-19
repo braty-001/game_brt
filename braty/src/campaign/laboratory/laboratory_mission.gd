@@ -11,6 +11,7 @@ const IMPACT_PAUSE_MSEC := 60
 const DEFEAT_PRESENTATION_MSEC := 600
 
 signal editing_requested
+signal selection_requested
 
 var session
 var level
@@ -27,12 +28,19 @@ var _defeat_deadline_msec := 0
 var _defeat_pending := false
 var _defeat_ready_to_restart := false
 var _resume_after_impact := false
+var _navigation_requested := false
 @onready var stage: Control = $Margin/Page/Stage
 @onready var display: SubViewportContainer = $Margin/Page/Stage/Display
 @onready var world: SubViewport = $Margin/Page/Stage/Display/World
 @onready var status_label: Label = $Margin/Page/Status
 @onready var pause_button: Button = $Margin/Page/Actions/PauseButton
 @onready var edit_button: Button = $Margin/Page/Actions/EditButton
+@onready var milestone_overlay: Control = $MilestoneOverlay
+@onready var milestone_panel: PanelContainer = $MilestoneOverlay/Center/Panel
+@onready var milestone_title: Label = $MilestoneOverlay/Center/Panel/Content/Title
+@onready var milestone_description: Label = $MilestoneOverlay/Center/Panel/Content/Description
+@onready var milestone_primary: Button = $MilestoneOverlay/Center/Panel/Content/Actions/Primary
+@onready var milestone_secondary: Button = $MilestoneOverlay/Center/Panel/Content/Actions/Secondary
 
 func configure_session(campaign_session) -> void:
 	session = campaign_session
@@ -41,6 +49,12 @@ func _ready() -> void:
 	$Background.color = Tokens.BACKGROUND
 	Tokens.apply_secondary_button(pause_button)
 	Tokens.apply_primary_button(edit_button)
+	Tokens.apply_panel(milestone_panel, Tokens.SURFACE_RAISED)
+	Tokens.apply_primary_button(milestone_primary)
+	Tokens.apply_secondary_button(milestone_secondary)
+	milestone_title.add_theme_color_override("font_color", Tokens.SUCCESS)
+	milestone_primary.pressed.connect(_on_milestone_primary_pressed)
+	milestone_secondary.pressed.connect(_on_milestone_secondary_pressed)
 	pause_button.pressed.connect(toggle_pause)
 	edit_button.pressed.connect(_request_editing)
 	stage.resized.connect(_fit_world)
@@ -81,11 +95,11 @@ func _process(_delta: float) -> void:
 			_finish_defeat_presentation()
 
 func _physics_process(_delta: float) -> void:
-	if attempt == null or paused or impact_pause_active or defeat_presentation_active or not outcome.is_empty():
+	if attempt == null or milestone_overlay.visible or _navigation_requested or paused or impact_pause_active or defeat_presentation_active or not outcome.is_empty():
 		return
 	if level.reached_exit():
 		attempt.complete()
-		_finish("escaped", "Saida alcancada! Missao concluida com combate ativo.")
+		_finish("escaped", "Voce escapou do laboratorio.")
 		return
 	if buneko.position.y > level.WORLD_SIZE.y + 60:
 		attempt.fail_externally()
@@ -100,7 +114,7 @@ func _physics_process(_delta: float) -> void:
 		status_label.text = "Vida %d/10 | Inimigos %d/3 | Executando: %s" % [buneko.current_health(), level.living_enemy_count(), attempt.runtime.last_executed_block_id]
 
 func toggle_pause() -> void:
-	if attempt == null or not outcome.is_empty():
+	if attempt == null or milestone_overlay.visible or _navigation_requested or not outcome.is_empty():
 		return
 	if paused:
 		paused = false
@@ -133,33 +147,75 @@ func _finish(result: String, message: String) -> void:
 	status_label.text = message
 	pause_button.disabled = true
 	if level != null:
+		level.set_simulation_suspended(true)
 		level.process_mode = Node.PROCESS_MODE_DISABLED
+	if result == "escaped":
+		_show_milestone("Missao concluida!", message, "Voltar a selecao", true)
 
 func _request_editing() -> void:
+	if milestone_overlay.visible:
+		return
+	_request_navigation(true)
+
+func _request_navigation(open_editor: bool) -> void:
+	if _navigation_requested:
+		return
+	_navigation_requested = true
+	pause_button.disabled = true
+	edit_button.disabled = true
+	milestone_primary.disabled = true
+	milestone_secondary.disabled = true
 	_cancel_combat_presentation()
 	if attempt != null:
 		attempt.stop()
 	if level != null:
+		level.set_simulation_suspended(true)
 		level.process_mode = Node.PROCESS_MODE_DISABLED
 	if buneko != null:
 		buneko.set_physics_process(false)
-	editing_requested.emit()
+	if open_editor:
+		editing_requested.emit()
+	else:
+		selection_requested.emit()
 
 func _on_baton_checkpoint_reached() -> void:
-	if session == null or session.baton_checkpoint_active:
+	if session == null or session.baton_checkpoint_active or _navigation_requested or not outcome.is_empty():
 		return
 	session.activate_baton_checkpoint()
 	_cancel_combat_presentation()
 	attempt.stop()
+	level.set_simulation_suspended(true)
 	level.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
-	status_label.text = "Bastao equipado! Abrindo o cerebro no checkpoint..."
-	call_deferred("_request_checkpoint_editing")
+	status_label.text = "Bastao equipado. Checkpoint ativado."
+	_show_milestone(
+		"Bastao adquirido!",
+		"Atacar e as condicoes de inimigo visivel e inimigo ao alcance estao liberados.\nSe for derrotado, voltara a este checkpoint com o bastao e seu programa.",
+		"Editar cerebro"
+	)
 
-func _request_checkpoint_editing() -> void:
-	editing_requested.emit()
+func _show_milestone(title: String, description: String, primary_text: String, show_secondary := false) -> void:
+	milestone_title.text = title
+	milestone_description.text = description
+	milestone_primary.text = primary_text
+	milestone_secondary.visible = show_secondary
+	pause_button.disabled = true
+	edit_button.disabled = true
+	milestone_overlay.show()
+	var other: Button = milestone_secondary if show_secondary else milestone_primary
+	milestone_primary.focus_next = milestone_primary.get_path_to(other)
+	milestone_primary.focus_previous = milestone_primary.get_path_to(other)
+	milestone_primary.grab_focus()
+
+func _on_milestone_primary_pressed() -> void:
+	if milestone_overlay.visible:
+		_request_navigation(outcome != "escaped")
+
+func _on_milestone_secondary_pressed() -> void:
+	if milestone_overlay.visible and outcome == "escaped":
+		_request_navigation(true)
 
 func _on_buneko_defeated() -> void:
-	if not outcome.is_empty():
+	if milestone_overlay.visible or _navigation_requested or not outcome.is_empty():
 		return
 	attempt.fail_externally()
 	_defeat_pending = true
@@ -169,7 +225,7 @@ func _on_buneko_defeated() -> void:
 		_begin_defeat_presentation()
 
 func _on_combat_batch_resolved(results: Array) -> void:
-	if not outcome.is_empty() or impact_pause_active or defeat_presentation_active:
+	if milestone_overlay.visible or _navigation_requested or not outcome.is_empty() or impact_pause_active or defeat_presentation_active:
 		return
 	if not results.any(func(result): return bool(result.get("hit", false))):
 		return

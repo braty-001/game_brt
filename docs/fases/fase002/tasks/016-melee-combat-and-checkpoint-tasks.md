@@ -29,7 +29,11 @@ Riscos: ultrapassar 10 RAM, dano duplicado ou atraves de piso, inimigo preso em 
 - [x] Cobrir deteccao pela frente, aproximacao pelas costas, virada, perda de visao e regressao de simultaneidade/oclusao.
 - [ ] Aceite manual: bater, esquivar, fugir sem matar, perder/retentar e conferir feedback.
 
-## Resultado automatizado final de 2026-09-11
+## Melhoria de coleta aprovada em 2026-09-16
+
+Execucao e aceite centralizados nas [tarefas 019](019-baton-pickup-and-mission-completion-tasks.md). Implementada e validada automaticamente em 2026-09-16; aceite manual pendente. Evidencias historicas desta lista permanecem preservadas.
+
+## Resultado automatizado final de 2026-09-11 (historico)
 
 - Godot 4.4.1 / GUT 9.4.0: 44 scripts, 243 testes e 1677 assercoes, todos aprovados com codigo 0.
 - `test_combat_route_uses_exactly_ten_ram_kills_and_escapes_repeatedly` conclui as cinco repeticoes internas e comprova salto aceito, saida do chao, pouso, ao menos um inimigo derrotado e chegada com vida.

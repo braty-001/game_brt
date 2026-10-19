@@ -72,3 +72,72 @@ text = "Pausar"
 [node name="EditButton" type="Button" parent="Margin/Page/Actions"]
 layout_mode = 2
 text = "Voltar ao cerebro"
+
+[node name="MilestoneOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Shade" type="ColorRect" parent="MilestoneOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.025, 0.04, 0.055, 0.7)
+
+[node name="Center" type="CenterContainer" parent="MilestoneOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="MilestoneOverlay/Center"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="MilestoneOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="MilestoneOverlay/Center/Panel/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Description" type="Label" parent="MilestoneOverlay/Center/Panel/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Actions" type="VBoxContainer" parent="MilestoneOverlay/Center/Panel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Primary" type="Button" parent="MilestoneOverlay/Center/Panel/Content/Actions"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+focus_neighbor_top = NodePath("../Secondary")
+focus_neighbor_bottom = NodePath("../Secondary")
+focus_neighbor_left = NodePath(".")
+focus_neighbor_right = NodePath(".")
+
+[node name="Secondary" type="Button" parent="MilestoneOverlay/Center/Panel/Content/Actions"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+focus_neighbor_top = NodePath("../Primary")
+focus_neighbor_bottom = NodePath("../Primary")
+focus_neighbor_left = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_next = NodePath("../Primary")
+focus_previous = NodePath("../Primary")
+text = "Rever cerebro"
