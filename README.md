@@ -44,6 +44,40 @@ godot --path braty
 
 Execute os comandos a partir da raiz do repositório. A raiz do projeto Godot é **`braty/`**.
 
+## Como jogar
+
+### Primeira partida
+
+1. No menu principal, clique em **Iniciar**. Em **Configuracoes**, você pode ajustar o tamanho da janela.
+2. Na montagem, clique nas peças para instalar **cabeça, corpo e locomoção**. Depois clique em **Confirmar montagem**.
+3. No editor do cérebro, use **Carregar exemplo** para começar com um programa que você pode estudar e modificar. Essa opção substitui o programa atual.
+4. Observe as conexões a partir de **INICIO** e o indicador de RAM. Ajuste os blocos e corrija os problemas indicados pela validação.
+5. Clique em **Executar tentativa** e observe o Buneko. Durante a fase, ele se movimenta pelas instruções do programa, sem controle direto pelo teclado.
+6. Use **Pausar** e **Retomar** para observar a execução. **Parar e editar** permite revisar a estratégia. Conclua o tutorial para acessar a campanha.
+
+### Montando seu próprio programa
+
+- Abra **Blocos** para adicionar instruções. Selecione uma saída vazia para inserir um bloco conectado; para ligar blocos existentes, selecione a saída de um e a entrada do outro.
+- Use ações como andar, pular e virar. Selecione o bloco para ajustar os parâmetros disponíveis no painel de propriedades.
+- Use **IF** para decidir com base em uma condição e **WHILE** para repetir enquanto a condição for verdadeira. As condições consultam os sensores disponíveis, como caminho livre, buraco ou objetivo visível.
+- Acompanhe o custo de RAM e os avisos de validação antes de executar. Blocos soltos não fazem parte do caminho de execução iniciado em **INICIO**.
+- Use **Organizar** para arrumar os blocos e **Código** para consultar o pseudocódigo. **Mover**, os botões de zoom e **Centralizar** ajudam a navegar pelo editor.
+- O botão **×** remove um bloco. **Zerar cerebro** remove todos os blocos e conexões; use quando quiser recomeçar.
+
+### Primeira missão: escapar do laboratório
+
+1. Na seleção da campanha, leia o objetivo e a planta. As marcações dos inimigos indicam posições aproximadas.
+2. Clique em **Preparar cerebro / 10 RAM**, ajuste o programa e use **Confirmar preparo**. Depois escolha **Entrar no laboratorio**.
+3. O percurso começa no andar inferior, à esquerda. Suba pelas plataformas à direita e alcance a saída no andar superior, à esquerda. Eliminar os inimigos é opcional.
+4. Ao coletar o bastão, a simulação fica suspensa e aparece **Bastao adquirido!**. Leia a explicação e clique em **Editar cerebro** para continuar o preparo.
+5. Com o bastão, ficam disponíveis **Atacar** e condições de inimigo visível ou ao alcance. Confirme o programa e entre novamente para continuar do checkpoint.
+6. Após uma derrota no checkpoint, o Buneko recupera a vida e conserva bastão e programa; os três inimigos voltam às posições iniciais. O programa recomeça do início.
+7. Ao chegar à saída, o painel **Missao concluida!** oferece **Voltar a selecao** e **Rever cerebro**.
+
+O Buneko só percebe o que está dentro de sua visão frontal e sem bloqueio por paredes ou pisos. Considere a direção para a qual ele está virado ao programar condições de visão.
+
+**Progresso da sessão:** o save persistente ainda não foi implementado. Não conte com a recuperação da campanha ou do checkpoint depois de fechar o jogo.
+
 ## Testes
 
 O **GUT 9.4.0** já está incluído em `braty/addons/gut`; não é necessário instalá-lo separadamente.
