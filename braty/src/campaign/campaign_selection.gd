@@ -8,12 +8,15 @@ const LaboratoryExamples = preload("res://src/campaign/laboratory/laboratory_exa
 
 signal menu_requested
 signal mission_requested
+signal progress_changed
 
 var session
 var brain_editor
+var save_error := false
 @onready var briefing: Control = $Margin/Page/Briefing
 @onready var editor_host: Control = $Margin/Page/EditorHost
 @onready var status_label: Label = $Margin/Page/StatusLabel
+@onready var balance_label: Label = $Margin/Page/Header/BalanceLabel
 @onready var prepare_button: Button = $Margin/Page/Briefing/Actions/PrepareButton
 @onready var menu_button: Button = $Margin/Page/Header/MenuButton
 @onready var enter_button: Button = $Margin/Page/Briefing/Actions/EnterButton
@@ -31,6 +34,8 @@ func _ready() -> void:
 	info.get_node("Equipment").text = data["equipment"]
 	info.get_node("Checkpoint").text = data["checkpoint"]
 	info.get_node("Reward").text = data["reward"]
+	balance_label.text = "Saldo: %d moedas" % (session.money if session != null else 0)
+	balance_label.add_theme_color_override("font_color", Tokens.AMBER)
 	info.get_node("Checkpoint").add_theme_color_override("font_color", Tokens.AMBER)
 	Tokens.apply_primary_button(prepare_button)
 	Tokens.apply_secondary_button(menu_button)
@@ -72,6 +77,7 @@ func open_preparation() -> bool:
 	brain_editor.summary_changed.connect(_on_editor_summary_changed)
 	if session.graph_state != null:
 		brain_editor.load_graph_state(session.graph_state)
+	brain_editor.draft_changed.connect(_on_draft_changed)
 	briefing.hide()
 	editor_host.show()
 	var snapshot = brain_editor.capture_snapshot()
@@ -79,6 +85,10 @@ func open_preparation() -> bool:
 	return true
 
 func _on_editor_summary_changed(ram: String, _status: String, _is_valid: bool) -> void:
+	if save_error:
+		status_label.text = "Nao foi possivel salvar o progresso. Sua edicao continua nesta sessao."
+		status_label.add_theme_color_override("font_color", Tokens.ERROR)
+		return
 	if session != null and session.baton_checkpoint_active:
 		status_label.text = "Checkpoint do bastao / %s | Atacar e sensores de inimigo liberados." % ram
 	else:
@@ -99,6 +109,7 @@ func return_to_briefing(confirm := false) -> bool:
 	editor_host.hide()
 	briefing.show()
 	_refresh_briefing()
+	progress_changed.emit()
 	return true
 
 func _refresh_briefing() -> void:
@@ -127,4 +138,26 @@ func _on_back_requested() -> void:
 func _on_menu_pressed() -> void:
 	if brain_editor != null:
 		session.keep_draft(brain_editor.capture_snapshot())
+		progress_changed.emit()
 	menu_requested.emit()
+
+func _on_draft_changed() -> void:
+	if session == null or brain_editor == null:
+		return
+	session.keep_draft(brain_editor.capture_snapshot())
+	progress_changed.emit()
+
+func show_save_error() -> void:
+	save_error = true
+	_on_editor_summary_changed("", "", false)
+
+func clear_save_error() -> void:
+	if not save_error:
+		return
+	save_error = false
+	status_label.remove_theme_color_override("font_color")
+	if brain_editor != null:
+		var snapshot = brain_editor.capture_snapshot()
+		_on_editor_summary_changed(snapshot.ram, snapshot.status, snapshot.is_valid)
+	else:
+		_refresh_briefing()

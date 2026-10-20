@@ -6,12 +6,14 @@ const AttemptScript = preload("res://src/buneko/runtime/program_attempt_session.
 const GraphBuilder = preload("res://src/brain_editor/program_graph_builder.gd")
 const Catalog = preload("res://src/campaign/campaign_mission_catalog.gd")
 const Tokens = preload("res://src/ui/design_tokens.gd")
+const DangerCueScript = preload("res://src/campaign/presentation/danger_time_cue.gd")
 
 const IMPACT_PAUSE_MSEC := 60
 const DEFEAT_PRESENTATION_MSEC := 600
 
 signal editing_requested
 signal selection_requested
+signal progress_changed
 
 var session
 var level
@@ -29,6 +31,10 @@ var _defeat_pending := false
 var _defeat_ready_to_restart := false
 var _resume_after_impact := false
 var _navigation_requested := false
+var save_failed := false
+var danger_cue = DangerCueScript.new()
+var _time_before_danger := 1.0
+var _danger_scale_applied := false
 @onready var stage: Control = $Margin/Page/Stage
 @onready var display: SubViewportContainer = $Margin/Page/Stage/Display
 @onready var world: SubViewport = $Margin/Page/Stage/Display/World
@@ -85,6 +91,7 @@ func _start_attempt(program) -> void:
 
 func _process(_delta: float) -> void:
 	var now := Time.get_ticks_msec()
+	_update_danger_time(now)
 	if impact_pause_active and now >= _impact_deadline_msec:
 		_finish_impact_pause()
 	if defeat_presentation_active and not _defeat_ready_to_restart and now >= _defeat_deadline_msec:
@@ -97,9 +104,12 @@ func _process(_delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 	if attempt == null or milestone_overlay.visible or _navigation_requested or paused or impact_pause_active or defeat_presentation_active or not outcome.is_empty():
 		return
+	_observe_danger(Time.get_ticks_msec())
 	if level.reached_exit():
 		attempt.complete()
-		_finish("escaped", "Voce escapou do laboratorio.")
+		var first_reward: bool = session.complete_laboratory()
+		progress_changed.emit()
+		_finish("escaped", "Voce escapou do laboratorio.", first_reward)
 		return
 	if buneko.position.y > level.WORLD_SIZE.y + 60:
 		attempt.fail_externally()
@@ -129,17 +139,19 @@ func toggle_pause() -> void:
 			level.set_simulation_suspended(false)
 			pause_button.text = "Pausar"
 	elif impact_pause_active or defeat_presentation_active:
+		_cancel_danger_time()
 		paused = true
 		pause_button.text = "Continuar"
 		status_label.text = "Pausado. A tentativa nao retomara ao fim do efeito."
 	elif attempt.pause():
+		_cancel_danger_time()
 		paused = true
 		level.process_mode = Node.PROCESS_MODE_DISABLED
 		level.stop_presentation_audio()
 		pause_button.text = "Continuar"
 		status_label.text = "Pausado. O programa e o movimento continuam do mesmo ponto."
 
-func _finish(result: String, message: String) -> void:
+func _finish(result: String, message: String, first_reward := false) -> void:
 	_cancel_combat_presentation()
 	outcome = result
 	if attempt != null and result == "finished":
@@ -150,7 +162,8 @@ func _finish(result: String, message: String) -> void:
 		level.set_simulation_suspended(true)
 		level.process_mode = Node.PROCESS_MODE_DISABLED
 	if result == "escaped":
-		_show_milestone("Missao concluida!", message, "Voltar a selecao", true)
+		var reward_message := "+10 moedas pela primeira conclusao." if first_reward else "Recompensa da primeira conclusao ja recebida."
+		_show_milestone("Missao concluida!", "%s\n%s" % [message, reward_message], "Voltar a selecao", true)
 
 func _request_editing() -> void:
 	if milestone_overlay.visible:
@@ -182,6 +195,7 @@ func _on_baton_checkpoint_reached() -> void:
 	if session == null or session.baton_checkpoint_active or _navigation_requested or not outcome.is_empty():
 		return
 	session.activate_baton_checkpoint()
+	progress_changed.emit()
 	_cancel_combat_presentation()
 	attempt.stop()
 	level.set_simulation_suspended(true)
@@ -193,9 +207,16 @@ func _on_baton_checkpoint_reached() -> void:
 		"Editar cerebro"
 	)
 
+func show_save_error() -> void:
+	save_failed = true
+	status_label.text = "Nao foi possivel salvar o progresso. Sua sessao atual continua."
+
+func clear_save_error() -> void:
+	save_failed = false
+
 func _show_milestone(title: String, description: String, primary_text: String, show_secondary := false) -> void:
 	milestone_title.text = title
-	milestone_description.text = description
+	milestone_description.text = description + ("\nNao foi possivel salvar o progresso." if save_failed else "")
 	milestone_primary.text = primary_text
 	milestone_secondary.visible = show_secondary
 	pause_button.disabled = true
@@ -217,6 +238,7 @@ func _on_milestone_secondary_pressed() -> void:
 func _on_buneko_defeated() -> void:
 	if milestone_overlay.visible or _navigation_requested or not outcome.is_empty():
 		return
+	_cancel_danger_time()
 	attempt.fail_externally()
 	_defeat_pending = true
 	level.set_simulation_suspended(true)
@@ -229,6 +251,7 @@ func _on_combat_batch_resolved(results: Array) -> void:
 		return
 	if not results.any(func(result): return bool(result.get("hit", false))):
 		return
+	_cancel_danger_time()
 	impact_pause_active = true
 	_impact_deadline_msec = Time.get_ticks_msec() + IMPACT_PAUSE_MSEC
 	_resume_after_impact = attempt != null and not paused and attempt.pause()
@@ -263,6 +286,7 @@ func _finish_defeat_presentation() -> void:
 	_restart_from_checkpoint()
 
 func _cancel_combat_presentation() -> void:
+	_cancel_danger_time()
 	impact_pause_active = false
 	defeat_presentation_active = false
 	_impact_deadline_msec = 0
@@ -289,6 +313,7 @@ func _restart_from_checkpoint() -> void:
 	attempt = null
 	paused = false
 	_cancel_combat_presentation()
+	danger_cue.reset()
 	outcome = ""
 	restart_count += 1
 	pause_button.disabled = false
@@ -296,6 +321,33 @@ func _restart_from_checkpoint() -> void:
 	_start_attempt(program)
 	last_restart_position = buneko.position
 	status_label.text = "Checkpoint restaurado: vida 10, bastao e tres inimigos reiniciados."
+
+func _update_danger_time(now_msec: int) -> void:
+	var factor: float = danger_cue.factor(now_msec)
+	if is_equal_approx(factor, 1.0):
+		_restore_danger_time()
+		return
+	if not _danger_scale_applied:
+		_time_before_danger = Engine.time_scale
+		_danger_scale_applied = true
+	Engine.time_scale = _time_before_danger * factor
+
+func _observe_danger(now_msec: int) -> void:
+	level.sensor.update_from_buneko(buneko)
+	if danger_cue.observe(level.sensor.can_see_enemy(), now_msec):
+		_update_danger_time(now_msec)
+
+func _cancel_danger_time() -> void:
+	danger_cue.cancel()
+	_restore_danger_time()
+
+func _restore_danger_time() -> void:
+	if _danger_scale_applied:
+		Engine.time_scale = _time_before_danger
+		_danger_scale_applied = false
+
+func _exit_tree() -> void:
+	_cancel_danger_time()
 
 func _fit_world() -> void:
 	var extent := Vector2(world.size)

@@ -7,14 +7,16 @@ Escopo aprovado: selecao e preparacao, laboratorio, combate corpo a corpo e save
 1. [PRD 014](prds/014-campaign-selection-and-preparation.md): selecao e preparacao com 10 RAM. Implementada e testada; selecao/mapa aprovados pelo usuario, aceite manual ampliado pendente.
 2. [PRD 015](prds/015-laboratory-escape-and-vision.md): laboratorio de dois andares, percurso de fuga e visao. Percurso implementado, integrado ao combate e validado automaticamente; roteiro manual pendente.
 3. [PRD 016](prds/016-melee-combat-and-checkpoint.md): combate, inimigos e checkpoint didatico. Implementacao automatizada integrada, incluindo rota repetivel de combate e fuga em exatamente 10 RAM; aceite manual pendente.
-4. [PRD 017](prds/017-progress-save-and-rewards.md): save persistente e recompensa unica. Planejada.
+4. [PRD 017](prds/017-progress-save-and-rewards.md): save persistente e recompensa unica. Implementacao e testes automatizados concluidos em 2026-10-20; aceite manual pendente.
 5. [PRD 018](prds/018-character-readability-and-combat-weight.md): visibilidade do Buneko, peso corporal, feedback de combate e encontros demonstraveis. Implementacao automatizada concluida; [tarefas](tasks/018-character-readability-and-combat-weight-tasks.md) de aceite manual pendentes.
 
-Ordem recomendada apos o retorno de 2026-09-14: aceitar manualmente a experiencia da 018 e os marcos da 019 antes de iniciar a 017. A numeracao existente permanece preservada. A [ADR 013](../../decisions/ADR-013-character-presentation-and-impact-timing.md) registra os contratos implementados de apresentacao/tempo que complementam 015 e 016.
+Em 2026-10-20, o usuario confirmou sua avaliacao jogavel da 018 e dos marcos da 019, pediu para encerrar essa etapa com as criticas registradas na PRD 020 e priorizou iniciar a 017. Os roteiros manuais detalhados nao foram apresentados item a item e continuam identificados nas listas. A numeracao existente permanece preservada. A [ADR 013](../../decisions/ADR-013-character-presentation-and-impact-timing.md) registra os contratos implementados de apresentacao/tempo que complementam 015 e 016.
 
-Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cerebro, entrar no laboratorio com tres inimigos, coletar o bastao, pausar para adaptar o programa, restaurar o checkpoint apos derrota e concluir repetidamente a rota integrada. Persistencia e recompensa dependem da 017.
+Cada PRD possui tarefas correspondentes. A entrega atual permite preparar o cerebro, entrar no laboratorio com tres inimigos, coletar o bastao, pausar para adaptar o programa, restaurar o checkpoint apos derrota e concluir repetidamente a rota integrada. A 017 acrescenta persistencia local e recompensa unica, ainda sem aceite manual de fechamento/reabertura e interface.
 
-A [PRD 019](prds/019-baton-pickup-and-mission-completion.md) e suas [tarefas](tasks/019-baton-pickup-and-mission-completion-tasks.md) tratam da coleta perceptivel e conclusao evidente, implementadas e validadas em 2026-09-16 com 272 testes aprovados; aceite manual pendente.
+A [PRD 019](prds/019-baton-pickup-and-mission-completion.md) e suas [tarefas](tasks/019-baton-pickup-and-mission-completion-tasks.md) tratam da coleta perceptivel e conclusao evidente, implementadas e validadas em 2026-09-16 com 272 testes aprovados; avaliacao do usuario registrada em 2026-10-20 sem evidencia do roteiro completo.
+
+A [PRD 020](prds/020-editor-zoom-map-context-and-combat-cue.md) e sua [lista de tarefas](tasks/020-editor-zoom-map-context-and-combat-cue-tasks.md) reunem tres melhorias de leitura da mesma experiencia: enquadramento do cerebro, desenho basico do mapa sob a neblina e sinal de perigo por breve desaceleracao temporal, inclusive durante fuga. Implementacao e testes automatizados concluidos em 2026-10-20, incluindo o primeiro inimigo mais distante; calibracao perceptiva e aceite manual permanecem pendentes.
 
 ## Decisoes aprovadas
 

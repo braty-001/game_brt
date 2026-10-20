@@ -20,6 +20,14 @@ func create_block(kind: int, position: Vector2 = Vector2.ZERO, condition: Progra
 		parameters = MovementPaceScript.default_parameters()
 	return EditorBlockStateScript.new(block_id, kind, position, condition, parameters)
 
+func reserve_existing_ids(block_ids: Array) -> void:
+	for block_id in block_ids:
+		if typeof(block_id) != TYPE_STRING or not block_id.begins_with("editor_block_"):
+			continue
+		var suffix: String = block_id.trim_prefix("editor_block_")
+		if suffix.is_valid_int():
+			_next_id = maxi(_next_id, suffix.to_int() + 1)
+
 func label_for_kind(kind: int) -> String:
 	return presentation_registry.presentation_for(kind).get("label", "")
 

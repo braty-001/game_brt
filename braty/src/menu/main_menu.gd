@@ -6,6 +6,7 @@ const Tokens = preload("res://src/ui/design_tokens.gd")
 const TutorialMissionScene = preload("res://scenes/tutorial/tutorial_mission.tscn")
 
 signal start_requested
+signal new_game_requested
 
 var display_settings
 var navigation_enabled := true
@@ -19,6 +20,9 @@ var resolution_selector: OptionButton
 var current_resolution_label: Label
 var apply_button: Button
 var back_button: Button
+var new_game_button: Button
+var progress_label: Label
+var new_game_dialog: ConfirmationDialog
 
 func _ready() -> void:
 	_bind_view()
@@ -46,7 +50,21 @@ func show_settings() -> void:
 func show_main_menu() -> void:
 	main_actions.visible = true
 	settings_panel.visible = false
-	start_button.grab_focus()
+	(new_game_button if start_button.disabled else start_button).grab_focus()
+
+func configure_progress(has_save: bool, invalid_save: bool) -> void:
+	start_button.text = "Continuar" if has_save else "Iniciar"
+	start_button.disabled = invalid_save
+	new_game_button.visible = has_save or invalid_save
+	if invalid_save:
+		progress_label.text = "Save ilegivel ou incompativel. O arquivo foi preservado."
+		progress_label.show()
+	else:
+		progress_label.hide()
+
+func show_progress_error(message: String) -> void:
+	progress_label.text = message
+	progress_label.show()
 
 func selected_resolution() -> Vector2i:
 	if resolution_selector.selected < 0:
@@ -75,21 +93,42 @@ func _bind_view() -> void:
 	current_resolution_label = get_node("Margin/Center/MenuCard/Page/SettingsPanel/CurrentResolutionLabel")
 	apply_button = get_node("Margin/Center/MenuCard/Page/SettingsPanel/SettingsActions/ApplyButton")
 	back_button = get_node("Margin/Center/MenuCard/Page/SettingsPanel/SettingsActions/BackButton")
+	new_game_button = Button.new()
+	new_game_button.name = "NewGameButton"
+	new_game_button.text = "Novo jogo"
+	new_game_button.custom_minimum_size.y = 48
+	new_game_button.visible = false
+	main_actions.add_child(new_game_button)
+	main_actions.move_child(new_game_button, 1)
+	progress_label = Label.new()
+	progress_label.name = "ProgressLabel"
+	progress_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	progress_label.visible = false
+	main_actions.add_child(progress_label)
+	new_game_dialog = ConfirmationDialog.new()
+	new_game_dialog.title = "Novo jogo"
+	new_game_dialog.dialog_text = "Substituir o progresso salvo e comecar uma nova campanha?"
+	new_game_dialog.ok_button_text = "Substituir progresso"
+	add_child(new_game_dialog)
 
 	start_button.pressed.connect(_on_start_pressed)
 	settings_button.pressed.connect(show_settings)
 	apply_button.pressed.connect(apply_selected_resolution)
 	back_button.pressed.connect(show_main_menu)
+	new_game_button.pressed.connect(new_game_dialog.popup_centered)
+	new_game_dialog.confirmed.connect(func(): new_game_requested.emit())
 
 func _configure_styles() -> void:
 	Tokens.apply_panel(menu_card, Color("202b31"))
 	Tokens.apply_primary_button(start_button)
 	Tokens.apply_secondary_button(settings_button)
+	Tokens.apply_secondary_button(new_game_button)
 	Tokens.apply_primary_button(apply_button)
 	Tokens.apply_secondary_button(back_button)
 	get_node("Margin/Center/MenuCard/Page/Subtitle").add_theme_color_override("font_color", Tokens.TEXT_MUTED)
 	get_node("Margin/Center/MenuCard/Page/SettingsPanel/SettingsHint").add_theme_color_override("font_color", Tokens.TEXT_MUTED)
 	current_resolution_label.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
+	progress_label.add_theme_color_override("font_color", Tokens.ERROR)
 
 func _populate_resolutions() -> void:
 	resolution_selector.clear()

@@ -1,6 +1,6 @@
 # PRD 018: Visibilidade do Buneko, peso corporal e clareza do combate
 
-Status: implementacao corrigida e revalidada em 2026-09-16, com verificacao grafica por roteiro nas tres resolucoes; aceite perceptivo do usuario e roteiro manual ampliado permanecem pendentes. Os parametros de apresentacao abaixo permanecem ajustaveis no aceite.
+Status: implementacao corrigida e revalidada em 2026-09-16. Em 2026-10-20, o usuario confirmou que ja avaliou a experiencia jogavel, aceitou encerrar esta frente e registrou novas criticas na PRD 020. O roteiro manual detalhado de 018-09 nao foi apresentado nesta conversa e permanece sem evidencia item a item; nao o contabilizar como executado.
 
 Tarefas: [018-character-readability-and-combat-weight-tasks.md](../tasks/018-character-readability-and-combat-weight-tasks.md).
 

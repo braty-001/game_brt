@@ -28,3 +28,13 @@ func test_center_restores_default_viewport() -> void:
 	assert_true(viewport.center())
 	assert_eq(viewport.zoom, viewport.DEFAULT_ZOOM)
 	assert_eq(viewport.pan, Vector2.ZERO)
+
+func test_frame_fits_large_graph_and_preserves_small_graph_default() -> void:
+	var viewport = ViewportControllerScript.new()
+	assert_false(viewport.frame(Rect2(0, 0, 360, 250), Vector2(800, 500)))
+	assert_eq(viewport.zoom, 1.0)
+	assert_eq(viewport.pan, Vector2.ZERO)
+	assert_true(viewport.frame(Rect2(0, 0, 1200, 600), Vector2(800, 500)))
+	assert_almost_eq(viewport.zoom, 0.613333333, 0.0001)
+	assert_gte(viewport.world_to_viewport(Vector2.ZERO).x, 32.0)
+	assert_lte(viewport.world_to_viewport(Vector2(1200, 600)).x, 800.0)

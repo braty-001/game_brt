@@ -37,7 +37,7 @@ func test_reference_reaches_exit_ten_times_using_real_physics() -> void:
 				break
 		assert_eq(mission.outcome, "escaped", "run=%s pos=%s block=%s" % [run, mission.buneko.position, mission.attempt.runtime.last_executed_block_id])
 		assert_true(mission.milestone_overlay.visible)
-		assert_eq(mission.milestone_description.text, "Voce escapou do laboratorio.")
+		assert_true(mission.milestone_description.text.begins_with("Voce escapou do laboratorio.\n+10 moedas"))
 		assert_true(climbed_right)
 		assert_true(turned_left)
 		assert_eq(mission.attempt.runtime.state, RuntimeState.Value.COMPLETED)

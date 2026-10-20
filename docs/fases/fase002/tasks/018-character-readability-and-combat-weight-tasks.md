@@ -1,6 +1,6 @@
 # Tarefas: PRD 018 - Visibilidade do Buneko, peso corporal e clareza do combate
 
-Status geral: implementacao corrigida e revalidada em 2026-09-16, com verificacao grafica por roteiro nas tres resolucoes; aceite perceptivo do usuario e roteiro manual ampliado pendentes em 018-09.
+Status geral: implementacao corrigida e revalidada em 2026-09-16; usuario encerrou a avaliacao perceptiva em 2026-10-20 com criticas encaminhadas a PRD 020. O roteiro manual ampliado de 018-09 nao possui evidencia item a item e suas caixas continuam abertas.
 
 Fonte de verdade: [PRD 018](../prds/018-character-readability-and-combat-weight.md). Contratos transversais implementados: [ADR 013](../../../decisions/ADR-013-character-presentation-and-impact-timing.md).
 
@@ -119,7 +119,7 @@ Revalidacao autorizada em 2026-09-16:
 - [ ] Se ainda houver flutuacao, registrar proposta posterior de aceleracao, gravidade ou recuo fisico com impactos em percurso/10 RAM; nao implementar essa segunda calibracao implicitamente.
 - [ ] Registrar data, resolucao, cenarios, parametros finais, defeitos restantes e aceite do usuario. Concluir somente quando CA-01 a CA-08 estiverem atendidos.
 
-Criterio de conclusao ainda pendente: experiencia aceita pelo usuario, com evidencias manuais. Dependencia: 018-08. Risco: encobrir um problema de fisica com efeitos ou encerrar sem validar percepcao real.
+Criterio de conclusao: o usuario confirmou sua avaliacao perceptiva em 2026-10-20 e pediu encerramento desta etapa. O registro nao comprova as dez tentativas nem cada cenario do roteiro ampliado; essas verificacoes permanecem sem evidencia e nao bloqueiam a priorizacao da PRD 017 por decisao do usuario.
 
 ## Revalidacao de 2026-09-16
 

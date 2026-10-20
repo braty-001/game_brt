@@ -15,7 +15,7 @@ func _init(include_combat := false) -> void:
 func entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = [{"id": Example.ROUTE, "label": "Percurso do laboratorio"}]
 	if combat_available:
-		result.append({"id": Example.MELEE, "label": "Combate: atacar ate derrubar"})
+		result.append({"id": Example.MELEE, "label": "Combate: aproximar e atacar"})
 		result.append({"id": Example.COMBAT_ROUTE, "label": "Combate + fuga / 10 RAM"})
 	return result
 
@@ -54,14 +54,12 @@ func _build_route_program():
 
 func _build_melee_program():
 	var program := ProgramDefinition.new()
-	program.start_block_id = "fight"
-	_control(program, "fight", ConditionCatalog.Query.ENEMY_VISIBLE)
-	_action(program, "approach_enemy", ProgramBlockKind.Value.WALK)
-	_control(program, "enemy_in_range", ConditionCatalog.Query.ENEMY_IN_MELEE_RANGE)
+	program.start_block_id = "approach"
+	_control(program, "approach", ConditionCatalog.Query.PATH_CLEAR_AHEAD)
+	_action(program, "walk_in", ProgramBlockKind.Value.WALK, true)
 	_action(program, "strike", ProgramBlockKind.Value.ATTACK)
-	program.add_connection(ProgramConnection.new("fight", "body", "approach_enemy"))
-	program.add_connection(ProgramConnection.new("approach_enemy", "next", "enemy_in_range"))
-	program.add_connection(ProgramConnection.new("enemy_in_range", "body", "strike"))
+	program.add_connection(ProgramConnection.new("approach", "body", "walk_in"))
+	program.add_connection(ProgramConnection.new("walk_in", "next", "strike"))
 	return program
 
 func _build_combat_route_program():

@@ -3,6 +3,7 @@ extends Node2D
 
 var vision
 var world_extent := 2200.0
+var known_solids: Array[Rect2] = []
 var _last_origin := Vector2.INF
 var _last_facing_direction := 0
 
@@ -29,6 +30,7 @@ func _draw() -> void:
 			continue
 		draw_colored_polygon(PackedVector2Array([first, outer_first, outer_second, second]), Color("080e13"))
 	_draw_outside_cone()
+	_draw_known_structure()
 
 func _draw_outside_cone() -> void:
 	var forward_angle := 0.0 if vision.facing_direction >= 0 else PI
@@ -44,3 +46,19 @@ func _draw_outside_cone() -> void:
 			PackedVector2Array([vision.origin, outer_first, outer_second]),
 			Color("080e13")
 		)
+
+func _draw_known_structure() -> void:
+	var outline := Color("3a6570")
+	for rect in known_solids:
+		_draw_hidden_edge(rect.position, Vector2(rect.end.x, rect.position.y), Vector2.UP, outline)
+		_draw_hidden_edge(Vector2(rect.end.x, rect.position.y), rect.end, Vector2.RIGHT, outline)
+		_draw_hidden_edge(rect.end, Vector2(rect.position.x, rect.end.y), Vector2.DOWN, outline)
+		_draw_hidden_edge(Vector2(rect.position.x, rect.end.y), rect.position, Vector2.LEFT, outline)
+
+func _draw_hidden_edge(from: Vector2, to: Vector2, outside: Vector2, color: Color) -> void:
+	var parts := maxi(1, ceili(from.distance_to(to) / 12.0))
+	for index in parts:
+		var first := from.lerp(to, float(index) / parts)
+		var last := from.lerp(to, float(index + 1) / parts)
+		if not vision.can_see((first + last) * 0.5 + outside * 2.0):
+			draw_line(first, last, color, 2.0, true)

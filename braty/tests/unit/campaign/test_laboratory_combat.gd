@@ -86,7 +86,7 @@ func test_checkpoint_editor_unlocks_only_combat_capabilities_and_example() -> vo
 	assert_eq(after.brain_editor.example_selector.item_count, 3)
 	assert_true(after.brain_editor.load_example(Examples.Example.MELEE))
 	var snapshot = after.brain_editor.capture_snapshot()
-	assert_eq(snapshot.ram, "4/10 RAM")
+	assert_eq(snapshot.ram, "3/10 RAM")
 	assert_true(snapshot.is_valid)
 	assert_true(snapshot.program.blocks.values().any(func(block): return block.kind == ProgramBlockKind.Value.ATTACK))
 
@@ -524,11 +524,32 @@ func test_laboratory_declares_enemy_spawns_and_preserves_patrol_configuration() 
 	add_child_autofree(level)
 	var spawn_points := level.get_node("EnemySpawns").get_children()
 	assert_eq(spawn_points.size(), 3)
-	assert_eq(spawn_points[0].global_position, Vector2(300, 594))
+	assert_eq(spawn_points[0].global_position, Vector2(520, 594))
+	assert_gt(spawn_points[0].global_position.x - level.get_node("Checkpoint").position.x - spawn_points[0].patrol_left_distance, 240.0)
 	assert_eq(spawn_points[0].patrol_left_distance, 50.0)
 	assert_eq(spawn_points[0].patrol_right_distance, 420.0)
 	assert_eq(spawn_points[0].initial_direction, -1)
 	assert_eq(spawn_points[2].initial_direction, -1)
+
+func test_danger_cue_uses_buneko_vision_and_restores_previous_time_scale() -> void:
+	var mission = _checkpoint_mission(Examples.new(true).build_program(Examples.Example.COMBAT_ROUTE))
+	var enemy = mission.level.enemies[0]
+	enemy.position = Vector2(350, 594)
+	mission.buneko.face_direction(-1)
+	mission._observe_danger(1000)
+	assert_eq(Engine.time_scale, 10.0)
+	assert_false(mission.danger_cue.was_visible)
+	mission.buneko.face_direction(1)
+	mission._observe_danger(1100)
+	assert_true(mission.danger_cue.was_visible)
+	assert_eq(Engine.time_scale, 4.0)
+	mission.toggle_pause()
+	assert_eq(Engine.time_scale, 10.0)
+	mission._observe_danger(1200)
+	assert_eq(Engine.time_scale, 10.0)
+	mission.queue_free()
+	await get_tree().process_frame
+	assert_eq(Engine.time_scale, 10.0)
 
 func test_audio_uses_confirmed_events_and_hides_unseen_enemy_actions() -> void:
 	var level = LevelScene.instantiate()
@@ -555,6 +576,7 @@ func test_ground_enemy_autonomously_detects_and_deals_exactly_two_damage() -> vo
 	var level = LevelScene.instantiate()
 	add_child_autofree(level)
 	var buneko = level.spawn(BaseBunekoParts.complete_assembly(), true)
+	level.enemies[0].position = Vector2(300, 594)
 	watch_signals(level.enemies[0])
 	buneko.position = Vector2(180, 594)
 	for frame in 480:
@@ -569,6 +591,7 @@ func test_started_enemy_strike_misses_when_buneko_jumps_out_of_range() -> void:
 	add_child_autofree(level)
 	var buneko = level.spawn(BaseBunekoParts.complete_assembly(), true)
 	var enemy = level.enemies[0]
+	enemy.position = Vector2(300, 594)
 	buneko.position = Vector2(180, 594)
 	watch_signals(enemy)
 	for frame in 480:

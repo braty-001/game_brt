@@ -23,8 +23,10 @@ signal buneko_defeated
 signal combat_batch_resolved(results: Array)
 
 func _ready() -> void:
-	sensor.configure(solid_rectangles(), $Exit.position)
+	var rectangles := solid_rectangles()
+	sensor.configure(rectangles, $Exit.position)
 	$Fog.vision = sensor.vision
+	$Fog.known_solids = rectangles
 	_combat_vision.occluders = sensor.solids
 	_combat_resolver.batch_resolved.connect(_on_combat_batch_resolved)
 	combat_audio = CombatAudioScript.new()

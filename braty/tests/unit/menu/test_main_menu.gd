@@ -65,6 +65,25 @@ func test_menu_card_fits_inside_smallest_supported_viewport() -> void:
 	assert_lte(card_rect.end.x, 960.0)
 	assert_lte(card_rect.end.y, 540.0)
 
+func test_saved_progress_and_error_actions_fit_smallest_viewport() -> void:
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(960, 540)
+	add_child_autofree(viewport)
+	var menu = MainMenuScene.instantiate()
+	menu.configure_display_settings(DisplaySettingsScript.new(TEST_CONFIG_PATH))
+	menu.set_navigation_enabled(false)
+	viewport.add_child(menu)
+	menu.configure_progress(true, false)
+	await get_tree().process_frame
+	assert_eq(menu.start_button.text, "Continuar")
+	assert_true(menu.new_game_button.visible)
+	assert_lte(menu.menu_card.get_global_rect().end.y, 540.0)
+	menu.configure_progress(false, true)
+	await get_tree().process_frame
+	assert_true(menu.start_button.disabled)
+	assert_true(menu.new_game_button.visible)
+	assert_lte(menu.menu_card.get_global_rect().end.y, 540.0)
+
 func _create_menu():
 	var menu = MainMenuScene.instantiate()
 	menu.configure_display_settings(DisplaySettingsScript.new(TEST_CONFIG_PATH))

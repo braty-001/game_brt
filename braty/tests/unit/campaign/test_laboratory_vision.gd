@@ -3,6 +3,7 @@ extends GutTest
 const Vision = preload("res://src/campaign/laboratory/occluded_vision.gd")
 const Sensor = preload("res://src/campaign/laboratory/laboratory_world_sensor.gd")
 const Fog = preload("res://src/campaign/laboratory/laboratory_fog.gd")
+const LevelScene = preload("res://scenes/campaign/laboratory_level.tscn")
 const Reader = preload("res://src/buneko/runtime/buneko_sensor_reader.gd")
 const Selector = preload("res://src/brain_editor/condition_selector.gd")
 const Examples = preload("res://src/campaign/laboratory/laboratory_example_provider.gd")
@@ -77,6 +78,14 @@ func test_fog_tracks_position_and_direction_changes() -> void:
 	fog._process(0.0)
 	assert_eq(fog._last_origin, Vector2(20, 30))
 	assert_eq(fog._last_facing_direction, -1)
+
+func test_known_map_outline_uses_only_solid_collision_geometry() -> void:
+	var level = LevelScene.instantiate()
+	add_child_autofree(level)
+	var fog = level.get_node("Fog")
+	assert_eq(fog.known_solids, level.sensor.solids)
+	assert_eq(fog.known_solids.size(), level.get_node("Solids").get_child_count())
+	assert_false(fog.known_solids.has(level.exit_rect()))
 
 func test_step_support_gap_and_direction_are_distinct() -> void:
 	var sensor = Sensor.new()

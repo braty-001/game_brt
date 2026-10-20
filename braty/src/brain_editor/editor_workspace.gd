@@ -10,6 +10,7 @@ var viewport_controller = ViewportControllerScript.new()
 var canvas: Control
 var navigation_enabled := false
 var _panning := false
+var automatic_framing := true
 
 signal viewport_changed(zoom_label: String)
 
@@ -24,21 +25,35 @@ func _notification(what: int) -> void:
 		if canvas != null and canvas.anchor_left == canvas.anchor_right and canvas.anchor_top == canvas.anchor_bottom:
 			canvas.size = size
 		queue_redraw()
+		frame_graph()
 
 func add_block_node(block_node: Control) -> void:
 	_ensure_canvas()
 	canvas.add_child(block_node)
 
 func zoom_in() -> void:
+	automatic_framing = false
 	if viewport_controller.zoom_in():
 		_apply_viewport()
 
 func zoom_out() -> void:
+	automatic_framing = false
 	if viewport_controller.zoom_out():
 		_apply_viewport()
 
 func center_viewport() -> void:
-	if viewport_controller.center():
+	automatic_framing = true
+	frame_graph()
+
+func frame_graph() -> void:
+	if not automatic_framing or size.x <= 0.0 or size.y <= 0.0:
+		return
+	var bounds := Rect2(Vector2.ZERO, Vector2(152, 102))
+	for block_node in connection_block_nodes.values():
+		if is_instance_valid(block_node):
+			var extent := Vector2(maxf(block_node.size.x, block_node.custom_minimum_size.x), maxf(block_node.size.y, block_node.custom_minimum_size.y))
+			bounds = bounds.merge(Rect2(block_node.position, extent))
+	if viewport_controller.frame(bounds, size):
 		_apply_viewport()
 
 func set_navigation_enabled(enabled: bool) -> void:
@@ -63,6 +78,7 @@ func configure_connections(graph_state, block_nodes: Dictionary) -> void:
 	connection_graph_state = graph_state
 	connection_block_nodes = block_nodes
 	queue_redraw()
+	frame_graph()
 
 func visible_connection_count() -> int:
 	if connection_graph_state == null:
@@ -112,6 +128,7 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 	elif event is InputEventMouseMotion and _panning:
 		if viewport_controller.pan_by(event.relative):
+			automatic_framing = false
 			_apply_viewport()
 		accept_event()
 

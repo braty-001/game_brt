@@ -475,6 +475,25 @@ func test_zoom_buttons_change_only_the_viewport() -> void:
 	editor.center_view_button.pressed.emit()
 	assert_eq(editor.zoom_label_button.text, "100%")
 
+func test_automatic_framing_respects_manual_zoom_until_frame_button() -> void:
+	var editor = await _ready_editor()
+	var first = editor.create_block(BlockKind.Value.WALK, Vector2(1200, 400))
+	await get_tree().process_frame
+	assert_lt(editor.workspace.viewport_controller.zoom, 1.0)
+	editor.zoom_in_button.pressed.emit()
+	var manual_zoom: float = editor.workspace.viewport_controller.zoom
+	assert_false(editor.workspace.automatic_framing)
+	var second = editor.create_block(BlockKind.Value.TURN, Vector2(1450, 480))
+	await get_tree().process_frame
+	assert_eq(editor.workspace.viewport_controller.zoom, manual_zoom)
+	editor.center_view_button.pressed.emit()
+	assert_true(editor.workspace.automatic_framing)
+	assert_lt(editor.workspace.viewport_controller.zoom, manual_zoom)
+	assert_true(editor._remove_block(second.block_id))
+	assert_true(editor._remove_block(first.block_id))
+	await get_tree().process_frame
+	assert_eq(editor.workspace.viewport_controller.zoom, 1.0)
+
 func test_pseudocode_panel_reads_the_current_graph_without_editing_it() -> void:
 	var editor = await _ready_editor()
 	assert_true(editor.load_example(TutorialReferenceProgramScript.Example.WHILE_PATH_CLEAR))

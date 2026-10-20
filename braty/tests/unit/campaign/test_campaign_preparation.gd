@@ -109,6 +109,7 @@ func test_briefing_and_preparation_fit_supported_viewports() -> void:
 		viewport.add_child(selection)
 		for frame in 6:
 			await get_tree().process_frame
+		_assert_inside(selection.balance_label, target)
 		_assert_inside(selection.prepare_button, target)
 		_assert_inside(selection.menu_button, target)
 		_assert_inside(selection.get_node("Margin/Page/Briefing/Content/MapColumn/Minimap"), target)

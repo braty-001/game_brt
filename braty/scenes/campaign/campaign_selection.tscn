@@ -46,6 +46,12 @@ theme_override_font_sizes/font_size = 24
 text = "CAMPANHA"
 autowrap_mode = 2
 
+[node name="BalanceLabel" type="Label" parent="Margin/Page/Header"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 16
+text = "Saldo: 0 moedas"
+
 [node name="MenuButton" type="Button" parent="Margin/Page/Header"]
 layout_mode = 2
 size_flags_vertical = 4
@@ -121,7 +127,7 @@ autowrap_mode = 2
 [node name="Availability" type="Label" parent="Margin/Page/Briefing"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Percurso disponivel para teste. Bastao, inimigos, checkpoint e recompensa chegam nas proximas entregas."
+text = "Missao disponivel. Prepare o cerebro e entre no laboratorio."
 autowrap_mode = 2
 
 [node name="Actions" type="HBoxContainer" parent="Margin/Page/Briefing"]

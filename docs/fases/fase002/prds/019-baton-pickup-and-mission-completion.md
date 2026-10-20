@@ -1,6 +1,6 @@
 # PRD 019: Coleta do bastao e conclusao perceptiveis
 
-Status: implementado e validado automaticamente em 2026-09-16; aceite manual pendente (019-05).
+Status: implementado e validado automaticamente em 2026-09-16. Em 2026-10-20, o usuario confirmou que ja avaliou o fluxo jogavel e pediu encerramento desta etapa, com criticas encaminhadas a PRD 020. O roteiro detalhado de 019-05 nao foi apresentado item a item nesta conversa.
 
 ## Problema e objetivo
 

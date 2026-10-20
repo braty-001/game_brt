@@ -30,6 +30,7 @@ const SPAWN_OFFSET := Vector2(24, 82)
 signal attempt_requested
 signal back_to_assembly_requested
 signal summary_changed(ram: String, status: String, is_valid: bool)
+signal draft_changed
 
 var graph_state
 var block_factory
@@ -318,6 +319,7 @@ func load_example(example_id := -1) -> bool:
 	_reset_graph_state()
 	load_graph_state(example_graph)
 	select_block(graph_state.start_block_id)
+	draft_changed.emit()
 
 	connection_feedback_label.text = "Exemplo carregado. Mova os blocos e observe as conexoes."
 	connection_feedback_label.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
@@ -325,6 +327,7 @@ func load_example(example_id := -1) -> bool:
 
 func reset_brain() -> void:
 	_reset_graph_state()
+	draft_changed.emit()
 	connection_feedback_label.text = "Cerebro zerado"
 	connection_feedback_label.add_theme_color_override("font_color", Tokens.TEXT_MUTED)
 	refresh_panels()
@@ -553,6 +556,7 @@ func _on_example_pressed() -> void:
 	load_example(int(example_selector.get_selected_metadata()))
 
 func _on_block_node_moved(block_id: String, new_position: Vector2) -> void:
+	workspace.automatic_framing = false
 	command_controller.move_block(block_id, new_position)
 
 func _on_remove_block_requested(block_id: String) -> void:
@@ -644,6 +648,7 @@ func organize_program() -> void:
 			block_nodes[block_id].move_to(positions[block_id])
 	is_sync_suspended = false
 	_sync_editor_from_graph_state()
+	draft_changed.emit()
 
 func _configure_graph_state() -> void:
 	if graph_state == null or command_controller == null:
@@ -656,11 +661,14 @@ func _replace_graph_state(next_graph_state) -> void:
 	if graph_state != null and graph_state.changed.is_connected(_on_graph_state_changed):
 		graph_state.changed.disconnect(_on_graph_state_changed)
 	graph_state = next_graph_state
+	if block_factory != null:
+		block_factory.reserve_existing_ids(graph_state.blocks.keys())
 	_configure_graph_state()
 
 func _on_graph_state_changed(_change: int, _affected_block_ids: PackedStringArray) -> void:
 	if not is_sync_suspended:
 		_sync_editor_from_graph_state()
+		draft_changed.emit()
 
 func _sync_editor_from_graph_state() -> void:
 	if workspace == null:

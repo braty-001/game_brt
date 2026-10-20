@@ -1,6 +1,6 @@
 # Tarefas: PRD 019 - Coleta do bastao e conclusao perceptiveis
 
-Status: 019-01 a 019-04 concluidas em 2026-09-16; 019-05 (aceite manual) pendente.
+Status: 019-01 a 019-04 concluidas em 2026-09-16; usuario encerrou sua avaliacao manual em 2026-10-20. As caixas do roteiro 019-05 continuam abertas por falta de evidencia item a item.
 
 Fonte de verdade: [PRD 019](../prds/019-baton-pickup-and-mission-completion.md).
 
@@ -35,6 +35,8 @@ Fonte de verdade: [PRD 019](../prds/019-baton-pickup-and-mission-completion.md).
 - [x] Atualizar status/documentacao com numeros e limites da evidencia obtida.
 
 ## 019-05 - Aceite manual
+
+Em 2026-10-20, o usuario informou que ja jogou e avaliou o funcionamento, pediu para encerrar esta etapa e indicou as melhorias reunidas na PRD 020. Isso registra o aceite de seguir para a PRD 017, sem afirmar que cada resolucao, escolha e metodo de entrada abaixo foi verificado. As caixas permanecem abertas como historico da evidencia nao fornecida.
 
 - [ ] Obter nova autorizacao antes de abrir/focar janela, capturar imagens ou interagir com GUI.
 - [ ] Em 960x540, 1440x810 e 1600x900: coletar, ler sem pressa, confirmar com mouse/teclado e retomar com bastao.

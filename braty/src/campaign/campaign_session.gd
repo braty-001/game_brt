@@ -9,6 +9,8 @@ var graph_state
 var preparation_confirmed := false
 var baton_checkpoint_active := false
 var baton_checkpoint_intro_seen := false
+var money := 0
+var laboratory_first_completed := false
 
 func complete_tutorial(completed_assembly, completed_graph) -> void:
 	if tutorial_completed:
@@ -47,3 +49,10 @@ func activate_baton_checkpoint() -> bool:
 	baton_checkpoint_intro_seen = true
 	preparation_confirmed = false
 	return first_activation
+
+func complete_laboratory() -> bool:
+	if laboratory_first_completed:
+		return false
+	laboratory_first_completed = true
+	money += 10
+	return true
