@@ -1,5 +1,7 @@
 # ADR 014: Liberdade de programacao com complexidade opcional
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: diretriz aprovada pelo usuario em 2026-09-16; capacidades futuras ainda nao implementadas.
 
 ## Decisao

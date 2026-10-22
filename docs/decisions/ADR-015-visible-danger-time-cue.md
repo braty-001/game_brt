@@ -1,5 +1,7 @@
 # ADR 015: Sinal temporal de perigo visivel
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: implementada na PRD 020 em 2026-10-20; calibracao perceptiva pelo usuario pendente.
 
 ## Decisao

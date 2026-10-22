@@ -1,5 +1,7 @@
 # Tarefas: PRD 006 - Experiencia Visual de Montagem e Programacao
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementado para validacao manual. Tema, montagem visual, editor reorganizado e tentativa real estao integrados; falta executar o roteiro manual completo de falha/conclusao e revisar qualitativamente o comportamento do brain editor.
 
 ## Ordem de implementacao

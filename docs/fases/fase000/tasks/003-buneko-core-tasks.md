@@ -1,5 +1,7 @@
 # Tarefas: PRD 003 - Buneko Basico, Montagem e Fisica
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: concluido. PRDs 001 e 002 ja entregam o dominio da linguagem e do executor; esta PRD adicionou o nucleo do Buneko, a montagem basica e a ponte entre runtime e fisica.
 
 ## Ordem de implementacao

@@ -1,5 +1,7 @@
 # Fundacao do Projeto Buneko
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Proposito
 
 Buneko e um jogo 2D de plataforma em que o jogador construi e programa um Buneko para cumprir missoes. O jogador nao controla o personagem durante a fase: ele cria o programa, inicia a execucao e observa o resultado, ajustando a construcao ou a logica quando necessario.
@@ -48,6 +50,10 @@ Aplicar SOLID de forma pratica, sem criar camadas artificiais:
 Cada fase fica em `docs/fases/faseNNN/`, com PRDs em `prds/` e listas correspondentes em `tasks/`. Exemplo: `docs/fases/fase000/prds/004-brain-editor.md` e `docs/fases/fase000/tasks/004-brain-editor-tasks.md`.
 
 Uma PRD descreve problema, experiencia do jogador, escopo, regras, criterios de aceite, riscos e limites. A lista de tarefas traduz essa definicao em trabalho executavel, com dependencias, status, criterio de conclusao e testes exigidos. Nenhuma PRD ou lista deve ser criada apenas para preencher estrutura: elas surgem quando o trabalho precisa delas.
+
+## Integracao obrigatoria com Godot MCP
+
+O desenvolvimento, a investigacao e a validacao do Godot assistidos por agentes devem usar o servidor `godot` de Coding-Solo/godot-mcp. A [ADR 016](decisions/ADR-016-required-godot-mcp.md) registra a decisao transversal; o [guia operacional](godot-mcp.md) define configuracao, verificacao inicial, limites e tratamento de indisponibilidade. A regra vale para todas as fases e futuras tarefas, sem transformar evidencias anteriores em validacoes via MCP.
 
 ## Testes
 

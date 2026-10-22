@@ -1,5 +1,7 @@
 # Tarefas: PRD 008 - Brain e Movimento Responsivo
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: o experimento B foi consolidado como contrato final. `Correr` foi substituido por `Andar` com ritmo `normal` ou `rapido`; a fisica conserva inercia com desaceleracao no chao e momentum no ar. Programas que terminam antes do objetivo encerram a tentativa com feedback. A migracao automatizada esta concluida; falta validar manualmente a sensacao.
 
 ## Ordem de implementacao

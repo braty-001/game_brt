@@ -1,5 +1,7 @@
 # Tarefas: PRD 018 - Visibilidade do Buneko, peso corporal e clareza do combate
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementacao corrigida e revalidada em 2026-09-16; usuario encerrou a avaliacao perceptiva em 2026-10-20 com criticas encaminhadas a PRD 020. O roteiro manual ampliado de 018-09 nao possui evidencia item a item e suas caixas continuam abertas.
 
 Fonte de verdade: [PRD 018](../prds/018-character-readability-and-combat-weight.md). Contratos transversais implementados: [ADR 013](../../../decisions/ADR-013-character-presentation-and-impact-timing.md).

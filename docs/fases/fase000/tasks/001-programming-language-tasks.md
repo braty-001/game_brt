@@ -1,5 +1,7 @@
 # Tarefas: PRD 001 - Linguagem de Programacao por Blocos
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: concluido. A revisao de integracao com o prototipo do editor foi concluida na PRD 004 sem alterar a semantica da linguagem.
 
 Evolucao de capacidade na PRD 014: validacao recebe limite explicito, com padrao 5 e campanha 10; cobertura e aceite adicionais ficam nas tarefas 014.

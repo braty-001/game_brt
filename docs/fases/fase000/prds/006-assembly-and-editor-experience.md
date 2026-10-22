@@ -1,5 +1,7 @@
 # PRD 006: Experiencia Visual de Montagem e Programacao
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Transformar a montagem e a programacao do Buneko em uma experiencia visual compreensivel, agradavel e diretamente ligada ao personagem. O jogador deve perceber que esta construindo um robo, instalando um cerebro e ensinando esse cerebro a agir, em vez de apenas clicar em botoes de uma ferramenta de debug.

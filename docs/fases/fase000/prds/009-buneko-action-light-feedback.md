@@ -1,5 +1,7 @@
 # PRD 009: Sinal Luminoso de Acao do Buneko
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Substituir o modo `Acompanhar` por um feedback visual imediato e nao intrusivo no Buneko. Durante uma tentativa normal, o jogador deve perceber quando o brain muda o comportamento do personagem sem pausar a fisica, ler mensagens de depuracao ou clicar em `NEXT`.

@@ -1,5 +1,7 @@
 # Tarefas: PRD 020 - Enquadramento do cerebro, contexto do mapa e sinal de perigo
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementacao e testes automatizados concluidos em 2026-10-20; aceite perceptivo manual pendente.
 
 Fonte de verdade: [PRD 020](../prds/020-editor-zoom-map-context-and-combat-cue.md). Complementa PRDs 004, 015, 016 e 018; nao substitui seus aceites manuais pendentes. PRD 017 permanece separada.

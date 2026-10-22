@@ -1,5 +1,7 @@
 # Tarefas: PRD 014 - Selecao e preparacao
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementacao e validacao automatizada concluidas em 2026-09-09; aceite manual pendente.
 
 - [x] Registrar escopo e ADR 010 antes do codigo.

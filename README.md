@@ -1,5 +1,7 @@
 # Buneko
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](docs/godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Jogo 2D de plataforma e programação feito em **Godot 4.4.1 com GDScript**. Você monta um Buneko, programa seu cérebro com blocos e observa como ele resolve a missão. O personagem executa o programa: o jogador ajusta a lógica e a montagem entre as tentativas.
 
 ## Como funciona
@@ -77,6 +79,12 @@ Execute os comandos a partir da raiz do repositório. A raiz do projeto Godot é
 O Buneko só percebe o que está dentro de sua visão frontal e sem bloqueio por paredes ou pisos. Considere a direção para a qual ele está virado ao programar condições de visão.
 
 **Progresso da sessão:** o save persistente ainda não foi implementado. Não conte com a recuperação da campanha ou do checkpoint depois de fechar o jogo.
+
+## Desenvolvimento com agentes
+
+O **Godot MCP e obrigatorio** para desenvolvimento e validacao do Godot assistidos por agentes. Configure o servidor `godot` e confirme `get_godot_version` e `get_project_info` antes de trabalhar no motor. Consulte o [guia de instalacao e uso](docs/godot-mcp.md) e a [ADR 016](docs/decisions/ADR-016-required-godot-mcp.md).
+
+Essa integracao e uma ferramenta de desenvolvimento; executar o jogo como jogador e rodar a suite GUT no CI continuam usando Godot diretamente.
 
 ## Testes
 

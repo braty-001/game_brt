@@ -1,5 +1,7 @@
 # PRD 012: Estabilizacao da Arquitetura do MVP
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: concluida em 2026-09-04; validacao automatizada e smoke test visual aprovados.
 
 ## Problema

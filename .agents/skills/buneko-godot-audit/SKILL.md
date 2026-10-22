@@ -5,6 +5,8 @@ description: Audit the Buneko Godot project for architecture, documentation drif
 
 # Buneko Godot Audit
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../docs/godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Produce an evidence-based assessment of the current checkout. Treat an audit as read-only unless the user separately authorizes changes.
 
 ## Load project context
@@ -14,6 +16,10 @@ Produce an evidence-based assessment of the current checkout. Treat an audit as 
 3. Read applicable records in `docs/decisions/`.
 4. Confirm that the Godot root is `braty/` and that `braty/project.godot` exists.
 5. Inspect `git status` before other work and preserve all unrelated user changes.
+
+## Verify the required Godot MCP
+
+Follow `docs/godot-mcp.md` and ADR 016. Call `get_godot_version` and `get_project_info` for the absolute `braty/` path before Godot investigation. Record availability and results. If unavailable, report the blocker; read-only repository inspection may continue but cannot establish MCP validation. Use supported MCP diagnostics within the authorized scope, inspect both `output` and `errors`, and retain the separate headless, GUT, and manual checks below. GUI operations still require fresh authorization.
 
 ## Map the current state
 

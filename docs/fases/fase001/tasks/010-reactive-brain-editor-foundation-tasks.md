@@ -1,5 +1,7 @@
 # Tarefas: PRD 010 - Fundacao Reativa do Editor de Cerebro
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementacao e validacao automatizada concluidas. A fundacao reativa e a view dedicada estao integradas; falta concluir o roteiro manual.
 
 A PRD 012 complementa esta fundacao ao tornar operacoes compostas atomicas e restringir as mutacoes ao controlador de comandos.

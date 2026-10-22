@@ -1,5 +1,7 @@
 # ADR 010: Campanha, capacidades e checkpoint didatico
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Decisao
 
 RAM e contexto do Buneko fornecido pela composicao ao editor e runtime, nao propriedade editavel do programa nem limite global mutavel. Tutorial usa 5; primeira missao fornece 10 antes da entrada. Painel, validacao, pseudocodigo e runtime recebem o mesmo limite. Cada bloco alcancavel custa 1.

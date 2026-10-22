@@ -1,5 +1,7 @@
 # ADR 001: Modelo inicial de RAM
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Decisao
 
 O cerebro do Buneko inicia com 5 unidades de RAM. Cada bloco presente no programa consome 1 unidade de RAM.

@@ -1,5 +1,7 @@
 # ADR 007: Godot and testing stack
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Decisao
 
 O projeto usa Godot 4.4.1 com GDScript. Os testes automatizados usam GUT 9.4.0, instalado em `braty/addons/gut`.

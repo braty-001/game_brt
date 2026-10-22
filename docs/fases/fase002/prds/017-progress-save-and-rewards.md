@@ -1,5 +1,7 @@
 # PRD 017: Save de progresso e recompensas
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: implementacao e validacao automatizada concluidas em 2026-10-20; aceite manual de fechamento/reabertura, interface e recompensa pendente. O usuario priorizou a entrega apos sua avaliacao jogavel das PRDs 018/019 e confirmou o plano e as escolhas do menu/saldo antes da implementacao.
 
 ## Objetivo e dados

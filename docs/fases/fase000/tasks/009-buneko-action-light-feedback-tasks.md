@@ -1,5 +1,7 @@
 # Tarefas: PRD 009 - Sinal Luminoso de Acao do Buneko
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementado para validacao visual. Acompanhar e `NEXT` foram removidos; a cabeca do Buneko recebe pulsos luminosos por mudanca de acao e recusa. Falta validar manualmente contraste e ritmo na fase.
 
 ## Ordem de implementacao

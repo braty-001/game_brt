@@ -1,5 +1,7 @@
 # Tarefas: PRD 005 - Fase Tutorial
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementado para o MVP funcional. Testes automatizados foram preparados para o fluxo principal; verificacao manual de repetibilidade e revisao da experiencia do brain ainda pendentes antes de fechar o tutorial como pronto.
 
 ## Ordem de implementacao

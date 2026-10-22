@@ -1,5 +1,7 @@
 # Tarefas: PRD 016 - Combate e checkpoint
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: comportamento automatizado, composicao reutilizavel de inimigos e deteccao frontal integrados ate 2026-09-14; aceite manual pendente.
 
 Melhorias de peso, leitura de ataques/dano/derrota e demonstracao de ataque inimigo foram implementadas automaticamente nas [tarefas 018](018-character-readability-and-combat-weight-tasks.md). O aceite manual desta PRD permanece aberto.

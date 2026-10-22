@@ -1,5 +1,7 @@
 # Tarefas: PRD 019 - Coleta do bastao e conclusao perceptiveis
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: 019-01 a 019-04 concluidas em 2026-09-16; usuario encerrou sua avaliacao manual em 2026-10-20. As caixas do roteiro 019-05 continuam abertas por falta de evidencia item a item.
 
 Fonte de verdade: [PRD 019](../prds/019-baton-pickup-and-mission-completion.md).

@@ -1,5 +1,7 @@
 # Fase 002: Entrada na campanha
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Escopo aprovado: selecao e preparacao, laboratorio, combate corpo a corpo e save. PRD 013 permanece concluida; aceite manual ampliado do MVP permanece nas listas anteriores.
 
 ## Entregas e ordem

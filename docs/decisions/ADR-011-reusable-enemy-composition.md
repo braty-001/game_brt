@@ -1,5 +1,7 @@
 # ADR 011: Composicao reutilizavel de inimigos
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Decisao
 
 Inimigos de combate serao compostos por contratos pequenos, sem depender do laboratorio que os instancia:

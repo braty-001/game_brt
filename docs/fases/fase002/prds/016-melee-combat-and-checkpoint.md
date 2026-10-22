@@ -1,5 +1,7 @@
 # PRD 016: Combate corpo a corpo e checkpoint didatico
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: comportamento automatizado, composicao reutilizavel de inimigos e deteccao frontal integrados ate 2026-09-14; aceite manual permanece pendente.
 
 A [PRD 018](018-character-readability-and-combat-weight.md) implementa animacoes, som, pausa de impacto, derrota legivel e encontros que demonstram ataque inimigo, com tarefas proprias. Numeros de combate e rota de 10 RAM permanecem preservados; aceite manual continua pendente.

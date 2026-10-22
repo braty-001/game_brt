@@ -1,5 +1,7 @@
 # PRD 020: Enquadramento do cerebro, contexto do mapa e sinal de perigo
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: implementacao e validacao automatizada concluidas em 2026-10-20; calibracao perceptiva e aceite manual CA-06 pendentes. O usuario aprovou os gatilhos do editor, o contorno do mapa, o efeito ao Buneko ver inimigo, o fator/duracao iniciais e o afastamento do primeiro inimigo. Autorizou validacao grafica local desta entrega.
 
 Tarefas: [020-editor-zoom-map-context-and-combat-cue-tasks.md](../tasks/020-editor-zoom-map-context-and-combat-cue-tasks.md).

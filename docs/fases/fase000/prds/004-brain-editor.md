@@ -1,5 +1,7 @@
 # PRD 004: Editor de Cerebro
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Permitir que o jogador crie e revise visualmente o programa do Buneko por meio de blocos conectados por linhas.

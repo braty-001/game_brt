@@ -1,5 +1,7 @@
 # Tarefas: PRD 000 - MVP Tutorial
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementacao funcional concluida; refinamento visual, validacao manual e revisao da experiencia do brain editor em andamento.
 
 ## Fundacao

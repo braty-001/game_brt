@@ -1,5 +1,7 @@
 # PRD 010: Fundacao Reativa do Editor de Cerebro
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Reestruturar o editor de cerebro para que o programa seja a unica fonte de verdade e toda a interface reaja de forma consistente a insercao, conexao, movimento e remocao de blocos.

@@ -1,5 +1,7 @@
 # PRD 011: Linguagem Visual do Cerebro e Pseudocodigo
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Transformar o cerebro em uma linguagem visual mais legivel e expressiva, preservando a liberdade de arrastar blocos e introduzindo um canvas navegavel, insercao por gaveta lateral, formas distintas de controle e uma visualizacao opcional de pseudocodigo.

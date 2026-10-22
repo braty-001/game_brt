@@ -1,5 +1,7 @@
 # Tarefas: PRD 011 - Linguagem Visual do Cerebro e Pseudocodigo
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementacao e validacao automatizada concluidas. Depende apenas do roteiro manual compartilhado com a PRD 010.
 
 A PRD 012 estabiliza as fronteiras internas antes da continuidade do produto, sem alterar a linguagem visual definida aqui.

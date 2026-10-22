@@ -1,5 +1,7 @@
 # ADR 013: Apresentacao do corpo proprio e tempo de impacto
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: implementada automaticamente em 2026-09-14; aceite manual da apresentacao ainda pendente.
 
 ## Contexto

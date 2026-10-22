@@ -1,5 +1,7 @@
 # Tarefas: PRD 007 - Buneko Simples e Logica Visual Legivel
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: implementacao e validacao automatizada concluidas. `PATH_CLEAR_AHEAD`, exemplos de `IF`/`WHILE`, seletor do editor e Buneko 2D simples estao integrados; falta validacao manual de layout, leitura do personagem e revisao qualitativa do brain antes de fechar a PRD.
 
 ## Ordem de implementacao

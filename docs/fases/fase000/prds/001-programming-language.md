@@ -1,5 +1,7 @@
 # PRD 001: Linguagem de Programacao por Blocos
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Definir a linguagem visual minima que permite ao jogador descrever o comportamento autonomo do Buneko dentro de 5 RAM.

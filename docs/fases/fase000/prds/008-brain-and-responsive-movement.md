@@ -1,5 +1,7 @@
 # PRD 008: Brain e Movimento Responsivo
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Ajustar a relacao entre o brain programado pelo jogador e o movimento fisico do Buneko para que cada bloco produza uma resposta corporal clara, previsivel e gostosa de observar. O jogador deve sentir que o Buneko esta obedecendo ao programa em tempo real, nao que a fase esta executando uma simulacao opaca.

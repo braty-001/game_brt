@@ -1,5 +1,7 @@
 # Tarefas: PRD 004 - Editor de Cerebro
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: concluido para o MVP funcional. Polimento visual e refinamentos de UX podem ser feitos depois sem bloquear a PRD 005.
 
 ## Ordem de implementacao

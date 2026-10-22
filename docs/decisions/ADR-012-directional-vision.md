@@ -1,5 +1,7 @@
 # ADR 012: Visao frontal direcional compartilhada
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Decisao
 
 A visao de Bunekos usa um cone frontal de 120 graus, com alcance de 240 unidades e meio angulo de 60 graus em torno da direcao atual do observador.

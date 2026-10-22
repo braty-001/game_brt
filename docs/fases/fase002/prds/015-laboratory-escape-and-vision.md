@@ -1,5 +1,7 @@
 # PRD 015: Fuga do laboratorio e visao
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: percurso e cone frontal compartilhado por sensores/nevoa implementados e validados automaticamente em 2026-09-14; aceite manual permanece pendente.
 
 A [PRD 018](018-character-readability-and-combat-weight.md) mantem corpo/arma do jogador acima da neblina somente na apresentacao propria. A excecao foi implementada conforme ADR 013; cone, sensores e oclusao do mundo permanecem iguais. Aceite visual permanece pendente.

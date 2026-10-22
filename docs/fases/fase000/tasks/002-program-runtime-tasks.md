@@ -1,5 +1,7 @@
 # Tarefas: PRD 002 - Executor Continuo do Programa
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: concluido. A integracao com a fisica foi entregue pela PRD 003.
 
 Capacidade de RAM parametrizada e coberta adicionalmente na PRD 014, sem mudar fluxo nem guardas do executor.

@@ -1,5 +1,7 @@
 # ADR 009: Fronteiras de composicao do gameplay
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Decisao
 
 O dominio de programacao, o estado do editor, a sessao de tentativa e a apresentacao das cenas devem evoluir como responsabilidades separadas.

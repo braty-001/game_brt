@@ -1,5 +1,7 @@
 # Tarefas: PRD 015 - Laboratorio e visao
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status geral: percurso, cone frontal, combate/checkpoint e rota completa de 10 RAM validados automaticamente ate 2026-09-14. Aceite manual permanece pendente.
 
 A correcao de visibilidade do corpo/arma sob a neblina foi implementada nas [tarefas 018](018-character-readability-and-combat-weight-tasks.md), sem mudar os sensores desta PRD. O roteiro manual abaixo permanece aberto.

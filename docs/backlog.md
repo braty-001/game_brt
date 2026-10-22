@@ -1,5 +1,7 @@
 # Trabalho futuro
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Itens solicitados sem compromisso de data. Uma entrada neste backlog nao indica implementacao nem substitui a PRD e sua lista de tarefas.
 
 ## FUT-001 - Composicao livre e funcoes opcionais no cerebro

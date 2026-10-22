@@ -1,5 +1,7 @@
 # ADR 008: Ritmo de movimento e capacidades de locomocao
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Decisao
 
 O brain oferece um unico bloco `Andar` com os ritmos discretos `normal` e `rapido`. O ritmo e um parametro do bloco, nao consome RAM e representa a intencao do programa. A peca de locomocao define a capacidade fisica usada para atender essa intencao, como velocidade e desaceleracao.

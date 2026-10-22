@@ -1,5 +1,7 @@
 # PRD 007: Buneko Simples e Logica Visual Legivel
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Tornar a fantasia central do jogo mais simples de entender e mais coerente visualmente. O Buneko deve parecer um personagem 2D modular, simpatico e facil de reconhecer, enquanto `IF` e `WHILE` devem permitir programas intuitivos baseados no que o personagem percebe a frente.

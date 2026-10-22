@@ -1,5 +1,7 @@
 # PRD 013: Menu Inicial e Configuracoes de Tela
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 Status: concluida em 2026-09-04; validacoes automatizada e visual aprovadas.
 
 Evolucao: PRD 014 envolve este menu numa raiz de navegacao para conduzir tutorial e campanha. Esta PRD registra a entrega original de menu/configuracoes; a nova integracao e validada nas tarefas 014.

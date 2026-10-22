@@ -1,5 +1,7 @@
 # PRD 003: Buneko Basico, Montagem e Fisica
 
+> Fluxo de trabalho vigente: o [Godot MCP e obrigatorio](../../../godot-mcp.md) no desenvolvimento e na validacao assistidos por agentes. A regra complementa GUT e aceite manual e nao altera evidencias historicas deste documento.
+
 ## Objetivo
 
 Criar um unico Buneko montavel que responda ao programa em um mundo de plataforma 2D com fisica livre.
